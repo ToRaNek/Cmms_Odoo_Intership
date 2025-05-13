@@ -183,6 +183,11 @@ class Model3D(models.Model):
 
     def _save_model_file(self, record):
         try:
+            # Vérifier que model_filename est bien une chaîne
+            if not isinstance(record.model_filename, str):
+                _logger.warning(f"model_filename n'est pas une chaîne: {record.model_filename}, type: {type(record.model_filename)}")
+                record.model_filename = str(record.model_filename)  # Conversion en chaîne
+
             # Créer le dossier si nécessaire
             models_dir = os.path.normpath(os.path.join(MODELS_DIR, str(record.id)))
             os.makedirs(models_dir, exist_ok=True)
@@ -204,6 +209,11 @@ class Model3D(models.Model):
     def _convert_and_save_blend_file(self, record):
         """Convertit un fichier Blender en GLTF et le sauvegarde"""
         try:
+            # Vérifier que model_filename est bien une chaîne
+            if not isinstance(record.model_filename, str):
+                _logger.warning(f"model_filename n'est pas une chaîne: {record.model_filename}, type: {type(record.model_filename)}")
+                record.model_filename = str(record.model_filename)  # Conversion en chaîne
+
             # Sauvegarder le fichier Blender original
             models_dir = os.path.normpath(os.path.join(MODELS_DIR, str(record.id)))
             os.makedirs(models_dir, exist_ok=True)
@@ -278,19 +288,16 @@ class Model3D(models.Model):
             # Filtrer les erreurs ALSA
             alsa_filtered_errors = self._filter_alsa_errors(stderr)
 
-            # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
-            if process.returncode != 0 and "CONVERT_OK=1" not in stdout:
+            # CORRECTION: Vérifier uniquement le code de retour, pas le contenu des logs
+            if process.returncode != 0:
                 _logger.error(f"[BLENDER ERROR] Erreur lors de la conversion du fichier Blender:"
                               f"\n--Stderr Filtré--\n{alsa_filtered_errors}")
-                if "CONVERT_OK=1" in stdout:
-                    _logger.info("Conversion réussie malgré des avertissements")
-                else:
-                    raise ValidationError(
-                        f"Erreur conversion Blender! returncode={process.returncode}\n"
-                        f"stdout:\n{stdout}\n"
-                        f"stderr:\n{stderr}\n"
-                        f"stderr filtré:\n{alsa_filtered_errors}"
-                    )
+                raise ValidationError(
+                    f"Erreur conversion Blender! returncode={process.returncode}\n"
+                    f"stdout:\n{stdout}\n"
+                    f"stderr:\n{stderr}\n"
+                    f"stderr filtré:\n{alsa_filtered_errors}"
+                )
 
             # Extraire le chemin du fichier converti de la sortie
             converted_file = None
@@ -301,21 +308,10 @@ class Model3D(models.Model):
                 elif line.startswith('BINARY_FILE='):
                     binary_file = line.split('=', 1)[1].strip()
 
-            # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
-            if (not converted_file or not os.path.exists(converted_file)) and "CONVERT_OK=1" not in stdout:
-                if "CONVERT_OK=1" in stdout:
-                    # Si le signal de succès est présent mais qu'on n'a pas trouvé le fichier, on utilise un chemin prédictible
-                    converted_file = output_file
-                    if os.path.exists(converted_file):
-                        _logger.info(f"Fichier de sortie trouvé au chemin prédit: {converted_file}")
-                    else:
-                        raise ValidationError(
-                            f"Conversion paradoxale: Signal de succès reçu mais aucun fichier de sortie trouvé\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-                        )
-                else:
-                    raise ValidationError(
-                        f"Conversion échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-                    )
+            if not converted_file or not os.path.exists(converted_file):
+                raise ValidationError(
+                    f"Conversion échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
+                )
 
             # Lire le fichier GLTF converti
             with open(converted_file, 'rb') as f:
@@ -376,6 +372,11 @@ class Model3D(models.Model):
                     bin_filename = record.model_filename.replace('.gltf', '.bin')
                 else:
                     bin_filename = 'model.bin'
+
+            # Vérifier que bin_filename est bien une chaîne
+            if not isinstance(bin_filename, str):
+                _logger.warning(f"bin_filename n'est pas une chaîne: {bin_filename}, type: {type(bin_filename)}")
+                bin_filename = str(bin_filename)  # Conversion en chaîne
 
             # Save the binary file
             file_path = os.path.normpath(os.path.join(models_dir, bin_filename))
@@ -459,14 +460,23 @@ class Model3D(models.Model):
 
                     # Extract all files with explicit paths
                     for file in file_list:
+                        # Vérifier que file est une chaîne de caractères (et non un booléen ou autre)
+                        if not isinstance(file, str):
+                            _logger.warning(f"Élément non-chaîne dans la liste des fichiers: {file}, type: {type(file)}")
+                            continue  # Ignorer les éléments non-chaînes
+
                         _logger.info(f"Extraction du fichier: {file}")
                         # Extraire en gérant les séparateurs de chemin
                         extract_path = os.path.normpath(os.path.join(models_dir, file))
                         # S'assurer que le dossier parent existe
                         os.makedirs(os.path.dirname(extract_path), exist_ok=True)
-                        # Extraction du fichier
-                        with zip_ref.open(file) as source, open(extract_path, 'wb') as target:
-                            target.write(source.read())
+                        # Extraction du fichier avec gestion des erreurs
+                        try:
+                            with zip_ref.open(file) as source, open(extract_path, 'wb') as target:
+                                target.write(source.read())
+                        except Exception as e:
+                            _logger.error(f"Erreur lors de l'extraction du fichier {file}: {str(e)}")
+                            # Continuer avec les autres fichiers au lieu d'échouer complètement
 
                     # Vérifier si les fichiers ont été extraits
                     main_file_path = os.path.normpath(os.path.join(models_dir, main_file))
@@ -538,18 +548,15 @@ class Model3D(models.Model):
                         # Filtrer les erreurs ALSA
                         alsa_filtered_errors = self._filter_alsa_errors(stderr)
 
-                        # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
-                        if process.returncode != 0 and "CONVERT_OK=1" not in stdout:
+                        # CORRECTION: Vérifier uniquement le code de retour, pas le contenu des logs
+                        if process.returncode != 0:
                             _logger.error(f"[BLENDER ZIP ERROR] Erreur lors de la conversion: {alsa_filtered_errors}")
-                            if "CONVERT_OK=1" in stdout:
-                                _logger.info("Conversion réussie malgré des avertissements")
-                            else:
-                                raise ValidationError(
-                                    f"Erreur conversion Blender (ZIP)! returncode={process.returncode}\n"
-                                    f"stdout:\n{stdout}\n"
-                                    f"stderr:\n{stderr}\n"
-                                    f"stderr filtré:\n{alsa_filtered_errors}"
-                                )
+                            raise ValidationError(
+                                f"Erreur conversion Blender (ZIP)! returncode={process.returncode}\n"
+                                f"stdout:\n{stdout}\n"
+                                f"stderr:\n{stderr}\n"
+                                f"stderr filtré:\n{alsa_filtered_errors}"
+                            )
 
                         # Analyse de la sortie pour vrais chemins générés
                         converted_file = None
@@ -561,10 +568,8 @@ class Model3D(models.Model):
                                 binary_file = line.split('=', 1)[1].strip()
 
                         # Sécurité: fallback si pas renvoyé
-                        # MODIFICATION: Ne prendre le fallback que si CONVERTED_FILE= n'est pas trouvé
-                        if not converted_file and "CONVERTED_FILE=" not in stdout:
+                        if not converted_file:
                             converted_file = output_file
-
                         if not os.path.exists(converted_file):
                             raise ValidationError(
                                 f"Conversion ZIP échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
@@ -602,6 +607,10 @@ class Model3D(models.Model):
                     additional_files = []
 
                     for file in file_list:
+                        # S'assurer que file est une chaîne
+                        if not isinstance(file, str):
+                            continue
+
                         # On ignore déjà pris comme main file
                         if file == main_file:
                             continue
@@ -618,6 +627,7 @@ class Model3D(models.Model):
                                     record.has_external_files = True
                         else:
                             other_files.append(file)
+                        # Ajouter seulement si c'est une chaîne
                         additional_files.append(os.path.basename(file))
 
                     # Si un .gltf: analyse références
@@ -628,7 +638,7 @@ class Model3D(models.Model):
                     record.files_list = json.dumps(additional_files)
                     record.has_external_files = bool(additional_files)
 
-                    _logger.info(f"Archive ZIP extraite: {record.model_zip_filename}, {len(file_list)} fichiers")
+                    _logger.info(f"Archive ZIP extraite: {record.model_zip_filename or 'sans nom'}, {len(file_list)} fichiers")
                     _logger.info(f"Textures trouvées: {len(texture_files)}, Fichiers binaires: {len(bin_files)}, Autres: {len(other_files)}")
 
                     return True
@@ -646,6 +656,11 @@ class Model3D(models.Model):
     def _analyze_gltf_references(self, record, gltf_path):
         """Analyze a GLTF file to find referenced external files"""
         try:
+            # Vérifier que gltf_path est bien une chaîne
+            if not isinstance(gltf_path, str):
+                _logger.warning(f"gltf_path n'est pas une chaîne: {gltf_path}, type: {type(gltf_path)}")
+                gltf_path = str(gltf_path)  # Conversion en chaîne
+
             # Read and parse the GLTF file
             with open(gltf_path, 'r') as f:
                 gltf_data = json.load(f)
