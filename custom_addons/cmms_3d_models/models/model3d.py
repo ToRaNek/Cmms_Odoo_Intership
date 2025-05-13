@@ -278,15 +278,19 @@ class Model3D(models.Model):
             # Filtrer les erreurs ALSA
             alsa_filtered_errors = self._filter_alsa_errors(stderr)
 
-            if process.returncode != 0 or alsa_filtered_errors.strip() != "":
+            # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
+            if process.returncode != 0 and "CONVERT_OK=1" not in stdout:
                 _logger.error(f"[BLENDER ERROR] Erreur lors de la conversion du fichier Blender:"
                               f"\n--Stderr Filtré--\n{alsa_filtered_errors}")
-                raise ValidationError(
-                    f"Erreur conversion Blender! returncode={process.returncode}\n"
-                    f"stdout:\n{stdout}\n"
-                    f"stderr:\n{stderr}\n"
-                    f"stderr filtré:\n{alsa_filtered_errors}"
-                )
+                if "CONVERT_OK=1" in stdout:
+                    _logger.info("Conversion réussie malgré des avertissements")
+                else:
+                    raise ValidationError(
+                        f"Erreur conversion Blender! returncode={process.returncode}\n"
+                        f"stdout:\n{stdout}\n"
+                        f"stderr:\n{stderr}\n"
+                        f"stderr filtré:\n{alsa_filtered_errors}"
+                    )
 
             # Extraire le chemin du fichier converti de la sortie
             converted_file = None
@@ -297,10 +301,21 @@ class Model3D(models.Model):
                 elif line.startswith('BINARY_FILE='):
                     binary_file = line.split('=', 1)[1].strip()
 
-            if not converted_file or not os.path.exists(converted_file):
-                raise ValidationError(
-                    f"Conversion échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
-                )
+            # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
+            if (not converted_file or not os.path.exists(converted_file)) and "CONVERT_OK=1" not in stdout:
+                if "CONVERT_OK=1" in stdout:
+                    # Si le signal de succès est présent mais qu'on n'a pas trouvé le fichier, on utilise un chemin prédictible
+                    converted_file = output_file
+                    if os.path.exists(converted_file):
+                        _logger.info(f"Fichier de sortie trouvé au chemin prédit: {converted_file}")
+                    else:
+                        raise ValidationError(
+                            f"Conversion paradoxale: Signal de succès reçu mais aucun fichier de sortie trouvé\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
+                        )
+                else:
+                    raise ValidationError(
+                        f"Conversion échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
+                    )
 
             # Lire le fichier GLTF converti
             with open(converted_file, 'rb') as f:
@@ -523,14 +538,18 @@ class Model3D(models.Model):
                         # Filtrer les erreurs ALSA
                         alsa_filtered_errors = self._filter_alsa_errors(stderr)
 
-                        if process.returncode != 0 or alsa_filtered_errors.strip() != "":
+                        # MODIFICATION: Vérifier "CONVERT_OK=1" dans la sortie pour déterminer le succès
+                        if process.returncode != 0 and "CONVERT_OK=1" not in stdout:
                             _logger.error(f"[BLENDER ZIP ERROR] Erreur lors de la conversion: {alsa_filtered_errors}")
-                            raise ValidationError(
-                                f"Erreur conversion Blender (ZIP)! returncode={process.returncode}\n"
-                                f"stdout:\n{stdout}\n"
-                                f"stderr:\n{stderr}\n"
-                                f"stderr filtré:\n{alsa_filtered_errors}"
-                            )
+                            if "CONVERT_OK=1" in stdout:
+                                _logger.info("Conversion réussie malgré des avertissements")
+                            else:
+                                raise ValidationError(
+                                    f"Erreur conversion Blender (ZIP)! returncode={process.returncode}\n"
+                                    f"stdout:\n{stdout}\n"
+                                    f"stderr:\n{stderr}\n"
+                                    f"stderr filtré:\n{alsa_filtered_errors}"
+                                )
 
                         # Analyse de la sortie pour vrais chemins générés
                         converted_file = None
@@ -542,8 +561,10 @@ class Model3D(models.Model):
                                 binary_file = line.split('=', 1)[1].strip()
 
                         # Sécurité: fallback si pas renvoyé
-                        if not converted_file:
+                        # MODIFICATION: Ne prendre le fallback que si CONVERTED_FILE= n'est pas trouvé
+                        if not converted_file and "CONVERTED_FILE=" not in stdout:
                             converted_file = output_file
+
                         if not os.path.exists(converted_file):
                             raise ValidationError(
                                 f"Conversion ZIP échouée: Aucun fichier de sortie {converted_file}\nSIGNAUX STDOUT:\n{stdout}\nSTDERR:\n{stderr}"
