@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_cmms_model3d_form" model="ir.ui.view">
+        <field name="name">cmms.model3d.form</field>
+        <field name="model">cmms.model3d</field>
+        <field name="arch" type="xml">
+            <form string="Modèle 3D">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button name="action_view_3d" type="object" class="oe_stat_button" icon="fa-cube"
+                                attrs="{'invisible': [('model_url', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Visualiser</span>
+                                <span class="o_stat_text">Modèle 3D</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="thumbnail" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du modèle"/>
+                        </h1>
+                    </div>
+
+                    <notebook>
+                        <page string="Fichiers du modèle 3D">
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>Instructions pour l'importation de modèles 3D:</strong></p>
+                                <ul>
+                                    <li>Pour les modèles Blender: téléchargez directement le fichier .blend, il sera automatiquement converti en GLB.</li>
+                                    <li>Pour les modèles simples (GLB): téléchargez directement le fichier GLB.</li>
+                                    <li>Pour les modèles avec textures/ressources externes (glTF):
+                                        <ul>
+                                            <li>Option 1: Téléchargez le fichier principal glTF et son fichier binaire (.bin) séparément</li>
+                                            <li>Option 2 (recommandée): Créez une archive ZIP contenant tous les fichiers du modèle et téléchargez-la</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <p><strong>Note:</strong> Ces fichiers sont utilisés pour la visualisation 3D des équipements de maintenance.</p>
+                            </div>
+
+                            <group>
+                                <group string="Fichier principal">
+                                    <field name="model_file" filename="model_filename"/>
+                                    <field name="model_filename" invisible="1"/>
+                                    <field name="model_format"/>
+                                    <field name="model_url" widget="url"/>
+                                    <field name="is_converted_from_blend" invisible="1"/>
+                                </group>
+                                <group string="Fichiers supplémentaires">
+                                    <field name="model_bin" filename="model_bin_filename"
+                                           help="Pour les modèles glTF, téléchargez le fichier binaire (.bin) correspondant"/>
+                                    <field name="model_bin_filename" invisible="1"/>
+                                    <field name="model_zip" filename="model_zip_filename"
+                                           help="Téléchargez une archive ZIP contenant le fichier principal (glTF/GLB/Blend) et tous les fichiers associés (textures .png/.jpg, binaires .bin)"/>
+                                    <field name="model_zip_filename" invisible="1"/>
+                                </group>
+                            </group>
+
+                            <group>
+                                <field name="has_external_files" readonly="1"/>
+                                <field name="files_list" attrs="{'invisible': [('has_external_files', '=', False)]}" widget="text"/>
+                            </group>
+
+                            <group attrs="{'invisible': [('is_converted_from_blend', '=', False)]}">
+                                <field name="source_blend_filename" readonly="1" string="Fichier Blender d'origine"/>
+                            </group>
+
+                            <group string="Paramètres d'affichage">
+                                <field name="scale"/>
+                                <label for="position_x" string="Position"/>
+                                <div>
+                                    <field name="position_x" class="oe_inline"/> X,
+                                    <field name="position_y" class="oe_inline"/> Y,
+                                    <field name="position_z" class="oe_inline"/> Z
+                                </div>
+                                <label for="rotation_x" string="Rotation"/>
+                                <div>
+                                    <field name="rotation_x" class="oe_inline"/> X,
+                                    <field name="rotation_y" class="oe_inline"/> Y,
+                                    <field name="rotation_z" class="oe_inline"/> Z
+                                </div>
+                            </group>
+                        </page>
+
+                        <page string="Description">
+                            <field name="description" placeholder="Description du modèle..."/>
+                        </page>
+
+                        <page string="Équipements liés">
+                            <field name="equipment_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="serial_no"/>
+                                    <field name="category_id"/>
+                                    <field name="location"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_cmms_model3d_tree" model="ir.ui.view">
+        <field name="name">cmms.model3d.tree</field>
+        <field name="model">cmms.model3d</field>
+        <field name="arch" type="xml">
+            <tree string="Modèles 3D">
+                <field name="name"/>
+                <field name="model_format"/>
+                <field name="has_external_files"/>
+                <field name="is_converted_from_blend"/>
+                <field name="scale"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_cmms_model3d_search" model="ir.ui.view">
+        <field name="name">cmms.model3d.search</field>
+        <field name="model">cmms.model3d</field>
+        <field name="arch" type="xml">
+            <search string="Modèles 3D">
+                <field name="name"/>
+                <field name="model_format"/>
+                <filter string="Avec fichiers externes" name="has_external" domain="[('has_external_files', '=', True)]"/>
+                <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
+                <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_cmms_model3d" model="ir.actions.act_window">
+        <field name="name">Modèles 3D</field>
+        <field name="res_model">cmms.model3d</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cmms_model3d_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier modèle 3D
+            </p>
+            <p>
+                Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_cmms_model3d"
+              name="Modèles 3D"
+              parent="maintenance.menu_maintenance_configuration"
+              action="action_cmms_model3d"
+              sequence="30"/>
+</odoo>

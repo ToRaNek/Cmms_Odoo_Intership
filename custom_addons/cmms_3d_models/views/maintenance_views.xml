@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Equipment Form View -->
+    <record id="hr_equipment_view_form_inherit_3d" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.inherit.3d</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_3d" type="object" class="oe_stat_button" icon="fa-cube"
+                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Visualiser</span>
+                        <span class="o_stat_text">Modèle 3D</span>
+                    </div>
+                </button>
+            </xpath>
+            <notebook position="inside">
+                <page string="Modèle 3D" name="3d_model_page">
+                    <group>
+                        <div class="alert alert-info" role="alert" attrs="{'invisible': [('model3d_id', '!=', False)]}">
+                            <p><strong>Visualisation 3D des équipements</strong></p>
+                            <p>Associez un modèle 3D à cet équipement pour permettre sa visualisation en 3D.
+                                Les modèles 3D doivent être créés au préalable dans le menu
+                                <i>Maintenance > Configuration > Modèles 3D</i>.</p>
+                            <p>Formats supportés: glTF/GLB exportés depuis Blender ou d'autres logiciels 3D.</p>
+                        </div>
+                        <group string="Modèle 3D">
+                            <field name="model3d_id" options="{'no_create': True}"
+                                   help="Sélectionnez un modèle 3D pour cet équipement"/>
+                            <field name="has_3d_model" invisible="1"/>
+                        </group>
+                        <group string="Paramètres d'affichage 3D" attrs="{'invisible': [('model3d_id', '=', False)]}">
+                            <field name="model3d_scale"/>
+                            <label for="model3d_position_x" string="Position"/>
+                            <div>
+                                <field name="model3d_position_x" class="oe_inline"/> X,
+                                <field name="model3d_position_y" class="oe_inline"/> Y,
+                                <field name="model3d_position_z" class="oe_inline"/> Z
+                            </div>
+                            <label for="model3d_rotation_x" string="Rotation"/>
+                            <div>
+                                <field name="model3d_rotation_x" class="oe_inline"/> X,
+                                <field name="model3d_rotation_y" class="oe_inline"/> Y,
+                                <field name="model3d_rotation_z" class="oe_inline"/> Z
+                            </div>
+                        </group>
+                    </group>
+                    <field name="model3d_id" invisible="1"/>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Add model3d_id to Equipment Tree View -->
+    <record id="hr_equipment_view_tree_inherit_3d" model="ir.ui.view">
+        <field name="name">maintenance.equipment.tree.inherit.3d</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="has_3d_model" widget="boolean_icon"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Add model3d_id to Equipment Search View -->
+    <record id="hr_equipment_view_search_inherit_3d" model="ir.ui.view">
+        <field name="name">maintenance.equipment.search.inherit.3d</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='assigned']" position="after">
+                <filter string="Avec modèle 3D" name="has_3d_model" domain="[('has_3d_model', '=', True)]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Modèle 3D" name="group_by_model3d" context="{'group_by': 'model3d_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,5 @@
+.venv/
+odoo/
+models/*/*
+.idea/
+.qodo/
