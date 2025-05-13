@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- model3d_views.xml -->
+<!-- Modifications à apporter à custom_addons/cmms_3d_models/views/model3d_views.xml -->
 <odoo>
     <!-- Form View -->
     <record id="view_cmms_model3d_form" model="ir.ui.view">
@@ -18,7 +20,35 @@
                                 <span class="o_stat_text">Modèle 3D</span>
                             </div>
                         </button>
+                        <button name="action_view_3d_with_children" type="object"
+                                class="oe_stat_button" icon="fa-cubes"
+                                attrs="{'invisible': [('child_ids', '=', [])]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Voir hiérarchie</span>
+                                <span class="o_stat_text">complète</span>
+                            </div>
+                        </button>
+                        <button name="action_view_submodels" type="object"
+                                class="oe_stat_button" icon="fa-sitemap"
+                                attrs="{'invisible': [('child_ids', '=', [])]}">
+                            <field name="child_count" string="Sous-modèles" widget="statinfo"/>
+                        </button>
+                        <!-- Nouveau bouton pour l'équipement auto-créé -->
+                        <button type="object" name="action_view_auto_equipment"
+                                class="oe_stat_button" icon="fa-wrench"
+                                attrs="{'invisible': [('auto_equipment_id', '=', False)]}">
+                            <field string="Équipement" name="auto_equipment_id" widget="statinfo"/>
+                        </button>
                     </div>
+
+                    <!-- Indiquer si c'est un sous-modèle -->
+                    <div class="alert alert-info" role="alert"
+                         attrs="{'invisible': [('is_submodel', '=', False)]}">
+                        <p><strong>Ce modèle est un sous-modèle de: </strong>
+                            <field name="parent_id" readonly="1" class="oe_inline"/>
+                        </p>
+                    </div>
+
                     <field name="thumbnail" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <h1>
@@ -70,6 +100,13 @@
                                 <field name="source_blend_filename" readonly="1" string="Fichier Blender d'origine"/>
                             </group>
 
+                            <!-- Nouvelle option pour la création automatique d'équipements -->
+                            <group string="Options d'importation">
+                                <field name="auto_create_equipment"
+                                       help="Créer automatiquement des équipements de maintenance liés aux modèles 3D importés"/>
+                                <field name="auto_equipment_id" invisible="1"/>
+                            </group>
+
                             <group string="Paramètres d'affichage">
                                 <field name="scale"/>
                                 <label for="position_x" string="Position"/>
@@ -89,6 +126,27 @@
 
                         <page string="Description">
                             <field name="description" placeholder="Description du modèle..."/>
+                        </page>
+
+                        <page string="Hiérarchie de modèles" name="hierarchy_page">
+                            <group>
+                                <field name="parent_id" domain="[('id', '!=', active_id)]"/>
+                                <field name="is_submodel" invisible="1"/>
+                                <field name="complete_name" invisible="1"/>
+                            </group>
+
+                            <field name="child_ids" mode="tree">
+                                <tree string="Sous-modèles">
+                                    <field name="name"/>
+                                    <field name="model_format"/>
+                                    <field name="has_external_files"/>
+                                    <field name="is_converted_from_blend"/>
+                                    <field name="auto_equipment_id"/>
+                                    <field name="active"/>
+                                    <button name="action_view_3d" type="object"
+                                            string="Voir en 3D" class="btn-primary"/>
+                                </tree>
+                            </field>
                         </page>
 
                         <page string="Équipements liés">
@@ -113,12 +171,16 @@
         <field name="model">cmms.model3d</field>
         <field name="arch" type="xml">
             <tree string="Modèles 3D">
+                <!-- Utiliser name au lieu de complete_name -->
                 <field name="name"/>
+                <field name="parent_id"/>
                 <field name="model_format"/>
                 <field name="has_external_files"/>
-                <field name="is_converted_from_blend"/>
-                <field name="scale"/>
+                <field name="is_submodel"/>
+                <field name="auto_equipment_id"/>
                 <field name="active"/>
+                <button name="action_view_3d" type="object"
+                        string="Voir en 3D" class="btn-sm btn-primary"/>
             </tree>
         </field>
     </record>
@@ -130,37 +192,19 @@
         <field name="arch" type="xml">
             <search string="Modèles 3D">
                 <field name="name"/>
+                <!-- Pas de recherche sur complete_name -->
                 <field name="model_format"/>
                 <filter string="Avec fichiers externes" name="has_external" domain="[('has_external_files', '=', True)]"/>
                 <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
+                <filter string="Sous-modèles" name="submodels" domain="[('parent_id', '!=', False)]"/>
+                <filter string="Modèles principaux" name="main_models" domain="[('parent_id', '=', False)]"/>
+                <filter string="Avec équipement auto-créé" name="with_equipment" domain="[('auto_equipment_id', '!=', False)]"/>
                 <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
+                    <filter string="Modèle parent" name="group_by_parent" context="{'group_by': 'parent_id'}"/>
                 </group>
             </search>
         </field>
     </record>
-
-    <!-- Action -->
-    <record id="action_cmms_model3d" model="ir.actions.act_window">
-        <field name="name">Modèles 3D</field>
-        <field name="res_model">cmms.model3d</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="view_cmms_model3d_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Créer votre premier modèle 3D
-            </p>
-            <p>
-                Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
-            </p>
-        </field>
-    </record>
-
-    <!-- Menu -->
-    <menuitem id="menu_cmms_model3d"
-              name="Modèles 3D"
-              parent="maintenance.menu_maintenance_configuration"
-              action="action_cmms_model3d"
-              sequence="30"/>
 </odoo>

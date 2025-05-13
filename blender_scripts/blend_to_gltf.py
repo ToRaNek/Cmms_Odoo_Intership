@@ -271,5 +271,59 @@ def main():
             logger.error(f"Erreur lors de la conversion: {str(e)}")
             sys.exit(1)
 
+
+
+def collect_equipment_metadata(scene):
+    equipment_data = {}
+
+    # Parcourir tous les objets de la scène
+    for i, obj in enumerate(scene.objects):
+        # Vérifier si l'objet a des propriétés personnalisées (custom properties)
+        if obj and hasattr(obj, 'keys'):
+            node_data = {}
+            # Chercher des propriétés pour l'équipement
+            for key in obj.keys():
+                # Filtrer uniquement les propriétés commençant par 'equipment_'
+                if key.startswith('equipment_') or key in ['serial_no', 'category_id', 'location']:
+                    node_data[key.replace('equipment_', '')] = obj[key]
+
+            # Si l'objet a un nom, l'utiliser comme nom d'équipement par défaut
+            if obj.name and 'name' not in node_data:
+                node_data['equipment_name'] = obj.name
+
+            # Ajouter une description basée sur l'objet
+            if 'description' not in node_data:
+                node_data['description'] = f"Équipement créé à partir de l'objet {obj.name} dans Blender"
+
+            # Si des métadonnées ont été trouvées, les ajouter
+            if node_data:
+                equipment_data[str(i)] = node_data
+
+    return equipment_data
+
+def add_equipment_metadata_to_gltf(gltf_data, scene):
+    """
+    Ajoute les métadonnées d'équipement au fichier GLTF
+    """
+    # Collecter les métadonnées
+    equipment_data = collect_equipment_metadata(scene)
+
+    # Si des métadonnées ont été trouvées, les ajouter au GLTF
+    if equipment_data:
+        # Initialiser les extensions si elles n'existent pas
+        if 'extensions' not in gltf_data:
+            gltf_data['extensions'] = {}
+
+        # Ajouter l'extension CMMS_equipment_data
+        gltf_data['extensions']['CMMS_equipment_data'] = equipment_data
+
+        # Ajouter l'extension utilisée à extensionsUsed si elle n'existe pas déjà
+        if 'extensionsUsed' not in gltf_data:
+            gltf_data['extensionsUsed'] = ['CMMS_equipment_data']
+        elif 'CMMS_equipment_data' not in gltf_data['extensionsUsed']:
+            gltf_data['extensionsUsed'].append('CMMS_equipment_data')
+
+    return gltf_data
+
 if __name__ == "__main__":
     main()

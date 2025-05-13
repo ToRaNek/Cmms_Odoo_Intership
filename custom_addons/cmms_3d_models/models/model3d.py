@@ -21,6 +21,8 @@ BLENDER_EXE = r"C:\Program Files\Blender Foundation\Blender 4.4\blender.exe"
 class Model3D(models.Model):
     _name = 'cmms.model3d'
     _description = '3D Model'
+    # Suppression de toutes les options qui nécessitent des colonnes spéciales en base
+    # _rec_name = 'complete_name'  # On utilise le champ 'name' par défaut
 
     name = fields.Char('Name', required=True)
     description = fields.Text('Description')
@@ -72,6 +74,34 @@ class Model3D(models.Model):
     rotation_x = fields.Float('Rotation X', default=0.0)
     rotation_y = fields.Float('Rotation Y', default=0.0)
     rotation_z = fields.Float('Rotation Z', default=0.0)
+
+    # Relation hiérarchique parent-enfant
+    parent_id = fields.Many2one('cmms.model3d', string='Modèle parent',
+                               ondelete='cascade', index=True)
+    child_ids = fields.One2many('cmms.model3d', 'parent_id', string='Sous-modèles')
+    is_submodel = fields.Boolean(compute='_compute_is_submodel', store=False,
+                                string='Est un sous-modèle')
+    complete_name = fields.Char('Nom complet', compute='_compute_complete_name',
+                              store=False)  # Ne pas stocker ce champ
+    child_count = fields.Integer(compute='_compute_child_count', string='Nombre de sous-modèles')
+
+    @api.depends('child_ids')
+    def _compute_child_count(self):
+        for record in self:
+            record.child_count = len(record.child_ids)
+
+    @api.depends('parent_id')
+    def _compute_is_submodel(self):
+        for record in self:
+            record.is_submodel = bool(record.parent_id)
+
+    @api.depends('name', 'parent_id.complete_name')
+    def _compute_complete_name(self):
+        for record in self:
+            if record.parent_id:
+                record.complete_name = '%s / %s' % (record.parent_id.complete_name, record.name)
+            else:
+                record.complete_name = record.name
 
     def _filter_alsa_errors(self, stderr):
         """Enlève le bruit ALSA/ALSA lib du stderr, retourne erreurs restantes."""
@@ -353,6 +383,35 @@ class Model3D(models.Model):
                     file_list.append(bin_filename)
                     record.files_list = json.dumps(file_list)
 
+            # Analyser le fichier GLTF pour en extraire la hiérarchie
+            try:
+                # Vérifier si le fichier GLTF a une structure hiérarchique
+                with open(converted_file, 'r') as f:
+                    gltf_data = json.load(f)
+
+                # Vérifier s'il y a des nodes avec des enfants dans le GLTF
+                if 'nodes' in gltf_data:
+                    has_hierarchy = False
+                    for node in gltf_data['nodes']:
+                        if 'children' in node:
+                            has_hierarchy = True
+                            break
+
+                    if has_hierarchy:
+                        _logger.info(f"Le fichier GLTF contient une hiérarchie, création des sous-modèles...")
+
+                        # Créer un modèle parent pour la hiérarchie si nécessaire
+                        parent_id = record.id
+
+                        # Importer la hiérarchie
+                        self.import_hierarchy_from_gltf(gltf_data, parent_id)
+
+                        _logger.info(f"Hiérarchie importée avec succès")
+            except Exception as e:
+                _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF: {str(e)}")
+                # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
+                # juste logger l'erreur
+
             return True
         except Exception as e:
             _logger.error(f"[DEBUG][PYTHON] Erreur lors de la conversion du fichier Blender (catch python): {str(e)}")
@@ -592,6 +651,35 @@ class Model3D(models.Model):
                         # Remet main_file_path sur le .gltf réel
                         main_file = os.path.basename(converted_file)
                         main_file_path = converted_file
+
+                        # Analyser le fichier GLTF pour en extraire la hiérarchie
+                        try:
+                            # Vérifier si le fichier GLTF a une structure hiérarchique
+                            with open(converted_file, 'r') as f:
+                                gltf_data = json.load(f)
+
+                            # Vérifier s'il y a des nodes avec des enfants dans le GLTF
+                            if 'nodes' in gltf_data:
+                                has_hierarchy = False
+                                for node in gltf_data['nodes']:
+                                    if 'children' in node:
+                                        has_hierarchy = True
+                                        break
+
+                                if has_hierarchy:
+                                    _logger.info(f"Le fichier GLTF contient une hiérarchie, création des sous-modèles...")
+
+                                    # Créer un modèle parent pour la hiérarchie si nécessaire
+                                    parent_id = record.id
+
+                                    # Importer la hiérarchie
+                                    self.import_hierarchy_from_gltf(gltf_data, parent_id)
+
+                                    _logger.info(f"Hiérarchie importée avec succès")
+                        except Exception as e:
+                            _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF (ZIP): {str(e)}")
+                            # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
+                            # juste logger l'erreur
                     else:
                         # Pour les zip contenant gltf ou glb directement
                         record.model_format = 'gltf' if main_file.endswith('.gltf') else 'glb'
@@ -599,6 +687,33 @@ class Model3D(models.Model):
                         with open(main_file_path, 'rb') as f:
                             record.model_file = base64.b64encode(f.read())
                         record.model_filename = os.path.basename(main_file)
+
+                        # Si c'est un fichier GLTF, analyser sa hiérarchie
+                        if main_file.endswith('.gltf'):
+                            try:
+                                with open(main_file_path, 'r') as f:
+                                    gltf_data = json.load(f)
+
+                                # Vérifier s'il y a des nodes avec des enfants dans le GLTF
+                                if 'nodes' in gltf_data:
+                                    has_hierarchy = False
+                                    for node in gltf_data['nodes']:
+                                        if 'children' in node:
+                                            has_hierarchy = True
+                                            break
+
+                                    if has_hierarchy:
+                                        _logger.info(f"Le fichier GLTF ZIP contient une hiérarchie, création des sous-modèles...")
+
+                                        # Créer un modèle parent pour la hiérarchie si nécessaire
+                                        parent_id = record.id
+
+                                        # Importer la hiérarchie
+                                        self.import_hierarchy_from_gltf(gltf_data, parent_id)
+
+                                        _logger.info(f"Hiérarchie importée avec succès depuis ZIP")
+                            except Exception as e:
+                                _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF depuis ZIP: {str(e)}")
 
                     # Check et ajoute les bin/textures/autres, MAJ files_list
                     texture_files = []
@@ -714,11 +829,98 @@ class Model3D(models.Model):
             'model_format': format,
         })
 
-    def action_view_3d(self):
+    def action_view_3d(self, include_children=False):
         """Affiche le modèle 3D dans le visualiseur"""
         self.ensure_one()
+        base_url = self.viewer_url
+
+        if include_children and self.child_ids:
+            # Ajouter un paramètre pour indiquer d'inclure les enfants
+            base_url += "?include_children=1"
+
         return {
             'type': 'ir.actions.act_url',
-            'url': self.viewer_url,
+            'url': base_url,
             'target': 'new',
         }
+
+    def action_view_3d_with_children(self):
+        """Affiche le modèle 3D avec tous ses sous-modèles"""
+        return self.action_view_3d(include_children=True)
+
+    # Action pour voir les sous-modèles
+    def action_view_submodels(self):
+        """Affiche la liste des sous-modèles"""
+        self.ensure_one()
+        action = self.env.ref('cmms_3d_models.action_cmms_model3d').read()[0]
+        action['domain'] = [('parent_id', '=', self.id)]
+        action['context'] = {'default_parent_id': self.id}
+        return action
+
+    def import_hierarchy_from_gltf(self, gltf_data, parent_id=False):
+        """
+        Importe récursivement la hiérarchie d'un modèle GLTF
+        en créant les sous-modèles correspondants
+        """
+        nodes = gltf_data.get('nodes', [])
+        # Fonction récursive pour créer la hiérarchie
+        def create_node_hierarchy(node_index, parent_id=False):
+            node = nodes[node_index]
+            # Créer un nouveau modèle 3D pour ce nœud
+            name = node.get('name', f'Node_{node_index}')
+            model_values = {
+                'name': name,
+                'parent_id': parent_id,
+                'description': f'Sous-modèle importé depuis GLTF',
+                # Autres champs au besoin
+            }
+            new_model = self.create(model_values)
+
+            # Créer les enfants récursivement
+            if 'children' in node:
+                for child_index in node['children']:
+                    create_node_hierarchy(child_index, new_model.id)
+
+            return new_model.id
+
+        # Commencer à partir des nœuds de premier niveau
+        root_nodes = []
+        for i, node in enumerate(nodes):
+            # Si le nœud n'est pas référencé comme enfant, c'est un nœud racine
+            is_child = False
+            for other_node in nodes:
+                if 'children' in other_node and i in other_node['children']:
+                    is_child = True
+                    break
+            if not is_child:
+                root_nodes.append(i)
+
+        result_ids = []
+        for root_index in root_nodes:
+            result_ids.append(create_node_hierarchy(root_index, parent_id))
+
+        return result_ids
+
+        def action_view_auto_equipment(self):
+            """Affiche l'équipement auto-créé"""
+            self.ensure_one()
+            if not self.auto_equipment_id:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Aucun équipement'),
+                        'message': _("Ce modèle n'a pas d'équipement automatiquement créé."),
+                        'sticky': False,
+                        'type': 'warning',
+                    }
+                }
+
+            # Rediriger vers la vue formulaire de l'équipement
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'maintenance.equipment',
+                'res_id': self.auto_equipment_id.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }

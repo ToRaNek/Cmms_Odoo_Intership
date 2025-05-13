@@ -138,6 +138,62 @@ class CMMS3DController(http.Controller):
         if not model3d.exists():
             return request.not_found()
 
+        # Vérifier si on doit inclure les enfants
+        include_children = bool(kw.get('include_children'))
+
+        # Préparer les données pour tous les modèles à afficher
+        models_data = []
+
+        # Toujours inclure le modèle principal
+        models_data.append({
+            'id': model3d.id,
+            'name': model3d.name,
+            'url': model3d.model_url,
+            'scale': model3d.scale if model3d.scale is not None else 1.0,
+            'position': {
+                'x': model3d.position_x if model3d.position_x is not None else 0.0,
+                'y': model3d.position_y if model3d.position_y is not None else 0.0,
+                'z': model3d.position_z if model3d.position_z is not None else 0.0,
+            },
+            'rotation': {
+                'x': model3d.rotation_x if model3d.rotation_x is not None else 0.0,
+                'y': model3d.rotation_y if model3d.rotation_y is not None else 0.0,
+                'z': model3d.rotation_z if model3d.rotation_z is not None else 0.0,
+            },
+            'is_child': False,
+            'parent_id': model3d.parent_id.id if model3d.parent_id else False,
+        })
+
+        # Ajouter les sous-modèles si demandé
+        if include_children:
+            def add_children(parent):
+                for child in parent.child_ids:
+                    models_data.append({
+                        'id': child.id,
+                        'name': child.name,
+                        'url': child.model_url,
+                        'scale': child.scale if child.scale is not None else 1.0,
+                        'position': {
+                            'x': child.position_x if child.position_x is not None else 0.0,
+                            'y': child.position_y if child.position_y is not None else 0.0,
+                            'z': child.position_z if child.position_z is not None else 0.0,
+                        },
+                        'rotation': {
+                            'x': child.rotation_x if child.rotation_x is not None else 0.0,
+                            'y': child.rotation_y if child.rotation_y is not None else 0.0,
+                            'z': child.rotation_z if child.rotation_z is not None else 0.0,
+                        },
+                        'is_child': True,
+                        'parent_id': parent.id,
+                    })
+                    # Récursion pour les enfants des enfants
+                    add_children(child)
+
+            add_children(model3d)
+
+        # Passer les données des modèles au template
+        models_json = json.dumps(models_data)
+
         # Création d'une simple page HTML avec un visualiseur 3D utilisant les CDN officiels
         html = """
         <!DOCTYPE html>
@@ -219,14 +275,52 @@ class CMMS3DController(http.Controller):
                     background-color: rgba(0,0,0,0.5);
                     font-size: 14px;
                 }
+
+                /* Nouveau style pour le sélecteur de sous-modèles */
+                #submodelSelector {
+                    position: absolute;
+                    top: 50px;
+                    right: 20px;
+                    background: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    z-index: 100;
+                    max-width: 200px;
+                    overflow-y: auto;
+                    max-height: 80vh;
+                }
+                .submodel-item {
+                    padding: 5px;
+                    cursor: pointer;
+                    border-bottom: 1px solid rgba(255,255,255,0.2);
+                }
+                .submodel-item:hover {
+                    background: rgba(255,255,255,0.1);
+                }
+                .submodel-item.active {
+                    background: rgba(0,150,255,0.3);
+                    font-weight: bold;
+                }
+                .child-model {
+                    padding-left: 15px;
+                    font-size: 0.9em;
+                }
             </style>
         </head>
         <body>
             <div id="viewer"></div>
             <div id="info">
-                <b>CMMS 3D Viewer - %s</b><br>
+                <b>CMMS 3D Viewer - <span id="currentModelName">%s</span></b><br>
                 Cliquer et glisser pour faire pivoter | Molette pour zoomer | Clic droit pour déplacer
             </div>
+
+            <!-- Sélecteur de sous-modèles si on a des enfants -->
+            <div id="submodelSelector" style="%s">
+                <h4>Modèles</h4>
+                <div id="modelList"></div>
+            </div>
+
             <div id="loading">
                 <div id="spinner"></div>
                 <div id="progress">Chargement... 0%%</div>
@@ -249,53 +343,36 @@ class CMMS3DController(http.Controller):
             <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 
             <script>
-                // Configuration
-                const modelUrl = '%s';
-                const scaleValue = %f; // Valeur de l'échelle (nombre)
-                const position = { x: %f, y: %f, z: %f };
-                const rotation = { x: %f, y: %f, z: %f };
+                // Données des modèles
+                const modelsData = %s;
 
-                // Variables
-                let scene, camera, renderer, controls, model;
-                let hasExternalFiles = %s;
+                // Variables pour Three.js
+                let scene, camera, renderer, controls;
+                let loadedModels = {}; // Stocke les modèles chargés par ID
 
-                // File list (for debugging)
-                const filesList = %s;
-
-                // Ajouter des logs pour le débogage
-                console.log("Configuration de la visualisation 3D:");
-                console.log("- URL du modèle:", modelUrl);
-                console.log("- Échelle:", scaleValue);
-                console.log("- Position:", position);
-                console.log("- Rotation:", rotation);
-                console.log("- Fichiers externes:", hasExternalFiles ? "Oui" : "Non");
-
-                // Initialize the scene
+                // Initialiser la scène
                 init();
 
-                // Main initialization function
+                // Fonction d'initialisation principale
                 function init() {
-                    // Create the scene
+                    // Créer la scène
                     scene = new THREE.Scene();
                     scene.background = new THREE.Color(0xf0f0f0);
 
-                    // Setup camera
-                    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    // Setup caméra
+                    const container = document.getElementById('viewer');
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+                    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
                     camera.position.z = 5;
-
-                    /* Axes d'aide - DÉSACTIVÉS en production
-                    const axesHelper = new THREE.AxesHelper(5);
-                    scene.add(axesHelper);
-                    console.log("Axes d'aide ajoutés à la scène");
-                    */
 
                     // Setup renderer
                     try {
                         renderer = new THREE.WebGLRenderer({ antialias: true });
-                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        renderer.setSize(width, height);
                         renderer.setPixelRatio(window.devicePixelRatio);
                         renderer.outputColorSpace = THREE.SRGBColorSpace;
-                        document.getElementById('viewer').appendChild(renderer.domElement);
+                        container.appendChild(renderer.domElement);
                     } catch (e) {
                         showError("Erreur d'initialisation WebGL: " + e.message);
                         return;
@@ -311,7 +388,7 @@ class CMMS3DController(http.Controller):
                         return;
                     }
 
-                    // Add lights
+                    // Ajouter des lumières
                     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
                     scene.add(ambientLight);
 
@@ -323,191 +400,253 @@ class CMMS3DController(http.Controller):
                     directionalLight2.position.set(-1, -1, -1);
                     scene.add(directionalLight2);
 
-                    console.log("Éclairages configurés: lumière ambiante et 2 lumières directionnelles");
+                    // Charger les modèles
+                    if (modelsData.length > 0) {
+                        // Toujours charger le modèle principal en premier
+                        loadModel(modelsData[0], function() {
+                            // Après chargement du modèle principal, charger les sous-modèles si présents
+                            if (modelsData.length > 1) {
+                                for (let i = 1; i < modelsData.length; i++) {
+                                    loadModel(modelsData[i]);
+                                }
+                            }
+                        });
 
-                    /* Cube de test - DÉSACTIVÉ en production
-                    const geometry = new THREE.BoxGeometry(1, 1, 1);
-                    const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-                    const cube = new THREE.Mesh(geometry, material);
-                    scene.add(cube);
-                    console.log("Cube de test ajouté à la scène");
-                    */
+                        // Remplir le sélecteur de modèles
+                        populateModelSelector();
+                    }
 
-                    // Load the 3D model
-                    loadModel();
-
-                    // Handle window resize
-                    window.addEventListener('resize', onWindowResize);
-
-                    // Start animation loop
+                    // Animation
                     animate();
+
+                    // Gestion du redimensionnement
+                    window.addEventListener('resize', onWindowResize);
                 }
 
-                // Load 3D model function
-                function loadModel() {
-                    // Setup loader - utiliser le GLTFLoader du CDN
+                // Fonction pour charger un modèle
+                function loadModel(modelData, callback) {
                     const loader = new THREE.GLTFLoader();
 
-                    // Optional: Setup DRACO decoder for compressed models
+                    // Setup DRACO decoder for compressed models
                     if (typeof THREE.DRACOLoader !== 'undefined') {
                         const dracoLoader = new THREE.DRACOLoader();
                         dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
                         loader.setDRACOLoader(dracoLoader);
                     }
 
+                    // Ajouter un indicateur de chargement
+                    document.getElementById('loading').style.display = 'block';
+
                     // For GLTFLoader, the path is critical for finding textures
                     // All textures must be in the same directory as the main GLTF file
-                    const modelUrlDir = modelUrl.substring(0, modelUrl.lastIndexOf('/') + 1);
-
-                    // Précharger les textures qui sont connues pour être utilisées
-                    const textures = ['grunge-scratched-brushed-metal-background.jpg', 'zinc04.jpg'];
-                    textures.forEach(textureName => {
-                        const textureUrl = modelUrlDir + textureName;
-                        console.log("Préchargement de la texture:", textureUrl);
-                        const img = new Image();
-                        img.src = textureUrl;
-                    });
+                    const modelUrlDir = modelData.url.substring(0, modelData.url.lastIndexOf('/') + 1);
 
                     // Set resource path for loader to help find textures
                     loader.setResourcePath(modelUrlDir);
 
-                    // Load model with progress tracking
                     loader.load(
-                        modelUrl,
-                        function(gltf) {
+                        modelData.url,
+                        function (gltf) {
                             try {
-                                // Success callback
-                                model = gltf.scene;
-
-                                // Vérifier que model existe
-                                if (!model) {
-                                    showError("Le modèle chargé est invalide ou vide");
-                                    return;
-                                }
-
-                                console.log("Modèle chargé avec succès:", model);
+                                const model = gltf.scene;
 
                                 // Appliquer les transformations
-                                model.scale.set(scaleValue, scaleValue, scaleValue);
-                                model.position.set(position.x, position.y, position.z);
-                                model.rotation.set(
-                                    THREE.MathUtils.degToRad(rotation.x),
-                                    THREE.MathUtils.degToRad(rotation.y),
-                                    THREE.MathUtils.degToRad(rotation.z)
+                                model.scale.set(
+                                    modelData.scale,
+                                    modelData.scale,
+                                    modelData.scale
                                 );
+
+                                model.position.set(
+                                    modelData.position.x,
+                                    modelData.position.y,
+                                    modelData.position.z
+                                );
+
+                                model.rotation.set(
+                                    THREE.MathUtils.degToRad(modelData.rotation.x),
+                                    THREE.MathUtils.degToRad(modelData.rotation.y),
+                                    THREE.MathUtils.degToRad(modelData.rotation.z)
+                                );
+
+                                // Ajouter une propriété pour l'identifier
+                                model.userData.modelId = modelData.id;
+                                model.userData.modelName = modelData.name;
 
                                 // Ajouter le modèle à la scène
                                 scene.add(model);
-                                console.log("Modèle ajouté à la scène");
 
-                                // Center camera on model
-                                const box = new THREE.Box3().setFromObject(model);
-                                const center = box.getCenter(new THREE.Vector3());
-                                const size = box.getSize(new THREE.Vector3());
+                                // Stocker le modèle par ID
+                                loadedModels[modelData.id] = model;
 
-                                const maxDim = Math.max(size.x, size.y, size.z);
-                                const fov = camera.fov * (Math.PI / 180);
-                                const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                                // Si c'est le modèle principal (premier de la liste)
+                                if (modelData.id === modelsData[0].id) {
+                                    // Centre la caméra sur le modèle
+                                    centerCameraOnModel(model);
 
-                                camera.position.z = center.z + cameraZ * 1.5;
-                                controls.target.set(center.x, center.y, center.z);
-                                controls.update();
+                                    // Masque l'indicateur de chargement
+                                    document.getElementById('loading').style.display = 'none';
 
-                                console.log("Caméra centrée sur le modèle");
-
-                                // Hide loading indicator
-                                document.getElementById('loading').style.display = 'none';
+                                    // Appeler le callback si fourni
+                                    if (callback) callback();
+                                }
                             } catch (e) {
-                                showError("Erreur lors du traitement du modèle: " + e.message);
-                                console.error("Erreur détaillée:", e);
+                                showError("Erreur lors du traitement du modèle 3D: " + e.message);
+                                console.error("Model processing error:", e);
                             }
                         },
-                        function(xhr) {
-                            // Progress callback
-                            if (xhr.lengthComputable) {
-                                const percent = xhr.loaded / xhr.total * 100;
-                                document.getElementById('progress').textContent = 'Chargement... ' + Math.round(percent) + '%%';
-                            }
+                        function (xhr) {
+                            const percent = xhr.loaded / xhr.total * 100;
+                            document.getElementById('progress').textContent = 'Chargement... ' + Math.round(percent) + '%%';
                         },
-                        function(error) {
-                            // Error callback
+                        function (error) {
                             console.error('Error loading 3D model:', error);
-
-                            // Essayer de fournir plus d'informations sur l'erreur
-                            let errorMessage = 'Erreur de chargement';
-                            if (error && error.message) {
-                                errorMessage += ': ' + error.message;
-                            } else if (error && error.target && error.target.src) {
-                                // Si l'erreur est liée au chargement d'une image, montrer son URL
-                                errorMessage += ': Impossible de charger l\\'image ' + error.target.src;
-
-                                // Essayons d'accéder directement à l'image
-                                fetch(error.target.src)
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            throw new Error(`HTTP error! Status: ${response.status}`);
-                                        }
-                                        console.log("L'image peut être accessible directement, mais le chargeur GLTF a des problèmes.");
-                                    })
-                                    .catch(err => {
-                                        console.error("Impossible d'accéder directement à l'image:", err);
-                                    });
-                            } else {
-                                errorMessage += ': undefined';
-                            }
-
-                            showError(errorMessage);
-
-                            // Essayons de tester un chargement direct du fichier
-                            fetch(modelUrl)
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error(`HTTP error! Status: ${response.status}`);
-                                    }
-                                    return response.text();
-                                })
-                                .then(data => {
-                                    console.log("Le fichier GLTF peut être accessible directement.");
-                                    console.log("Premiers 100 caractères:", data.substring(0, 100));
-                                })
-                                .catch(err => {
-                                    console.error("Impossible d'accéder directement au fichier GLTF:", err);
-                                });
-
-                            // Afficher un cube coloré pour indiquer qu'il y a une erreur mais que le visualiseur fonctionne
-                            // Un cube rouge plus petit et moins visible pour ne pas distraire
-                            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-                            const material = new THREE.MeshStandardMaterial({
-                                color: 0xff0000,
-                                roughness: 0.7,
-                                metalness: 0.3,
-                                transparent: true,
-                                opacity: 0.5
-                            });
-                            const errorCube = new THREE.Mesh(geometry, material);
-                            scene.add(errorCube);
-                            console.log("Cube d'erreur ajouté à la scène");
+                            showError("Erreur lors du chargement du modèle 3D: " + error.message);
                         }
                     );
                 }
 
-                // Show error function
-                function showError(message) {
-                    document.getElementById('loading').style.display = 'none';
-                    const errorDiv = document.getElementById('error');
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorDiv.style.display = 'block';
-                    errorMessage.textContent = message;
+                // Centrer la caméra sur un modèle
+                function centerCameraOnModel(model) {
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = camera.fov * (Math.PI / 180);
+                    const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+                    camera.position.z = center.z + cameraZ * 1.5;
+                    controls.target.set(center.x, center.y, center.z);
+                    controls.update();
                 }
 
-                // Resize handler
-                function onWindowResize() {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
+                // Fonction pour afficher/masquer un modèle spécifique
+                function toggleModel(modelId, visible = true) {
+                    // Mettre à jour l'interface
+                    document.querySelectorAll('.submodel-item').forEach(item => {
+                        if (parseInt(item.dataset.id) === modelId) {
+                            if (visible) {
+                                item.classList.add('active');
+                            } else {
+                                item.classList.remove('active');
+                            }
+                        }
+                    });
+
+                    // Mettre à jour le modèle 3D
+                    if (loadedModels[modelId]) {
+                        loadedModels[modelId].visible = visible;
+
+                        // Si on active un modèle, mettre à jour le nom affiché
+                        if (visible) {
+                            const modelName = loadedModels[modelId].userData.modelName;
+                            document.getElementById('currentModelName').textContent = modelName;
+
+                            // Centrer la caméra sur ce modèle
+                            centerCameraOnModel(loadedModels[modelId]);
+                        }
+                    }
                 }
 
-                // Animation loop
+                // Fonction pour afficher uniquement un modèle spécifique
+                function showOnlyModel(modelId) {
+                    // Masquer tous les modèles
+                    Object.keys(loadedModels).forEach(id => {
+                        loadedModels[id].visible = false;
+                    });
+
+                    // Afficher uniquement le modèle sélectionné
+                    if (loadedModels[modelId]) {
+                        loadedModels[modelId].visible = true;
+                    }
+
+                    // Mettre à jour l'interface
+                    document.querySelectorAll('.submodel-item').forEach(item => {
+                        if (parseInt(item.dataset.id) === modelId) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+
+                    // Mettre à jour le nom affiché
+                    const modelName = loadedModels[modelId].userData.modelName;
+                    document.getElementById('currentModelName').textContent = modelName;
+
+                    // Centrer la caméra sur ce modèle
+                    centerCameraOnModel(loadedModels[modelId]);
+                }
+
+                // Fonction pour afficher tous les modèles
+                function showAllModels() {
+                    Object.keys(loadedModels).forEach(id => {
+                        loadedModels[id].visible = true;
+                    });
+
+                    // Mettre à jour l'interface
+                    document.querySelectorAll('.submodel-item').forEach(item => {
+                        item.classList.add('active');
+                    });
+
+                    // Mettre à jour le nom affiché
+                    document.getElementById('currentModelName').textContent = "Tous les modèles";
+
+                    // Recalculer la vue pour englober tous les modèles
+                    const allObjects = new THREE.Group();
+                    Object.values(loadedModels).forEach(model => {
+                        allObjects.add(model.clone());
+                    });
+                    centerCameraOnModel(allObjects);
+                }
+
+                // Fonction pour remplir le sélecteur de modèles
+                function populateModelSelector() {
+                    const modelList = document.getElementById('modelList');
+
+                    // Ajouter une option pour tout afficher
+                    if (modelsData.length > 1) {
+                        const allItem = document.createElement('div');
+                        allItem.classList.add('submodel-item', 'active');
+                        allItem.textContent = "Tous les modèles";
+                        allItem.addEventListener('click', function() {
+                            showAllModels();
+                        });
+                        modelList.appendChild(allItem);
+                    }
+
+                    // Fonction récursive pour ajouter les modèles avec indentation
+                    function addModelToList(model, level = 0) {
+                        const item = document.createElement('div');
+                        item.classList.add('submodel-item', 'active');
+                        if (level > 0) {
+                            item.classList.add('child-model');
+                        }
+                        item.textContent = model.name;
+                        item.dataset.id = model.id;
+                        item.style.paddingLeft = (5 + level * 15) + 'px';
+
+                        item.addEventListener('click', function() {
+                            showOnlyModel(parseInt(this.dataset.id));
+                        });
+
+                        modelList.appendChild(item);
+
+                        // Ajouter les enfants de ce modèle
+                        const children = modelsData.filter(m => m.parent_id === model.id);
+                        children.forEach(child => {
+                            addModelToList(child, level + 1);
+                        });
+                    }
+
+                    // Commencer par le modèle principal
+                    const rootModels = modelsData.filter(m => !m.parent_id);
+                    rootModels.forEach(model => {
+                        addModelToList(model);
+                    });
+                }
+
+                // Fonctions standard de Three.js
                 function animate() {
                     requestAnimationFrame(animate);
                     if (controls) controls.update();
@@ -515,26 +654,36 @@ class CMMS3DController(http.Controller):
                         renderer.render(scene, camera);
                     }
                 }
+
+                function onWindowResize() {
+                    const container = document.getElementById('viewer');
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+
+                    camera.aspect = width / height;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(width, height);
+                }
+
+                function showError(message) {
+                    document.getElementById('loading').style.display = 'none';
+                    const errorDiv = document.getElementById('error');
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorDiv.style.display = 'block';
+                    errorMessage.textContent = message;
+                }
             </script>
         </body>
         </html>
         """ % (
             model3d.name,  # Title
-            model3d.name,  # Info header
+            model3d.name,  # Current model name display
+            "display: " + ("block" if include_children or model3d.child_ids else "none"),  # Afficher le sélecteur uniquement s'il y a des enfants
             model3d.name,  # Model info header
             model3d.description or "",  # Model info description
             # Ajouter une note si le modèle a été converti depuis Blender
             '<p><small>Convertit depuis fichier Blender: ' + model3d.source_blend_filename + '</small></p>' if model3d.is_converted_from_blend else "",
-            model3d.model_url,  # Model URL
-            model3d.scale if model3d.scale is not None else 1.0,  # Scale (avec valeur par défaut)
-            model3d.position_x if model3d.position_x is not None else 0.0,
-            model3d.position_y if model3d.position_y is not None else 0.0,
-            model3d.position_z if model3d.position_z is not None else 0.0,  # Position
-            model3d.rotation_x if model3d.rotation_x is not None else 0.0,
-            model3d.rotation_y if model3d.rotation_y is not None else 0.0,
-            model3d.rotation_z if model3d.rotation_z is not None else 0.0,  # Rotation
-            "true" if model3d.has_external_files else "false",  # Has external files
-            model3d.files_list or "[]"  # Files list as JSON
+            models_json  # Données des modèles en JSON
         )
 
         return request.make_response(
