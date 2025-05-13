@@ -230,6 +230,16 @@ class Model3D(models.Model):
             # Check if it's a GLTF file and parse it to see if it references external files
             if record.model_filename.endswith('.gltf'):
                 self._analyze_gltf_references(record, file_path)
+                
+                # Importer la hiérarchie directement après sauvegarde du glTF principal
+                try:
+                    with open(file_path, 'r') as f:
+                        gltf_data = json.load(f)
+                    if 'nodes' in gltf_data and gltf_data['nodes']:
+                        _logger.info(f"Import de la hiérarchie depuis le fichier glTF sauvegardé: {file_path}")
+                        self.import_hierarchy_from_gltf(gltf_data, record.id)
+                except Exception as e:
+                    _logger.error(f"Erreur lors de l'importation de la hiérarchie depuis glTF: {str(e)}")
 
             _logger.info(f"Modèle 3D sauvegardé: {file_path}")
         except Exception as e:
@@ -389,24 +399,17 @@ class Model3D(models.Model):
                 with open(converted_file, 'r') as f:
                     gltf_data = json.load(f)
 
-                # Vérifier s'il y a des nodes avec des enfants dans le GLTF
-                if 'nodes' in gltf_data:
-                    has_hierarchy = False
-                    for node in gltf_data['nodes']:
-                        if 'children' in node:
-                            has_hierarchy = True
-                            break
-
-                    if has_hierarchy:
-                        _logger.info(f"Le fichier GLTF contient une hiérarchie, création des sous-modèles...")
-
-                        # Créer un modèle parent pour la hiérarchie si nécessaire
-                        parent_id = record.id
-
-                        # Importer la hiérarchie
-                        self.import_hierarchy_from_gltf(gltf_data, parent_id)
-
-                        _logger.info(f"Hiérarchie importée avec succès")
+                # Importer la hiérarchie si le fichier contient des nodes
+                if 'nodes' in gltf_data and gltf_data['nodes']:
+                    _logger.info(f"Le fichier GLTF contient des nodes, création des sous-modèles et équipements...")
+                    
+                    # Créer un modèle parent pour la hiérarchie
+                    parent_id = record.id
+                    
+                    # Importer la hiérarchie et créer les équipements
+                    created_ids = self.import_hierarchy_from_gltf(gltf_data, parent_id)
+                    
+                    _logger.info(f"Hiérarchie importée avec succès: {len(created_ids)} sous-modèles et équipements créés")
             except Exception as e:
                 _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF: {str(e)}")
                 # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
@@ -658,24 +661,17 @@ class Model3D(models.Model):
                             with open(converted_file, 'r') as f:
                                 gltf_data = json.load(f)
 
-                            # Vérifier s'il y a des nodes avec des enfants dans le GLTF
-                            if 'nodes' in gltf_data:
-                                has_hierarchy = False
-                                for node in gltf_data['nodes']:
-                                    if 'children' in node:
-                                        has_hierarchy = True
-                                        break
-
-                                if has_hierarchy:
-                                    _logger.info(f"Le fichier GLTF contient une hiérarchie, création des sous-modèles...")
-
-                                    # Créer un modèle parent pour la hiérarchie si nécessaire
-                                    parent_id = record.id
-
-                                    # Importer la hiérarchie
-                                    self.import_hierarchy_from_gltf(gltf_data, parent_id)
-
-                                    _logger.info(f"Hiérarchie importée avec succès")
+                            # Importer la hiérarchie si le fichier contient des nodes
+                            if 'nodes' in gltf_data and gltf_data['nodes']:
+                                _logger.info(f"Le fichier GLTF (ZIP) contient des nodes, création des sous-modèles et équipements...")
+                                
+                                # Créer un modèle parent pour la hiérarchie
+                                parent_id = record.id
+                                
+                                # Importer la hiérarchie et créer les équipements
+                                created_ids = self.import_hierarchy_from_gltf(gltf_data, parent_id)
+                                
+                                _logger.info(f"Hiérarchie importée avec succès depuis ZIP: {len(created_ids)} sous-modèles et équipements créés")
                         except Exception as e:
                             _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF (ZIP): {str(e)}")
                             # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
@@ -694,26 +690,19 @@ class Model3D(models.Model):
                                 with open(main_file_path, 'r') as f:
                                     gltf_data = json.load(f)
 
-                                # Vérifier s'il y a des nodes avec des enfants dans le GLTF
-                                if 'nodes' in gltf_data:
-                                    has_hierarchy = False
-                                    for node in gltf_data['nodes']:
-                                        if 'children' in node:
-                                            has_hierarchy = True
-                                            break
-
-                                    if has_hierarchy:
-                                        _logger.info(f"Le fichier GLTF ZIP contient une hiérarchie, création des sous-modèles...")
-
-                                        # Créer un modèle parent pour la hiérarchie si nécessaire
-                                        parent_id = record.id
-
-                                        # Importer la hiérarchie
-                                        self.import_hierarchy_from_gltf(gltf_data, parent_id)
-
-                                        _logger.info(f"Hiérarchie importée avec succès depuis ZIP")
+                                # Importer la hiérarchie si le fichier contient des nodes
+                                if 'nodes' in gltf_data and gltf_data['nodes']:
+                                    _logger.info(f"Le fichier GLTF ZIP contient des nodes, création des sous-modèles et équipements...")
+                                    
+                                    # Créer un modèle parent pour la hiérarchie
+                                    parent_id = record.id
+                                    
+                                    # Importer la hiérarchie et créer les équipements
+                                    created_ids = self.import_hierarchy_from_gltf(gltf_data, parent_id)
+                                    
+                                    _logger.info(f"Hiérarchie importée avec succès depuis ZIP direct: {len(created_ids)} sous-modèles et équipements créés")
                             except Exception as e:
-                                _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF depuis ZIP: {str(e)}")
+                                _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF depuis ZIP direct: {str(e)}")
 
                     # Check et ajoute les bin/textures/autres, MAJ files_list
                     texture_files = []
@@ -857,70 +846,75 @@ class Model3D(models.Model):
         action['context'] = {'default_parent_id': self.id}
         return action
 
-    def import_hierarchy_from_gltf(self, gltf_data, parent_id=False):
+    def import_hierarchy_from_gltf(self, gltf_data, parent_id=False, parent_disk_path=None):
         """
-        Importe récursivement la hiérarchie d'un modèle GLTF
-        en créant les sous-modèles correspondants
+        Crée la hiérarchie de sous-modèles et équipements selon la structure glTF,
+        chaque enfant est dans models/<id_parent>/child/<id_enfant>/
         """
+        Model3D = self.env['cmms.model3d']
+        Equipment = self.env['maintenance.equipment']
+        created_ids = []
+
         nodes = gltf_data.get('nodes', [])
-        # Fonction récursive pour créer la hiérarchie
-        def create_node_hierarchy(node_index, parent_id=False):
-            node = nodes[node_index]
-            # Créer un nouveau modèle 3D pour ce nœud
-            name = node.get('name', f'Node_{node_index}')
-            model_values = {
-                'name': name,
+        if not nodes:
+            return []
+
+        # Utilisé pour retrouver le parent Odoo de l'ID glTF
+        node_odoo_id = {}
+        node_disk_path = {}
+
+        # Première passe: créer tous les sous-modèles et équipements
+        for idx, node in enumerate(nodes):
+            node_name = node.get('name', f'Objet_{idx}')
+            
+            # Créer le sous-modèle
+            submodel = Model3D.create({
+                'name': node_name,
                 'parent_id': parent_id,
-                'description': f'Sous-modèle importé depuis GLTF',
-                # Autres champs au besoin
-            }
-            new_model = self.create(model_values)
+                'model_format': 'gltf',
+                'active': True,
+                'description': node.get('extras', {}).get('description', 'Sous-modèle importé depuis GLTF'),
+            })
+            created_ids.append(submodel.id)
+            node_odoo_id[idx] = submodel.id
 
-            # Créer les enfants récursivement
+            # Détermine le chemin sur disque du parent (racine ou sous-child)
+            if parent_disk_path:
+                submodel_disk_root = os.path.join(parent_disk_path, 'child', str(submodel.id))
+            else:
+                parent_model = Model3D.browse(parent_id)
+                submodel_disk_root = os.path.join(MODELS_DIR, str(parent_model.id), 'child', str(submodel.id))
+            
+            os.makedirs(submodel_disk_root, exist_ok=True)
+            node_disk_path[idx] = submodel_disk_root
+
+            # Génère un fichier glTF placeholder pour le sous-modèle
+            gltf_file_path = os.path.join(submodel_disk_root, f"{node_name}.gltf")
+            with open(gltf_file_path, "w", encoding="utf-8") as f:
+                f.write(f'{{"node": {idx}, "name": "{node_name}"}}')  # Placeholder simple
+
+            # Mise à jour des informations du modèle
+            submodel.model_filename = f"{node_name}.gltf"
+            # URL relative pour le web
+            submodel.model_url = f"/models3d/{parent_id}/child/{submodel.id}/{node_name}.gltf"
+
+            # Créer l'équipement automatiquement lié à ce sous-modèle
+            equip_vals = {
+                'name': f"Équipement {node_name}",
+                'model3d_id': submodel.id,
+            }
+            self.env['maintenance.equipment'].create(equip_vals)
+            _logger.info(f"Créé sous-modèle et équipement pour le node {node_name}")
+
+        # Deuxième passe: établir les relations parent/enfant dans la hiérarchie
+        for idx, node in enumerate(nodes):
             if 'children' in node:
-                for child_index in node['children']:
-                    create_node_hierarchy(child_index, new_model.id)
+                for child_idx in node['children']:
+                    # Appel récursif pour traiter les enfants de ce nœud
+                    self.import_hierarchy_from_gltf(
+                        gltf_data,
+                        parent_id=node_odoo_id[idx],
+                        parent_disk_path=node_disk_path[idx]
+                    )
 
-            return new_model.id
-
-        # Commencer à partir des nœuds de premier niveau
-        root_nodes = []
-        for i, node in enumerate(nodes):
-            # Si le nœud n'est pas référencé comme enfant, c'est un nœud racine
-            is_child = False
-            for other_node in nodes:
-                if 'children' in other_node and i in other_node['children']:
-                    is_child = True
-                    break
-            if not is_child:
-                root_nodes.append(i)
-
-        result_ids = []
-        for root_index in root_nodes:
-            result_ids.append(create_node_hierarchy(root_index, parent_id))
-
-        return result_ids
-
-        def action_view_auto_equipment(self):
-            """Affiche l'équipement auto-créé"""
-            self.ensure_one()
-            if not self.auto_equipment_id:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Aucun équipement'),
-                        'message': _("Ce modèle n'a pas d'équipement automatiquement créé."),
-                        'sticky': False,
-                        'type': 'warning',
-                    }
-                }
-
-            # Rediriger vers la vue formulaire de l'équipement
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'maintenance.equipment',
-                'res_id': self.auto_equipment_id.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
+        return created_ids

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- model3d_views.xml -->
-<!-- Modifications à apporter à custom_addons/cmms_3d_models/views/model3d_views.xml -->
 <odoo>
     <!-- Form View -->
     <record id="view_cmms_model3d_form" model="ir.ui.view">
@@ -32,12 +30,6 @@
                                 class="oe_stat_button" icon="fa-sitemap"
                                 attrs="{'invisible': [('child_ids', '=', [])]}">
                             <field name="child_count" string="Sous-modèles" widget="statinfo"/>
-                        </button>
-                        <!-- Nouveau bouton pour l'équipement auto-créé -->
-                        <button type="object" name="action_view_auto_equipment"
-                                class="oe_stat_button" icon="fa-wrench"
-                                attrs="{'invisible': [('auto_equipment_id', '=', False)]}">
-                            <field string="Équipement" name="auto_equipment_id" widget="statinfo"/>
                         </button>
                     </div>
 
@@ -100,13 +92,6 @@
                                 <field name="source_blend_filename" readonly="1" string="Fichier Blender d'origine"/>
                             </group>
 
-                            <!-- Nouvelle option pour la création automatique d'équipements -->
-                            <group string="Options d'importation">
-                                <field name="auto_create_equipment"
-                                       help="Créer automatiquement des équipements de maintenance liés aux modèles 3D importés"/>
-                                <field name="auto_equipment_id" invisible="1"/>
-                            </group>
-
                             <group string="Paramètres d'affichage">
                                 <field name="scale"/>
                                 <label for="position_x" string="Position"/>
@@ -141,7 +126,6 @@
                                     <field name="model_format"/>
                                     <field name="has_external_files"/>
                                     <field name="is_converted_from_blend"/>
-                                    <field name="auto_equipment_id"/>
                                     <field name="active"/>
                                     <button name="action_view_3d" type="object"
                                             string="Voir en 3D" class="btn-primary"/>
@@ -177,7 +161,6 @@
                 <field name="model_format"/>
                 <field name="has_external_files"/>
                 <field name="is_submodel"/>
-                <field name="auto_equipment_id"/>
                 <field name="active"/>
                 <button name="action_view_3d" type="object"
                         string="Voir en 3D" class="btn-sm btn-primary"/>
@@ -198,7 +181,6 @@
                 <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
                 <filter string="Sous-modèles" name="submodels" domain="[('parent_id', '!=', False)]"/>
                 <filter string="Modèles principaux" name="main_models" domain="[('parent_id', '=', False)]"/>
-                <filter string="Avec équipement auto-créé" name="with_equipment" domain="[('auto_equipment_id', '!=', False)]"/>
                 <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
@@ -207,4 +189,27 @@
             </search>
         </field>
     </record>
+
+    <!-- Action -->
+    <record id="action_cmms_model3d" model="ir.actions.act_window">
+        <field name="name">Modèles 3D</field>
+        <field name="res_model">cmms.model3d</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cmms_model3d_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier modèle 3D
+            </p>
+            <p>
+                Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_cmms_model3d"
+              name="Modèles 3D"
+              parent="maintenance.menu_maintenance_configuration"
+              action="action_cmms_model3d"
+              sequence="30"/>
 </odoo>
