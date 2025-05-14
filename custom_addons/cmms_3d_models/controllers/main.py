@@ -7,6 +7,9 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+# Importer le chemin des modèles depuis model3d.py
+from ..models.model3d import MODELS_DIR
+
 class CMMS3DController(http.Controller):
 
     @http.route('/models3d/<int:model3d_id>/<path:filename>', type='http', auth="public")
@@ -50,7 +53,7 @@ class CMMS3DController(http.Controller):
                 return request.not_found()
 
             # Chemin du fichier - Adapté pour Windows - Utiliser backslash et normpath
-            file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models', str(model3d_id), filename))
+            file_path = os.path.normpath(os.path.join(MODELS_DIR, str(model3d_id), filename))
 
             # Log pour le débogage
             _logger.info(f"Tentative d'accès au fichier: {file_path}, existe: {os.path.isfile(file_path)}")
@@ -133,11 +136,21 @@ class CMMS3DController(http.Controller):
 
                     if submodel:
                         _logger.info(f"Sous-modèle trouvé dans JSON: {submodel['name']}")
-                        # Chemin du fichier pour la nouvelle structure
-                        file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
-                                                                 str(model3d_id), 'childs', str(submodel_id), filename))
 
-                        _logger.info(f"Chemin du fichier JSON: {file_path}")
+                        # Chemin du fichier pour la structure basée sur l'arborescence des sous-dossiers
+                        file_path = os.path.normpath(os.path.join(
+                            MODELS_DIR, str(model3d_id), 'childs', str(submodel_id), filename
+                        ))
+
+                        # Si le fichier n'existe pas, essayer dans le dossier racine du modèle parent
+                        if not os.path.isfile(file_path):
+                            alt_file_path = os.path.normpath(os.path.join(
+                                MODELS_DIR, str(model3d_id), filename
+                            ))
+                            if os.path.isfile(alt_file_path):
+                                file_path = alt_file_path
+
+                        _logger.info(f"Chemin du fichier: {file_path}, existe: {os.path.isfile(file_path)}")
 
                         # Vérifier si le fichier existe
                         if os.path.isfile(file_path):
@@ -148,7 +161,7 @@ class CMMS3DController(http.Controller):
                             # Détermination du type MIME
                             content_type = self._get_mime_type(filename)
 
-                            _logger.info(f"Fichier sous-modèle JSON servi avec succès: {filename} ({content_type})")
+                            _logger.info(f"Fichier sous-modèle servi avec succès: {filename} ({content_type})")
 
                             # Envoi du fichier
                             return request.make_response(
@@ -163,12 +176,14 @@ class CMMS3DController(http.Controller):
                                     ('Cache-Control', 'max-age=86400'), # Cache pour 1 jour
                                 ]
                             )
+                        else:
+                            _logger.warning(f"Fichier sous-modèle introuvable: {file_path}")
                     else:
                         _logger.warning(f"Sous-modèle ID {submodel_id} non trouvé dans JSON")
                 except Exception as e:
                     _logger.error(f"Erreur lors de l'accès au sous-modèle JSON: {str(e)}")
 
-            # Si on arrive ici, on vérifie l'ancien système
+            # Si on arrive ici, on vérifie l'ancien système de child_ids
             _logger.info("Recherche du sous-modèle dans l'ancien système")
             child_model = request.env['cmms.model3d'].sudo().browse(submodel_id)
             if not child_model.exists():
@@ -179,19 +194,12 @@ class CMMS3DController(http.Controller):
                 _logger.error(f"Le sous-modèle {submodel_id} n'appartient pas au parent {model3d_id}")
                 return request.not_found()
 
-            # Ancien système - d'abord essayer le nouveau chemin (transition)
-            file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
-                                                    str(model3d_id), 'childs', str(submodel_id), filename))
+            # Chercher le fichier dans le dossier du sous-modèle lui-même (ancien système)
+            file_path = os.path.normpath(os.path.join(MODELS_DIR, str(submodel_id), filename))
 
-            _logger.info(f"Chemin du fichier ancien système (nouveau format): {file_path}")
+            _logger.info(f"Chemin du fichier ancien système: {file_path}, existe: {os.path.isfile(file_path)}")
 
-            # Si le fichier n'existe pas dans la nouvelle structure, chercher dans l'ancienne
-            if not os.path.isfile(file_path):
-                file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
-                                                         str(submodel_id), filename))
-                _logger.info(f"Chemin du fichier ancien système (ancien format): {file_path}")
-
-            # Si toujours pas trouvé, vérifier si le fichier est stocké dans la base de données
+            # Si le fichier n'existe pas, vérifier si le fichier est stocké dans la base de données
             if not os.path.isfile(file_path):
                 if filename == child_model.model_filename and child_model.model_file:
                     content = base64.b64decode(child_model.model_file)

@@ -245,21 +245,29 @@ class Model3D(models.Model):
             with open(file_path, 'wb') as f:
                 f.write(base64.b64decode(record.model_file))
 
+            _logger.info(f"Modèle 3D sauvegardé: {file_path}")
+
             # Check if it's a GLTF file and parse it to see if it references external files
             if record.model_filename.endswith('.gltf'):
                 self._analyze_gltf_references(record, file_path)
 
-                # Importer la hiérarchie directement après sauvegarde du glTF principal
+                # Importer la hiérarchie après sauvegarde du fichier GLTF
                 try:
-                    with open(file_path, 'r') as f:
-                        gltf_data = json.load(f)
-                    if 'nodes' in gltf_data and gltf_data['nodes']:
-                        _logger.info(f"Import de la hiérarchie depuis le fichier glTF sauvegardé: {file_path}")
-                        self.import_hierarchy_from_gltf(gltf_data, record.id)
+                    _logger.info(f"Import de la hiérarchie depuis le fichier glTF sauvegardé: {file_path}")
+
+                    # Au lieu de charger le fichier JSON, on passe directement le chemin du fichier GLTF
+                    # à la méthode import_hierarchy_from_gltf qui va l'analyser avec Blender
+                    self.import_hierarchy_from_gltf(file_path, record.id)
                 except Exception as e:
                     _logger.error(f"Erreur lors de l'importation de la hiérarchie depuis glTF: {str(e)}")
 
-            _logger.info(f"Modèle 3D sauvegardé: {file_path}")
+            # Pour les fichiers GLB également
+            elif record.model_filename.endswith('.glb'):
+                try:
+                    _logger.info(f"Import de la hiérarchie depuis le fichier GLB sauvegardé: {file_path}")
+                    self.import_hierarchy_from_gltf(file_path, record.id)
+                except Exception as e:
+                    _logger.error(f"Erreur lors de l'importation de la hiérarchie depuis GLB: {str(e)}")
         except Exception as e:
             _logger.error(f"Erreur lors de la sauvegarde du modèle 3D: {e}")
             raise ValidationError(f"Erreur lors de la sauvegarde du modèle 3D: {e}")
@@ -413,25 +421,11 @@ class Model3D(models.Model):
 
             # Analyser le fichier GLTF pour en extraire la hiérarchie
             try:
-                # Vérifier si le fichier GLTF a une structure hiérarchique
-                with open(converted_file, 'r') as f:
-                    gltf_data = json.load(f)
-
-                # Importer la hiérarchie si le fichier contient des nodes
-                if 'nodes' in gltf_data and gltf_data['nodes']:
-                    _logger.info(f"Le fichier GLTF contient des nodes, création des sous-modèles et équipements...")
-
-                    # Importer la hiérarchie avec le nouvel ID parent
-                    result = self.import_hierarchy_from_gltf(gltf_data, record.id)
-
-                    if result:
-                        _logger.info(f"Hiérarchie importée avec succès dans {record.id}")
-                    else:
-                        _logger.warning(f"Échec ou aucune hiérarchie à importer pour {record.id}")
+                # Importer la hiérarchie directement avec le chemin du fichier
+                self.import_hierarchy_from_gltf(converted_file, record.id)
+                _logger.info(f"Hiérarchie importée avec succès depuis {converted_file}")
             except Exception as e:
                 _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF: {str(e)}")
-                # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
-                # juste logger l'erreur
 
             return True
         except Exception as e:
@@ -673,24 +667,13 @@ class Model3D(models.Model):
                         main_file = os.path.basename(converted_file)
                         main_file_path = converted_file
 
-                        # Analyser le fichier GLTF pour en extraire la hiérarchie
+                        # Importer la hiérarchie
                         try:
-                            # Vérifier si le fichier GLTF a une structure hiérarchique
-                            with open(converted_file, 'r') as f:
-                                gltf_data = json.load(f)
-
-                            # Importer la hiérarchie si le fichier contient des nodes
-                            if 'nodes' in gltf_data and gltf_data['nodes']:
-                                _logger.info(f"Le fichier GLTF (ZIP) contient des nodes, création des sous-modèles et équipements...")
-
-                                # Importer la hiérarchie
-                                self.import_hierarchy_from_gltf(gltf_data, record.id)
-
-                                _logger.info(f"Hiérarchie importée avec succès depuis ZIP pour modèle {record.id}")
+                            # Utiliser le chemin direct du fichier converti pour extraire la hiérarchie
+                            self.import_hierarchy_from_gltf(converted_file, record.id)
+                            _logger.info(f"Hiérarchie importée avec succès depuis le fichier converti: {converted_file}")
                         except Exception as e:
-                            _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF (ZIP): {str(e)}")
-                            # Ne pas faire échouer la conversion si l'importation de la hiérarchie échoue
-                            # juste logger l'erreur
+                            _logger.error(f"Erreur lors de l'importation de la hiérarchie depuis le fichier converti: {str(e)}")
                     else:
                         # Pour les zip contenant gltf ou glb directement
                         record.model_format = 'gltf' if main_file.endswith('.gltf') else 'glb'
@@ -699,22 +682,12 @@ class Model3D(models.Model):
                             record.model_file = base64.b64encode(f.read())
                         record.model_filename = os.path.basename(main_file)
 
-                        # Si c'est un fichier GLTF, analyser sa hiérarchie
-                        if main_file.endswith('.gltf'):
-                            try:
-                                with open(main_file_path, 'r') as f:
-                                    gltf_data = json.load(f)
-
-                                # Importer la hiérarchie si le fichier contient des nodes
-                                if 'nodes' in gltf_data and gltf_data['nodes']:
-                                    _logger.info(f"Le fichier GLTF ZIP contient des nodes, création des sous-modèles et équipements...")
-
-                                    # Importer la hiérarchie
-                                    self.import_hierarchy_from_gltf(gltf_data, record.id)
-
-                                    _logger.info(f"Hiérarchie importée avec succès depuis ZIP direct pour modèle {record.id}")
-                            except Exception as e:
-                                _logger.error(f"Erreur lors de l'importation de la hiérarchie GLTF depuis ZIP direct: {str(e)}")
+                        # Importer la hiérarchie à partir du fichier principal
+                        try:
+                            self.import_hierarchy_from_gltf(main_file_path, record.id)
+                            _logger.info(f"Hiérarchie importée avec succès depuis le fichier ZIP: {main_file_path}")
+                        except Exception as e:
+                            _logger.error(f"Erreur lors de l'importation de la hiérarchie depuis le fichier ZIP: {str(e)}")
 
                     # Check et ajoute les bin/textures/autres, MAJ files_list
                     texture_files = []
@@ -878,20 +851,90 @@ class Model3D(models.Model):
     def import_hierarchy_from_gltf(self, gltf_data, parent_id=False):
         """
         Crée la hiérarchie de sous-modèles selon la structure glTF,
-        stockant les sous-modèles dans le JSON au lieu de créer des records distincts
+        en utilisant Blender pour extraire chaque nœud individuellement.
         """
         parent_model = self.browse(parent_id)
         if not parent_model.exists():
             _logger.warning(f"Modèle parent ID {parent_id} introuvable")
             return False
 
-        # Préparer le dossier parent
+        # Créer un fichier GLTF temporaire si c'est un objet de données et non un chemin
+        if isinstance(gltf_data, dict):
+            import tempfile
+
+            temp_dir = tempfile.mkdtemp()
+            temp_gltf_path = os.path.join(temp_dir, "temp_model.gltf")
+
+            try:
+                with open(temp_gltf_path, 'w') as f:
+                    json.dump(gltf_data, f)
+                gltf_file_path = temp_gltf_path
+            except Exception as e:
+                _logger.error(f"Erreur lors de la création du fichier GLTF temporaire: {str(e)}")
+                return False
+        else:
+            # On suppose que c'est déjà un chemin de fichier
+            gltf_file_path = gltf_data
+
+        # Préparer le dossier parent pour les sous-modèles
         parent_dir = os.path.normpath(os.path.join(MODELS_DIR, str(parent_id)))
         childs_dir = os.path.normpath(os.path.join(parent_dir, 'childs'))
         os.makedirs(childs_dir, exist_ok=True)
 
-        nodes = gltf_data.get('nodes', [])
-        if not nodes:
+        # Chemin vers le script d'extraction
+        extract_script_path = os.path.normpath(os.path.join(
+            os.path.dirname(BLENDER_SCRIPT_PATH),
+            "extract_gltf_nodes.py"
+        ))
+
+        # Vérifier que le script existe
+        if not os.path.isfile(extract_script_path):
+            _logger.error(f"Script d'extraction non trouvé: {extract_script_path}")
+            return False
+
+        # Exécuter le script Blender pour extraire les nœuds
+        cmd = [
+            BLENDER_EXE,
+            "--background",
+            "-noaudio",
+            "--python", extract_script_path,
+            "--", gltf_file_path, childs_dir
+        ]
+
+        _logger.info(f"Exécution de la commande d'extraction: {' '.join(cmd)}")
+
+        try:
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True
+            )
+            stdout, stderr = process.communicate()
+
+            # Journaliser la sortie pour le débogage
+            _logger.info(f"[EXTRACTION STDOUT]\n{stdout}")
+            if stderr:
+                _logger.warning(f"[EXTRACTION STDERR]\n{stderr}")
+
+            if process.returncode != 0:
+                _logger.error(f"Échec de l'extraction des nœuds (code {process.returncode})")
+                return False
+        except Exception as e:
+            _logger.error(f"Erreur lors de l'exécution du script d'extraction: {str(e)}")
+            return False
+
+        # Charger les métadonnées des nœuds extraits
+        metadata_path = os.path.join(childs_dir, "nodes_metadata.json")
+        if not os.path.isfile(metadata_path):
+            _logger.error(f"Métadonnées des nœuds non trouvées: {metadata_path}")
+            return False
+
+        try:
+            with open(metadata_path, 'r') as f:
+                nodes_data = json.load(f)
+        except Exception as e:
+            _logger.error(f"Erreur lors du chargement des métadonnées: {str(e)}")
             return False
 
         # Charger la structure existante ou créer une nouvelle
@@ -903,71 +946,53 @@ class Model3D(models.Model):
                 _logger.warning(f"Impossible de décoder le JSON des sous-modèles pour ID {parent_id}")
                 submodels = []
 
-        # Identifiants pour l'incrémentation locale des sous-modèles
-        next_submodel_id = 1
-        if submodels:
-            # Trouver le prochain ID disponible
-            existing_ids = [sm.get('id', 0) for sm in submodels]
-            if existing_ids:
-                next_submodel_id = max(existing_ids) + 1
+        # Convertir les métadonnées en sous-modèles
+        for node_id, node_data in nodes_data.items():
+            # Vérifier que le nœud a été exporté correctement
+            node_dir = os.path.join(childs_dir, str(node_id))
+            gltf_path = node_data.get("gltf_path")
+            bin_path = node_data.get("bin_path")
 
-        # Créer les sous-modèles
-        for idx, node in enumerate(nodes):
-            node_name = node.get('name', f'Objet_{idx}')
+            if not os.path.isdir(node_dir) or not gltf_path:
+                _logger.warning(f"Dossier ou fichier GLTF manquant pour le nœud {node_id}")
+                continue
 
-            # Créer le dossier pour ce sous-modèle
-            submodel_dir = os.path.normpath(os.path.join(childs_dir, str(next_submodel_id)))
-            os.makedirs(submodel_dir, exist_ok=True)
-
-            # Générer un fichier GLTF placeholder
-            gltf_file_path = os.path.join(submodel_dir, f"{node_name}.gltf")
-            with open(gltf_file_path, "w", encoding="utf-8") as f:
-                f.write(f'{{"node": {idx}, "name": "{node_name}"}}')  # Placeholder simple
-
-            # Créer un fichier BIN vide si nécessaire
-            bin_file_path = os.path.join(submodel_dir, f"{node_name}.bin")
-            with open(bin_file_path, "wb") as f:
-                f.write(b'')  # Fichier binaire vide
-
-            # Créer l'entrée JSON pour ce sous-modèle
+            # Créer un sous-modèle pour ce nœud
             submodel_data = {
-                "id": next_submodel_id,
-                "name": node_name,
-                "gltf_path": f"childs/{next_submodel_id}/{node_name}.gltf",
-                "bin_path": f"childs/{next_submodel_id}/{node_name}.bin",
-                "description": node.get('extras', {}).get('description', f'Sous-modèle importé depuis GLTF: {node_name}'),
-                "scale": 1.0,
+                "id": int(node_id),
+                "name": node_data["name"],
+                "gltf_path": f"childs/{node_id}/{gltf_path}",
+                "bin_path": f"childs/{node_id}/{bin_path}" if bin_path else None,
+                "description": f"Sous-modèle extrait de {parent_model.name}: {node_data['name']}",
+                "scale": node_data.get("scale", 1.0),
                 "position": {
-                    "x": node.get('translation', [0, 0, 0])[0] if 'translation' in node else 0,
-                    "y": node.get('translation', [0, 0, 0])[1] if 'translation' in node else 0,
-                    "z": node.get('translation', [0, 0, 0])[2] if 'translation' in node else 0
+                    "x": node_data.get("position", {}).get("x", 0),
+                    "y": node_data.get("position", {}).get("y", 0),
+                    "z": node_data.get("position", {}).get("z", 0)
                 },
                 "rotation": {
-                    "x": node.get('rotation', [0, 0, 0, 1])[0] * 90.0 if 'rotation' in node else 0,
-                    "y": node.get('rotation', [0, 0, 0, 1])[1] * 90.0 if 'rotation' in node else 0,
-                    "z": node.get('rotation', [0, 0, 0, 1])[2] * 90.0 if 'rotation' in node else 0
+                    "x": node_data.get("rotation", {}).get("x", 0),
+                    "y": node_data.get("rotation", {}).get("y", 0),
+                    "z": node_data.get("rotation", {}).get("z", 0)
                 },
-                "children": []  # Liste pour les enfants de ce sous-modèle
+                "parent_id": node_data.get("parent_id"),
+                "children": []  # Sera rempli ultérieurement
             }
-
-            # Associer les enfants de ce nœud
-            if 'children' in node:
-                submodel_data["children"] = node['children']
 
             # Ajouter ce sous-modèle à la liste
             submodels.append(submodel_data)
 
-            # Incrémenter l'ID pour le prochain sous-modèle
-            next_submodel_id += 1
-
-            _logger.info(f"Sous-modèle '{node_name}' (local ID: {submodel_data['id']}) créé dans {submodel_dir}")
+        # Vérifier si des sous-modèles ont été créés
+        if not submodels:
+            _logger.warning(f"Aucun sous-modèle n'a été créé pour le modèle {parent_id}")
+            return False
 
         # Mettre à jour la structure JSON du modèle parent
         parent_model.write({
             'submodels_json': json.dumps(submodels, indent=2)
         })
 
-        # Créer l'équipement automatiquement pour les sous-modèles
+        # Créer les équipements automatiquement pour les sous-modèles
         self._create_equipment_for_submodels(parent_model, submodels)
 
         _logger.info(f"Hiérarchie importée avec succès: {len(submodels)} sous-modèles ajoutés au modèle {parent_id}")
