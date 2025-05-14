@@ -109,6 +109,59 @@ class CMMS3DController(http.Controller):
             _logger.error(f"Error serving 3D model file: {str(e)}")
             return request.not_found()
 
+    @http.route('/models3d/<int:model3d_id>/childs/<int:child_id>/<path:filename>', type='http', auth="public")
+    def models3d_child_content(self, model3d_id, child_id, filename, **kw):
+        """Sert les fichiers de modèles 3D enfants et leurs fichiers associés"""
+        try:
+            # Vérifier que le parent existe
+            parent_model = request.env['cmms.model3d'].sudo().browse(model3d_id)
+            if not parent_model.exists():
+                return request.not_found()
+
+            # Vérifier que l'enfant existe et est bien un enfant du parent
+            child_model = request.env['cmms.model3d'].sudo().browse(child_id)
+            if not child_model.exists() or child_model.parent_id.id != model3d_id:
+                return request.not_found()
+
+            # Chemin du fichier - Adapté pour Windows avec le nouveau format childs
+            file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
+                                                    str(model3d_id), 'childs', str(child_id), filename))
+
+            _logger.info(f"Tentative d'accès au fichier enfant: {file_path}, existe: {os.path.isfile(file_path)}")
+
+            # Vérification de l'existence du fichier
+            if not os.path.isfile(file_path):
+                # Si le fichier n'existe pas et n'est pas stocké dans la base
+                _logger.warning(f"Fichier enfant introuvable: {filename} à {file_path}")
+                return request.not_found()
+
+            # Lecture du fichier
+            with open(file_path, 'rb') as f:
+                content = f.read()
+
+            # Détermination du type MIME
+            content_type = self._get_mime_type(filename)
+
+            _logger.info(f"Fichier enfant servi avec succès: {filename} ({content_type})")
+
+            # Envoi du fichier avec des headers CORS explicites
+            return request.make_response(
+                content,
+                headers=[
+                    ('Content-Type', content_type),
+                    ('Content-Disposition', f'inline; filename={filename}'),
+                    ('Content-Length', len(content)),
+                    ('Access-Control-Allow-Origin', '*'),
+                    ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                    ('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'),
+                    ('Cache-Control', 'max-age=86400'), # Cache pour 1 jour
+                ]
+            )
+
+        except Exception as e:
+            _logger.error(f"Error serving child 3D model file: {str(e)}")
+            return request.not_found()
+
     def _get_mime_type(self, filename):
         """Détermine le type MIME en fonction de l'extension du fichier"""
         ext = os.path.splitext(filename.lower())[1]
