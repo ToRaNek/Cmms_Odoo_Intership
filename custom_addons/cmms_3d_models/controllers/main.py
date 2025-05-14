@@ -40,6 +40,10 @@ class CMMS3DController(http.Controller):
             elif filename in ['grunge-scratched-brushed-metal-background.jpg', 'zinc04.jpg']:
                 is_associated = True
                 _logger.info(f"Accès autorisé à la texture connue: {filename}")
+            # Amélioration: autoriser tous les fichiers .bin et fichiers image
+            elif filename.endswith(('.bin', '.jpg', '.jpeg', '.png', '.webp')):
+                is_associated = True
+                _logger.info(f"Accès autorisé à la ressource: {filename}")
 
             if not is_associated:
                 _logger.warning(f"Fichier non associé au modèle: {filename}")
@@ -109,31 +113,103 @@ class CMMS3DController(http.Controller):
             _logger.error(f"Error serving 3D model file: {str(e)}")
             return request.not_found()
 
-    @http.route('/models3d/<int:model3d_id>/childs/<int:child_id>/<path:filename>', type='http', auth="public")
-    def models3d_child_content(self, model3d_id, child_id, filename, **kw):
-        """Sert les fichiers de modèles 3D enfants et leurs fichiers associés"""
+    @http.route('/models3d/<int:model3d_id>/childs/<int:submodel_id>/<path:filename>', type='http', auth="public")
+    def models3d_child_content(self, model3d_id, submodel_id, filename, **kw):
+        """Sert les fichiers de sous-modèles avec la nouvelle structure"""
         try:
+            _logger.info(f"Requête pour sous-modèle: model_id={model3d_id}, submodel_id={submodel_id}, filename={filename}")
+
             # Vérifier que le parent existe
             parent_model = request.env['cmms.model3d'].sudo().browse(model3d_id)
             if not parent_model.exists():
+                _logger.error(f"Modèle parent {model3d_id} non trouvé")
                 return request.not_found()
 
-            # Vérifier que l'enfant existe et est bien un enfant du parent
-            child_model = request.env['cmms.model3d'].sudo().browse(child_id)
-            if not child_model.exists() or child_model.parent_id.id != model3d_id:
+            # Vérifier d'abord la nouvelle structure JSON
+            if parent_model.submodels_json:
+                try:
+                    submodels = json.loads(parent_model.submodels_json)
+                    submodel = next((sm for sm in submodels if sm.get('id') == submodel_id), None)
+
+                    if submodel:
+                        _logger.info(f"Sous-modèle trouvé dans JSON: {submodel['name']}")
+                        # Chemin du fichier pour la nouvelle structure
+                        file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
+                                                                 str(model3d_id), 'childs', str(submodel_id), filename))
+
+                        _logger.info(f"Chemin du fichier JSON: {file_path}")
+
+                        # Vérifier si le fichier existe
+                        if os.path.isfile(file_path):
+                            # Lecture du fichier
+                            with open(file_path, 'rb') as f:
+                                content = f.read()
+
+                            # Détermination du type MIME
+                            content_type = self._get_mime_type(filename)
+
+                            _logger.info(f"Fichier sous-modèle JSON servi avec succès: {filename} ({content_type})")
+
+                            # Envoi du fichier
+                            return request.make_response(
+                                content,
+                                headers=[
+                                    ('Content-Type', content_type),
+                                    ('Content-Disposition', f'inline; filename={filename}'),
+                                    ('Content-Length', len(content)),
+                                    ('Access-Control-Allow-Origin', '*'),
+                                    ('Access-Control-Allow-Methods', 'GET, OPTIONS'),
+                                    ('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'),
+                                    ('Cache-Control', 'max-age=86400'), # Cache pour 1 jour
+                                ]
+                            )
+                    else:
+                        _logger.warning(f"Sous-modèle ID {submodel_id} non trouvé dans JSON")
+                except Exception as e:
+                    _logger.error(f"Erreur lors de l'accès au sous-modèle JSON: {str(e)}")
+
+            # Si on arrive ici, on vérifie l'ancien système
+            _logger.info("Recherche du sous-modèle dans l'ancien système")
+            child_model = request.env['cmms.model3d'].sudo().browse(submodel_id)
+            if not child_model.exists():
+                _logger.error(f"Sous-modèle {submodel_id} non trouvé dans l'ancien système")
                 return request.not_found()
 
-            # Chemin du fichier - Adapté pour Windows avec le nouveau format childs
+            if child_model.parent_id.id != model3d_id:
+                _logger.error(f"Le sous-modèle {submodel_id} n'appartient pas au parent {model3d_id}")
+                return request.not_found()
+
+            # Ancien système - d'abord essayer le nouveau chemin (transition)
             file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
-                                                    str(model3d_id), 'childs', str(child_id), filename))
+                                                    str(model3d_id), 'childs', str(submodel_id), filename))
 
-            _logger.info(f"Tentative d'accès au fichier enfant: {file_path}, existe: {os.path.isfile(file_path)}")
+            _logger.info(f"Chemin du fichier ancien système (nouveau format): {file_path}")
 
-            # Vérification de l'existence du fichier
+            # Si le fichier n'existe pas dans la nouvelle structure, chercher dans l'ancienne
             if not os.path.isfile(file_path):
-                # Si le fichier n'existe pas et n'est pas stocké dans la base
-                _logger.warning(f"Fichier enfant introuvable: {filename} à {file_path}")
-                return request.not_found()
+                file_path = os.path.normpath(os.path.join('C:\\Users\\admin\\Desktop\\odoo\\models',
+                                                         str(submodel_id), filename))
+                _logger.info(f"Chemin du fichier ancien système (ancien format): {file_path}")
+
+            # Si toujours pas trouvé, vérifier si le fichier est stocké dans la base de données
+            if not os.path.isfile(file_path):
+                if filename == child_model.model_filename and child_model.model_file:
+                    content = base64.b64decode(child_model.model_file)
+                    # Créer les répertoires si nécessaire
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    # Sauvegarder le fichier
+                    with open(file_path, 'wb') as f:
+                        f.write(content)
+                elif filename == child_model.model_bin_filename and child_model.model_bin:
+                    content = base64.b64decode(child_model.model_bin)
+                    # Créer les répertoires si nécessaire
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    # Sauvegarder le fichier
+                    with open(file_path, 'wb') as f:
+                        f.write(content)
+                else:
+                    _logger.warning(f"Fichier sous-modèle introuvable: {filename} à {file_path}")
+                    return request.not_found()
 
             # Lecture du fichier
             with open(file_path, 'rb') as f:
@@ -142,9 +218,9 @@ class CMMS3DController(http.Controller):
             # Détermination du type MIME
             content_type = self._get_mime_type(filename)
 
-            _logger.info(f"Fichier enfant servi avec succès: {filename} ({content_type})")
+            _logger.info(f"Fichier sous-modèle servi avec succès: {filename} ({content_type})")
 
-            # Envoi du fichier avec des headers CORS explicites
+            # Envoi du fichier
             return request.make_response(
                 content,
                 headers=[
@@ -159,7 +235,7 @@ class CMMS3DController(http.Controller):
             )
 
         except Exception as e:
-            _logger.error(f"Error serving child 3D model file: {str(e)}")
+            _logger.error(f"Error serving submodel file: {str(e)}")
             return request.not_found()
 
     def _get_mime_type(self, filename):
@@ -219,30 +295,79 @@ class CMMS3DController(http.Controller):
 
         # Ajouter les sous-modèles si demandé
         if include_children:
-            def add_children(parent):
+            # Pour l'ancien système
+            def add_legacy_children(parent):
                 for child in parent.child_ids:
-                    models_data.append({
-                        'id': child.id,
-                        'name': child.name,
-                        'url': child.model_url,
-                        'scale': child.scale if child.scale is not None else 1.0,
-                        'position': {
-                            'x': child.position_x if child.position_x is not None else 0.0,
-                            'y': child.position_y if child.position_y is not None else 0.0,
-                            'z': child.position_z if child.position_z is not None else 0.0,
-                        },
-                        'rotation': {
-                            'x': child.rotation_x if child.rotation_x is not None else 0.0,
-                            'y': child.rotation_y if child.rotation_y is not None else 0.0,
-                            'z': child.rotation_z if child.rotation_z is not None else 0.0,
-                        },
-                        'is_child': True,
-                        'parent_id': parent.id,
-                    })
-                    # Récursion pour les enfants des enfants
-                    add_children(child)
+                    # Construire l'URL correcte pour l'ancien système
+                    child_url = None
+                    if child.model_url:
+                        # Utiliser l'URL du modèle directement - peut causer des problèmes
+                        child_url = child.model_url
+                    else:
+                        # Construire une URL basée sur le parent (plus fiable)
+                        child_name = child.model_filename or f"{child.name}.gltf"
+                        child_url = f"/models3d/{parent.id}/childs/{child.id}/{child_name}"
 
-            add_children(model3d)
+                    # Vérifier si ce sous-modèle n'est pas déjà inclu (cas de double définition)
+                    if not any(m.get('id') == child.id for m in models_data):
+                        models_data.append({
+                            'id': child.id,
+                            'name': child.name,
+                            'url': child_url,
+                            'scale': child.scale if child.scale is not None else 1.0,
+                            'position': {
+                                'x': child.position_x if child.position_x is not None else 0.0,
+                                'y': child.position_y if child.position_y is not None else 0.0,
+                                'z': child.position_z if child.position_z is not None else 0.0,
+                            },
+                            'rotation': {
+                                'x': child.rotation_x if child.rotation_x is not None else 0.0,
+                                'y': child.rotation_y if child.rotation_y is not None else 0.0,
+                                'z': child.rotation_z if child.rotation_z is not None else 0.0,
+                            },
+                            'is_child': True,
+                            'parent_id': parent.id,
+                            'legacy': True  # Marquer comme ancien système
+                        })
+                    # Récursion pour les enfants des enfants
+                    add_legacy_children(child)
+
+            # D'abord, ajouter les sous-modèles en JSON si disponibles
+            if model3d.submodels_json:
+                try:
+                    submodels_json = json.loads(model3d.submodels_json)
+                    for submodel in submodels_json:
+                        # Construire l'URL correcte pour chaque sous-modèle
+                        gltf_path = submodel.get('gltf_path', '')
+                        if gltf_path:
+                            basename = os.path.basename(gltf_path)
+                            submodel_url = f"/models3d/{model3d.id}/childs/{submodel.get('id')}/{basename}"
+
+                            # Ajouter le sous-modèle à la liste
+                            models_data.append({
+                                'id': submodel.get('id'),
+                                'name': submodel.get('name', 'Sous-modèle'),
+                                'url': submodel_url,
+                                'scale': submodel.get('scale', 1.0),
+                                'position': {
+                                    'x': submodel.get('position', {}).get('x', 0.0),
+                                    'y': submodel.get('position', {}).get('y', 0.0),
+                                    'z': submodel.get('position', {}).get('z', 0.0)
+                                },
+                                'rotation': {
+                                    'x': submodel.get('rotation', {}).get('x', 0.0),
+                                    'y': submodel.get('rotation', {}).get('y', 0.0),
+                                    'z': submodel.get('rotation', {}).get('z', 0.0)
+                                },
+                                'is_child': True,
+                                'parent_id': model3d.id,
+                                'json': True  # Marquer comme nouveau système JSON
+                            })
+                except Exception as e:
+                    _logger.error(f"Erreur lors du traitement des sous-modèles JSON: {str(e)}")
+
+            # Ensuite, ajouter les sous-modèles de l'ancien système
+            add_legacy_children(model3d)
 
         # Passer les données des modèles au template
         models_json = json.dumps(models_data)
@@ -328,6 +453,20 @@ class CMMS3DController(http.Controller):
                     background-color: rgba(0,0,0,0.5);
                     font-size: 14px;
                 }
+                #debug {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                    background: rgba(0,0,0,0.5);
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    font-size: 12px;
+                    max-width: 300px;
+                    max-height: 150px;
+                    overflow: auto;
+                    z-index: 100;
+                }
 
                 /* Nouveau style pour le sélecteur de sous-modèles */
                 #submodelSelector {
@@ -388,6 +527,7 @@ class CMMS3DController(http.Controller):
                 <p id="errorMessage"></p>
                 <p>Vérifiez que tous les fichiers nécessaires (textures, binaires) ont été téléchargés correctement.</p>
             </div>
+            <div id="debug"></div>
 
             <!-- Import Three.js et ses extensions depuis les CDN -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -396,8 +536,43 @@ class CMMS3DController(http.Controller):
             <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
 
             <script>
+                // Debug log helper
+                function debugLog(message) {
+                    const debugEl = document.getElementById('debug');
+                    const entry = document.createElement('div');
+                    entry.textContent = message;
+                    debugEl.appendChild(entry);
+
+                    // Scroll to bottom
+                    debugEl.scrollTop = debugEl.scrollHeight;
+
+                    // Limit entries
+                    while (debugEl.children.length > 20) {
+                        debugEl.removeChild(debugEl.firstChild);
+                    }
+
+                    console.log(message);
+                }
+
                 // Données des modèles
                 const modelsData = %s;
+                debugLog(`Modèles chargés: ${modelsData.length}`);
+
+                // Log modèle principal
+                if (modelsData.length > 0) {
+                    debugLog(`Modèle principal: ${modelsData[0].name}, URL: ${modelsData[0].url}`);
+                }
+
+                // Log sous-modèles
+                if (modelsData.length > 1) {
+                    debugLog(`Nombre de sous-modèles: ${modelsData.length - 1}`);
+                    for (let i = 1; i < Math.min(5, modelsData.length); i++) {
+                        debugLog(`Sous-modèle #${i}: ${modelsData[i].name}, URL: ${modelsData[i].url}`);
+                    }
+                    if (modelsData.length > 5) {
+                        debugLog(`... et ${modelsData.length - 5} autres sous-modèles`);
+                    }
+                }
 
                 // Variables pour Three.js
                 let scene, camera, renderer, controls;
@@ -490,9 +665,12 @@ class CMMS3DController(http.Controller):
                     // Ajouter un indicateur de chargement
                     document.getElementById('loading').style.display = 'block';
 
+                    debugLog(`Chargement du modèle: ${modelData.name} (${modelData.url})`);
+
                     // For GLTFLoader, the path is critical for finding textures
                     // All textures must be in the same directory as the main GLTF file
                     const modelUrlDir = modelData.url.substring(0, modelData.url.lastIndexOf('/') + 1);
+                    debugLog(`Répertoire de ressources: ${modelUrlDir}`);
 
                     // Set resource path for loader to help find textures
                     loader.setResourcePath(modelUrlDir);
@@ -501,6 +679,7 @@ class CMMS3DController(http.Controller):
                         modelData.url,
                         function (gltf) {
                             try {
+                                debugLog(`Modèle chargé avec succès: ${modelData.name}`);
                                 const model = gltf.scene;
 
                                 // Appliquer les transformations
@@ -545,6 +724,7 @@ class CMMS3DController(http.Controller):
                                 }
                             } catch (e) {
                                 showError("Erreur lors du traitement du modèle 3D: " + e.message);
+                                debugLog(`Erreur lors du traitement du modèle: ${e.message}`);
                                 console.error("Model processing error:", e);
                             }
                         },
@@ -554,6 +734,7 @@ class CMMS3DController(http.Controller):
                         },
                         function (error) {
                             console.error('Error loading 3D model:', error);
+                            debugLog(`Erreur de chargement: ${error.message}`);
                             showError("Erreur lors du chargement du modèle 3D: " + error.message);
                         }
                     );
@@ -787,61 +968,16 @@ class CMMS3DController(http.Controller):
             }
         }
 
-    @http.route('/web/cmms/upload_model', type='http', auth="user", methods=['POST'], csrf=False)
-    def upload_model(self, **kw):
-        """API pour télécharger un modèle 3D depuis Blender"""
+    @http.route('/web/cmms/submodels/<int:model3d_id>', type='json', auth="user")
+    def get_model_submodels(self, model3d_id, **kw):
+        """Récupère les sous-modèles d'un modèle 3D"""
+        model = request.env['cmms.model3d'].sudo().browse(model3d_id)
+        if not model.exists() or not model.submodels_json:
+            return []
+
         try:
-            name = kw.get('name')
-            description = kw.get('description')
-            file = kw.get('file')
-
-            if not file or not name:
-                return request.make_response(
-                    json.dumps({'error': 'Le fichier et le nom sont requis'}),
-                    headers=[('Content-Type', 'application/json')],
-                    status=400
-                )
-
-            # Vérifier le type de fichier
-            filename = file.filename
-            if not (filename.endswith('.gltf') or filename.endswith('.glb') or filename.endswith('.blend')):
-                return request.make_response(
-                    json.dumps({'error': 'Le fichier doit être au format glTF, GLB ou Blend'}),
-                    headers=[('Content-Type', 'application/json')],
-                    status=400
-                )
-
-            # Lire le contenu du fichier
-            file_content = file.read()
-            file_base64 = base64.b64encode(file_content).decode('utf-8')
-
-            # Déterminer le format
-            format = 'gltf' if filename.endswith('.gltf') else 'glb'
-            if filename.endswith('.blend'):
-                format = 'blend'
-
-            # Créer le modèle 3D
-            model3d = request.env['cmms.model3d'].create({
-                'name': name,
-                'description': description or '',
-                'model_file': file_base64,
-                'model_filename': filename,
-                'model_format': format,
-            })
-
-            return request.make_response(
-                json.dumps({
-                    'success': True,
-                    'id': model3d.id,
-                    'name': model3d.name,
-                    'url': model3d.model_url
-                }),
-                headers=[('Content-Type', 'application/json')]
-            )
-
-        except Exception as e:
-            return request.make_response(
-                json.dumps({'error': str(e)}),
-                headers=[('Content-Type', 'application/json')],
-                status=500
-            )
+            submodels = json.loads(model.submodels_json)
+            return submodels
+        except json.JSONDecodeError:
+            _logger.error(f"Erreur de décodage JSON pour le modèle {model3d_id}")
+            return []

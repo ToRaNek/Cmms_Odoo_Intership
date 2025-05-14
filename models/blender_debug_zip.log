@@ -1,696 +1,696 @@
-CMD: C:\Program Files\Blender Foundation\Blender 4.4\blender.exe --background -noaudio --python C:\Users\admin\Desktop\odoo\blender_scripts\blend_to_gltf.py -- C:\Users\admin\Desktop\odoo\models\681\pantografo.blend C:\Users\admin\Desktop\odoo\models\681\pantografo.gltf
+CMD: C:\Program Files\Blender Foundation\Blender 4.4\blender.exe --background -noaudio --python C:\Users\admin\Desktop\odoo\blender_scripts\blend_to_gltf.py -- C:\Users\admin\Desktop\odoo\models\2\pantografo.blend C:\Users\admin\Desktop\odoo\models\2\pantografo.gltf
 RETURNCODE: 0
 -- STDOUT --
 INFO Draco mesh compression is available, use library at C:\Program Files\Blender Foundation\Blender 4.4\4.4\scripts\addons_core\io_scene_gltf2\extern_draco.dll
-13:37:38 | INFO: Starting glTF 2.0 export
-13:37:38 | INFO: Extracting primitive: Cylinder.171
-13:37:38 | INFO: Primitives created: 1
-13:37:38 | INFO: Extracting primitive: Cylinder.167
-13:37:38 | INFO: Primitives created: 1
-13:37:38 | INFO: Extracting primitive: Cylinder.051
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.012
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.011
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.010
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.009
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.008
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.007
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.006
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: BÃ©zierCurve.005
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.001
-13:37:39 | INFO: Primitives created: 2
-13:37:39 | INFO: Extracting primitive: NurbsCurve
-13:37:39 | INFO: Primitives created: 2
-13:37:39 | INFO: Extracting primitive: NurbsCurve.003
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.005
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.004
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.003
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.009
-13:37:39 | INFO: Primitives created: 1
-13:37:39 | INFO: Extracting primitive: NurbsCurve.007
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: NurbsCurve.006
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: NurbsCurve.002
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: NurbsCurve.001
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: NurbsCurve
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cube.027
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.099
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.092
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.091
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.042
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.090
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.089
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.088
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.087
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.086
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.085
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.084
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.083
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.082
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.081
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.080
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.079
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.098
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.074
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.073
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.072
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.070
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.178
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.177
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.097
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.071
-13:37:40 | INFO: Primitives created: 3
-13:37:40 | INFO: Extracting primitive: Cylinder.069
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.068
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.067
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.066
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.065
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.064
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.061
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.037
-13:37:40 | INFO: Primitives created: 1
-13:37:40 | INFO: Extracting primitive: Cylinder.017
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.004
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.059
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.058
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.057
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.056
-13:37:41 | INFO: Primitives created: 2
-13:37:41 | INFO: Extracting primitive: Cylinder.055
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.054
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.053
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.052
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.050
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.049
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.048
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.047
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.046
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.045
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.044
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.043
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.041
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.040
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.039
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.038
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.003
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.036
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.035
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.034
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.033
-13:37:41 | INFO: Primitives created: 1
-13:37:41 | INFO: Extracting primitive: Cylinder.032
-13:37:42 | INFO: Primitives created: 2
-13:37:42 | INFO: Extracting primitive: Cylinder.031
-13:37:43 | INFO: Primitives created: 1
-13:37:43 | INFO: Extracting primitive: Cylinder.030
-13:37:43 | INFO: Primitives created: 1
-13:37:43 | INFO: Extracting primitive: Cylinder.029
-13:37:43 | INFO: Primitives created: 1
-13:37:43 | INFO: Extracting primitive: Cylinder.028
-13:37:43 | INFO: Primitives created: 1
-13:37:43 | INFO: Extracting primitive: Cylinder.027
-13:37:43 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.026
-13:37:44 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.025
-13:37:44 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.096
-13:37:44 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.023
-13:37:44 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.022
-13:37:44 | INFO: Primitives created: 1
-13:37:44 | INFO: Extracting primitive: Cylinder.020
-13:37:44 | INFO: Primitives created: 2
-13:37:45 | INFO: Extracting primitive: Cylinder.001
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.015
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.021
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.016
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.007
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.014
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.013
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.011
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.009
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.008
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.012
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.006
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.005
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.062
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.060
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.002
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.019
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cylinder.018
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cube.039
-13:37:45 | INFO: Primitives created: 1
-13:37:45 | INFO: Extracting primitive: Cube.043
-13:37:46 | INFO: Primitives created: 1
-13:37:46 | INFO: Extracting primitive: Cube.037
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.038
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.042
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.036
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.035
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.034
-13:37:48 | INFO: Primitives created: 1
-13:37:48 | INFO: Extracting primitive: Cube.033
-13:37:50 | INFO: Primitives created: 2
-13:37:50 | INFO: Extracting primitive: Cube.032
-13:37:50 | INFO: Primitives created: 1
-13:37:50 | INFO: Extracting primitive: Cube.031
-13:37:50 | INFO: Primitives created: 1
-13:37:50 | INFO: Extracting primitive: Cube.030
-13:37:52 | INFO: Primitives created: 2
-13:37:52 | INFO: Extracting primitive: Cube.029
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.028
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.021
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.025
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.024
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.023
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.022
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.026
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.020
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.019
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.018
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.017
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.016
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.015
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.012
-13:37:52 | INFO: Primitives created: 2
-13:37:52 | INFO: Extracting primitive: Cube.011
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.010
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.009
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.008
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.004
-13:37:52 | INFO: Primitives created: 1
-13:37:52 | INFO: Extracting primitive: Cube.002
-13:37:52 | INFO: Primitives created: 1
-13:37:53 | INFO: Extracting primitive: Cube.001
-13:37:54 | INFO: Primitives created: 3
-13:37:54 | INFO: Extracting primitive: Cube
-13:37:54 | INFO: Primitives created: 1
-13:37:54 | INFO: Extracting primitive: Cube.014
-13:37:58 | INFO: Primitives created: 1
-13:37:59 | INFO: Extracting primitive: Cube.005
-13:37:59 | INFO: Primitives created: 1
-13:37:59 | INFO: Extracting primitive: Circle.006
-13:37:59 | INFO: Primitives created: 1
-13:38:00 | INFO: Extracting primitive: Circle.004
-13:38:01 | INFO: Primitives created: 1
-13:38:01 | INFO: Extracting primitive: Circle.001
-13:38:02 | INFO: Primitives created: 1
-13:38:02 | INFO: Extracting primitive: Circle.002
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.013
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.007
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.005
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.004
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.003
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.006
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.002
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.001
-13:38:03 | INFO: Primitives created: 2
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.004
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.002
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve.001
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: BÃ©zierCurve
-13:38:03 | INFO: Primitives created: 1
-13:38:03 | INFO: Extracting primitive: Cylinder.077
-13:38:03 | INFO: Primitives created: 1
-13:38:08 | INFO: Finished glTF 2.0 export in 30.077723026275635 s
+15:26:31 | INFO: Starting glTF 2.0 export
+15:26:31 | INFO: Extracting primitive: Cylinder.171
+15:26:31 | INFO: Primitives created: 1
+15:26:31 | INFO: Extracting primitive: Cylinder.167
+15:26:31 | INFO: Primitives created: 1
+15:26:31 | INFO: Extracting primitive: Cylinder.051
+15:26:32 | INFO: Primitives created: 1
+15:26:32 | INFO: Extracting primitive: BÃ©zierCurve.012
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.011
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.010
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.009
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.008
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.007
+15:26:33 | INFO: Primitives created: 1
+15:26:33 | INFO: Extracting primitive: BÃ©zierCurve.006
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: BÃ©zierCurve.005
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.001
+15:26:34 | INFO: Primitives created: 2
+15:26:34 | INFO: Extracting primitive: NurbsCurve
+15:26:34 | INFO: Primitives created: 2
+15:26:34 | INFO: Extracting primitive: NurbsCurve.003
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.005
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.004
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.003
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.009
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.007
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.006
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.002
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve.001
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: NurbsCurve
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cube.027
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.099
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.092
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.091
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.042
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.090
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.089
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.088
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.087
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.086
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.085
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.084
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.083
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.082
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.081
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.080
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.079
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.098
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.074
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.073
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.072
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.070
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.178
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.177
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.097
+15:26:34 | INFO: Primitives created: 1
+15:26:34 | INFO: Extracting primitive: Cylinder.071
+15:26:35 | INFO: Primitives created: 3
+15:26:35 | INFO: Extracting primitive: Cylinder.069
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.068
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.067
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.066
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.065
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.064
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.061
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.037
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.017
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.004
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.059
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.058
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.057
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.056
+15:26:35 | INFO: Primitives created: 2
+15:26:35 | INFO: Extracting primitive: Cylinder.055
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.054
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.053
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.052
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.050
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.049
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.048
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.047
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.046
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.045
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.044
+15:26:35 | INFO: Primitives created: 1
+15:26:35 | INFO: Extracting primitive: Cylinder.043
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.041
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.040
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.039
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.038
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.003
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.036
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.035
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.034
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.033
+15:26:36 | INFO: Primitives created: 1
+15:26:36 | INFO: Extracting primitive: Cylinder.032
+15:26:36 | INFO: Primitives created: 2
+15:26:36 | INFO: Extracting primitive: Cylinder.031
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.030
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.029
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.028
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.027
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.026
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.025
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.096
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.023
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.022
+15:26:37 | INFO: Primitives created: 1
+15:26:37 | INFO: Extracting primitive: Cylinder.020
+15:26:38 | INFO: Primitives created: 2
+15:26:38 | INFO: Extracting primitive: Cylinder.001
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.015
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.021
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.016
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.007
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.014
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.013
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.011
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.009
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.008
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.012
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.006
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.005
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.062
+15:26:38 | INFO: Primitives created: 1
+15:26:38 | INFO: Extracting primitive: Cylinder.060
+15:26:38 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cylinder
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cylinder.002
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cylinder.019
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cylinder.018
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cube.039
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cube.043
+15:26:39 | INFO: Primitives created: 1
+15:26:39 | INFO: Extracting primitive: Cube.037
+15:26:40 | INFO: Primitives created: 1
+15:26:40 | INFO: Extracting primitive: Cube.038
+15:26:40 | INFO: Primitives created: 1
+15:26:40 | INFO: Extracting primitive: Cube.042
+15:26:40 | INFO: Primitives created: 1
+15:26:40 | INFO: Extracting primitive: Cube.036
+15:26:40 | INFO: Primitives created: 1
+15:26:40 | INFO: Extracting primitive: Cube.035
+15:26:40 | INFO: Primitives created: 1
+15:26:40 | INFO: Extracting primitive: Cube.034
+15:26:40 | INFO: Primitives created: 1
+15:26:41 | INFO: Extracting primitive: Cube.033
+15:26:41 | INFO: Primitives created: 2
+15:26:41 | INFO: Extracting primitive: Cube.032
+15:26:41 | INFO: Primitives created: 1
+15:26:41 | INFO: Extracting primitive: Cube.031
+15:26:41 | INFO: Primitives created: 1
+15:26:41 | INFO: Extracting primitive: Cube.030
+15:26:42 | INFO: Primitives created: 2
+15:26:42 | INFO: Extracting primitive: Cube.029
+15:26:42 | INFO: Primitives created: 1
+15:26:42 | INFO: Extracting primitive: Cube.028
+15:26:42 | INFO: Primitives created: 1
+15:26:42 | INFO: Extracting primitive: Cube.021
+15:26:42 | INFO: Primitives created: 1
+15:26:42 | INFO: Extracting primitive: Cube.025
+15:26:42 | INFO: Primitives created: 1
+15:26:42 | INFO: Extracting primitive: Cube.024
+15:26:42 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.023
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.022
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.026
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.020
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.019
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.018
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.017
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.016
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.015
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.012
+15:26:43 | INFO: Primitives created: 2
+15:26:43 | INFO: Extracting primitive: Cube.011
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.010
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.009
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.008
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.004
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.002
+15:26:43 | INFO: Primitives created: 1
+15:26:43 | INFO: Extracting primitive: Cube.001
+15:26:43 | INFO: Primitives created: 3
+15:26:44 | INFO: Extracting primitive: Cube
+15:26:44 | INFO: Primitives created: 1
+15:26:44 | INFO: Extracting primitive: Cube.014
+15:26:46 | INFO: Primitives created: 1
+15:26:46 | INFO: Extracting primitive: Cube.005
+15:26:46 | INFO: Primitives created: 1
+15:26:46 | INFO: Extracting primitive: Circle.006
+15:26:46 | INFO: Primitives created: 1
+15:26:46 | INFO: Extracting primitive: Circle.004
+15:26:47 | INFO: Primitives created: 1
+15:26:47 | INFO: Extracting primitive: Circle.001
+15:26:47 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: Circle.002
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.013
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.007
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.005
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.004
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.003
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.006
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.002
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.001
+15:26:48 | INFO: Primitives created: 2
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.004
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.002
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve.001
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: BÃ©zierCurve
+15:26:48 | INFO: Primitives created: 1
+15:26:48 | INFO: Extracting primitive: Cylinder.077
+15:26:48 | INFO: Primitives created: 1
+15:26:51 | INFO: Finished glTF 2.0 export in 19.775436878204346 s
 Blender 4.4.3 (hash 802179c51ccc built 2025-04-29 15:39:58)
 
-CONVERTED_FILE=C:\Users\admin\Desktop\odoo\models\681\pantografo.gltf
-BINARY_FILE=C:\Users\admin\Desktop\odoo\models\681\pantografo.bin
+CONVERTED_FILE=C:\Users\admin\Desktop\odoo\models\2\pantografo.gltf
+BINARY_FILE=C:\Users\admin\Desktop\odoo\models\2\pantografo.bin
 CONVERT_OK=1
 
 -- STDERR --
-2025-05-14 13:37:34,899 - INFO - Nettoyage de la scÃ¨ne...
-2025-05-14 13:37:34,903 - INFO - Chargement du fichier .blend: C:\Users\admin\Desktop\odoo\models\681\pantografo.blend
-2025-05-14 13:37:34,982 - INFO - ChargÃ© 171 objets et 13 collections
-2025-05-14 13:37:34,982 - INFO - Exportation au format GLTF: C:\Users\admin\Desktop\odoo\models\681\pantografo.gltf
-2025-05-14 13:37:38,406 - INFO - Starting glTF 2.0 export
-2025-05-14 13:37:38,415 - INFO - Extracting primitive: Cylinder.171
-2025-05-14 13:37:38,419 - INFO - Primitives created: 1
-2025-05-14 13:37:38,419 - INFO - Extracting primitive: Cylinder.167
-2025-05-14 13:37:38,422 - INFO - Primitives created: 1
-2025-05-14 13:37:38,444 - INFO - Extracting primitive: Cylinder.051
-2025-05-14 13:37:39,180 - INFO - Primitives created: 1
-2025-05-14 13:37:39,219 - INFO - Extracting primitive: BÃ©zierCurve.012
-2025-05-14 13:37:39,300 - INFO - Primitives created: 1
-2025-05-14 13:37:39,322 - INFO - Extracting primitive: BÃ©zierCurve.011
-2025-05-14 13:37:39,368 - INFO - Primitives created: 1
-2025-05-14 13:37:39,391 - INFO - Extracting primitive: BÃ©zierCurve.010
-2025-05-14 13:37:39,438 - INFO - Primitives created: 1
-2025-05-14 13:37:39,461 - INFO - Extracting primitive: BÃ©zierCurve.009
-2025-05-14 13:37:39,509 - INFO - Primitives created: 1
-2025-05-14 13:37:39,534 - INFO - Extracting primitive: BÃ©zierCurve.008
-2025-05-14 13:37:39,588 - INFO - Primitives created: 1
-2025-05-14 13:37:39,611 - INFO - Extracting primitive: BÃ©zierCurve.007
-2025-05-14 13:37:39,665 - INFO - Primitives created: 1
-2025-05-14 13:37:39,687 - INFO - Extracting primitive: BÃ©zierCurve.006
-2025-05-14 13:37:39,739 - INFO - Primitives created: 1
-2025-05-14 13:37:39,763 - INFO - Extracting primitive: BÃ©zierCurve.005
-2025-05-14 13:37:39,811 - INFO - Primitives created: 1
-2025-05-14 13:37:39,823 - INFO - Extracting primitive: NurbsCurve.001
-2025-05-14 13:37:39,910 - INFO - Primitives created: 2
-2025-05-14 13:37:39,922 - INFO - Extracting primitive: NurbsCurve
-2025-05-14 13:37:39,953 - INFO - Primitives created: 2
-2025-05-14 13:37:39,960 - INFO - Extracting primitive: NurbsCurve.003
-2025-05-14 13:37:39,974 - INFO - Primitives created: 1
-2025-05-14 13:37:39,975 - INFO - Extracting primitive: NurbsCurve.005
-2025-05-14 13:37:39,978 - INFO - Primitives created: 1
-2025-05-14 13:37:39,978 - INFO - Extracting primitive: NurbsCurve.004
-2025-05-14 13:37:39,982 - INFO - Primitives created: 1
-2025-05-14 13:37:39,982 - INFO - Extracting primitive: NurbsCurve.003
-2025-05-14 13:37:39,990 - INFO - Primitives created: 1
-2025-05-14 13:37:39,990 - INFO - Extracting primitive: NurbsCurve.009
-2025-05-14 13:37:39,999 - INFO - Primitives created: 1
-2025-05-14 13:37:39,999 - INFO - Extracting primitive: NurbsCurve.007
-2025-05-14 13:37:40,009 - INFO - Primitives created: 1
-2025-05-14 13:37:40,009 - INFO - Extracting primitive: NurbsCurve.006
-2025-05-14 13:37:40,018 - INFO - Primitives created: 1
-2025-05-14 13:37:40,018 - INFO - Extracting primitive: NurbsCurve.002
-2025-05-14 13:37:40,026 - INFO - Primitives created: 1
-2025-05-14 13:37:40,027 - INFO - Extracting primitive: NurbsCurve.001
-2025-05-14 13:37:40,035 - INFO - Primitives created: 1
-2025-05-14 13:37:40,035 - INFO - Extracting primitive: NurbsCurve
-2025-05-14 13:37:40,054 - INFO - Primitives created: 1
-2025-05-14 13:37:40,056 - INFO - Extracting primitive: Cube.027
-2025-05-14 13:37:40,061 - INFO - Primitives created: 1
-2025-05-14 13:37:40,061 - INFO - Extracting primitive: Cylinder.099
-2025-05-14 13:37:40,063 - INFO - Primitives created: 1
-2025-05-14 13:37:40,063 - INFO - Extracting primitive: Cylinder.092
-2025-05-14 13:37:40,064 - INFO - Primitives created: 1
-2025-05-14 13:37:40,064 - INFO - Extracting primitive: Cylinder.091
-2025-05-14 13:37:40,064 - INFO - Primitives created: 1
-2025-05-14 13:37:40,064 - INFO - Extracting primitive: Cylinder.042
-2025-05-14 13:37:40,068 - INFO - Primitives created: 1
-2025-05-14 13:37:40,068 - INFO - Extracting primitive: Cylinder.090
-2025-05-14 13:37:40,070 - INFO - Primitives created: 1
-2025-05-14 13:37:40,070 - INFO - Extracting primitive: Cylinder.089
-2025-05-14 13:37:40,070 - INFO - Primitives created: 1
-2025-05-14 13:37:40,072 - INFO - Extracting primitive: Cylinder.088
-2025-05-14 13:37:40,072 - INFO - Primitives created: 1
-2025-05-14 13:37:40,072 - INFO - Extracting primitive: Cylinder.087
-2025-05-14 13:37:40,075 - INFO - Primitives created: 1
-2025-05-14 13:37:40,075 - INFO - Extracting primitive: Cylinder.086
-2025-05-14 13:37:40,075 - INFO - Primitives created: 1
-2025-05-14 13:37:40,077 - INFO - Extracting primitive: Cylinder.085
-2025-05-14 13:37:40,077 - INFO - Primitives created: 1
-2025-05-14 13:37:40,077 - INFO - Extracting primitive: Cylinder.084
-2025-05-14 13:37:40,077 - INFO - Primitives created: 1
-2025-05-14 13:37:40,077 - INFO - Extracting primitive: Cylinder.083
-2025-05-14 13:37:40,080 - INFO - Primitives created: 1
-2025-05-14 13:37:40,080 - INFO - Extracting primitive: Cylinder.082
-2025-05-14 13:37:40,080 - INFO - Primitives created: 1
-2025-05-14 13:37:40,083 - INFO - Extracting primitive: Cylinder.081
-2025-05-14 13:37:40,085 - INFO - Primitives created: 1
-2025-05-14 13:37:40,085 - INFO - Extracting primitive: Cylinder.080
-2025-05-14 13:37:40,086 - INFO - Primitives created: 1
-2025-05-14 13:37:40,087 - INFO - Extracting primitive: Cylinder.079
-2025-05-14 13:37:40,088 - INFO - Primitives created: 1
-2025-05-14 13:37:40,089 - INFO - Extracting primitive: Cylinder.098
-2025-05-14 13:37:40,091 - INFO - Primitives created: 1
-2025-05-14 13:37:40,092 - INFO - Extracting primitive: Cylinder.074
-2025-05-14 13:37:40,093 - INFO - Primitives created: 1
-2025-05-14 13:37:40,093 - INFO - Extracting primitive: Cylinder.073
-2025-05-14 13:37:40,098 - INFO - Primitives created: 1
-2025-05-14 13:37:40,099 - INFO - Extracting primitive: Cylinder.072
-2025-05-14 13:37:40,104 - INFO - Primitives created: 1
-2025-05-14 13:37:40,105 - INFO - Extracting primitive: Cylinder.070
-2025-05-14 13:37:40,108 - INFO - Primitives created: 1
-2025-05-14 13:37:40,110 - INFO - Extracting primitive: Cylinder.178
-2025-05-14 13:37:40,110 - INFO - Primitives created: 1
-2025-05-14 13:37:40,113 - INFO - Extracting primitive: Cylinder.177
-2025-05-14 13:37:40,114 - INFO - Primitives created: 1
-2025-05-14 13:37:40,116 - INFO - Extracting primitive: Cylinder.097
-2025-05-14 13:37:40,117 - INFO - Primitives created: 1
-2025-05-14 13:37:40,204 - INFO - Extracting primitive: Cylinder.071
-2025-05-14 13:37:40,900 - INFO - Primitives created: 3
-2025-05-14 13:37:40,964 - INFO - Extracting primitive: Cylinder.069
-2025-05-14 13:37:40,966 - INFO - Primitives created: 1
-2025-05-14 13:37:40,966 - INFO - Extracting primitive: Cylinder.068
-2025-05-14 13:37:40,966 - INFO - Primitives created: 1
-2025-05-14 13:37:40,966 - INFO - Extracting primitive: Cylinder.067
-2025-05-14 13:37:40,971 - INFO - Primitives created: 1
-2025-05-14 13:37:40,971 - INFO - Extracting primitive: Cylinder.066
-2025-05-14 13:37:40,974 - INFO - Primitives created: 1
-2025-05-14 13:37:40,974 - INFO - Extracting primitive: Cylinder.065
-2025-05-14 13:37:40,984 - INFO - Primitives created: 1
-2025-05-14 13:37:40,984 - INFO - Extracting primitive: Cylinder.064
-2025-05-14 13:37:40,986 - INFO - Primitives created: 1
-2025-05-14 13:37:40,986 - INFO - Extracting primitive: Cylinder.061
-2025-05-14 13:37:40,986 - INFO - Primitives created: 1
-2025-05-14 13:37:40,986 - INFO - Extracting primitive: Cylinder.037
-2025-05-14 13:37:40,990 - INFO - Primitives created: 1
-2025-05-14 13:37:40,994 - INFO - Extracting primitive: Cylinder.017
-2025-05-14 13:37:41,001 - INFO - Primitives created: 1
-2025-05-14 13:37:41,001 - INFO - Extracting primitive: Cylinder.004
-2025-05-14 13:37:41,003 - INFO - Primitives created: 1
-2025-05-14 13:37:41,004 - INFO - Extracting primitive: Cylinder.059
-2025-05-14 13:37:41,004 - INFO - Primitives created: 1
-2025-05-14 13:37:41,011 - INFO - Extracting primitive: Cylinder.058
-2025-05-14 13:37:41,023 - INFO - Primitives created: 1
-2025-05-14 13:37:41,025 - INFO - Extracting primitive: Cylinder.057
-2025-05-14 13:37:41,025 - INFO - Primitives created: 1
-2025-05-14 13:37:41,056 - INFO - Extracting primitive: Cylinder.056
-2025-05-14 13:37:41,136 - INFO - Primitives created: 2
-2025-05-14 13:37:41,148 - INFO - Extracting primitive: Cylinder.055
-2025-05-14 13:37:41,152 - INFO - Primitives created: 1
-2025-05-14 13:37:41,153 - INFO - Extracting primitive: Cylinder.054
-2025-05-14 13:37:41,156 - INFO - Primitives created: 1
-2025-05-14 13:37:41,156 - INFO - Extracting primitive: Cylinder.053
-2025-05-14 13:37:41,156 - INFO - Primitives created: 1
-2025-05-14 13:37:41,199 - INFO - Extracting primitive: Cylinder.052
-2025-05-14 13:37:41,425 - INFO - Primitives created: 1
-2025-05-14 13:37:41,452 - INFO - Extracting primitive: Cylinder.050
-2025-05-14 13:37:41,455 - INFO - Primitives created: 1
-2025-05-14 13:37:41,455 - INFO - Extracting primitive: Cylinder.049
-2025-05-14 13:37:41,455 - INFO - Primitives created: 1
-2025-05-14 13:37:41,455 - INFO - Extracting primitive: Cylinder.048
-2025-05-14 13:37:41,455 - INFO - Primitives created: 1
-2025-05-14 13:37:41,455 - INFO - Extracting primitive: Cylinder.047
-2025-05-14 13:37:41,455 - INFO - Primitives created: 1
-2025-05-14 13:37:41,455 - INFO - Extracting primitive: Cylinder.046
-2025-05-14 13:37:41,459 - INFO - Primitives created: 1
-2025-05-14 13:37:41,459 - INFO - Extracting primitive: Cylinder.045
-2025-05-14 13:37:41,462 - INFO - Primitives created: 1
-2025-05-14 13:37:41,462 - INFO - Extracting primitive: Cylinder.044
-2025-05-14 13:37:41,463 - INFO - Primitives created: 1
-2025-05-14 13:37:41,505 - INFO - Extracting primitive: Cylinder.043
-2025-05-14 13:37:41,735 - INFO - Primitives created: 1
-2025-05-14 13:37:41,765 - INFO - Extracting primitive: Cylinder.041
-2025-05-14 13:37:41,765 - INFO - Primitives created: 1
-2025-05-14 13:37:41,767 - INFO - Extracting primitive: Cylinder.040
-2025-05-14 13:37:41,768 - INFO - Primitives created: 1
-2025-05-14 13:37:41,769 - INFO - Extracting primitive: Cylinder.039
-2025-05-14 13:37:41,769 - INFO - Primitives created: 1
-2025-05-14 13:37:41,769 - INFO - Extracting primitive: Cylinder.038
-2025-05-14 13:37:41,769 - INFO - Primitives created: 1
-2025-05-14 13:37:41,771 - INFO - Extracting primitive: Cylinder.003
-2025-05-14 13:37:41,773 - INFO - Primitives created: 1
-2025-05-14 13:37:41,773 - INFO - Extracting primitive: Cylinder.036
-2025-05-14 13:37:41,777 - INFO - Primitives created: 1
-2025-05-14 13:37:41,777 - INFO - Extracting primitive: Cylinder.035
-2025-05-14 13:37:41,784 - INFO - Primitives created: 1
-2025-05-14 13:37:41,786 - INFO - Extracting primitive: Cylinder.034
-2025-05-14 13:37:41,786 - INFO - Primitives created: 1
-2025-05-14 13:37:41,790 - INFO - Extracting primitive: Cylinder.033
-2025-05-14 13:37:41,790 - INFO - Primitives created: 1
-2025-05-14 13:37:41,841 - INFO - Extracting primitive: Cylinder.032
-2025-05-14 13:37:42,134 - INFO - Primitives created: 2
-2025-05-14 13:37:42,290 - INFO - Extracting primitive: Cylinder.031
-2025-05-14 13:37:43,653 - INFO - Primitives created: 1
-2025-05-14 13:37:43,891 - INFO - Extracting primitive: Cylinder.030
-2025-05-14 13:37:43,891 - INFO - Primitives created: 1
-2025-05-14 13:37:43,906 - INFO - Extracting primitive: Cylinder.029
-2025-05-14 13:37:43,986 - INFO - Primitives created: 1
-2025-05-14 13:37:43,992 - INFO - Extracting primitive: Cylinder.028
-2025-05-14 13:37:43,992 - INFO - Primitives created: 1
-2025-05-14 13:37:43,992 - INFO - Extracting primitive: Cylinder.027
-2025-05-14 13:37:43,992 - INFO - Primitives created: 1
-2025-05-14 13:37:44,038 - INFO - Extracting primitive: Cylinder.026
-2025-05-14 13:37:44,221 - INFO - Primitives created: 1
-2025-05-14 13:37:44,236 - INFO - Extracting primitive: Cylinder.025
-2025-05-14 13:37:44,238 - INFO - Primitives created: 1
-2025-05-14 13:37:44,238 - INFO - Extracting primitive: Cylinder.096
-2025-05-14 13:37:44,238 - INFO - Primitives created: 1
-2025-05-14 13:37:44,238 - INFO - Extracting primitive: Cylinder.023
-2025-05-14 13:37:44,238 - INFO - Primitives created: 1
-2025-05-14 13:37:44,242 - INFO - Extracting primitive: Cylinder.022
-2025-05-14 13:37:44,242 - INFO - Primitives created: 1
-2025-05-14 13:37:44,343 - INFO - Extracting primitive: Cylinder.020
-2025-05-14 13:37:44,989 - INFO - Primitives created: 2
-2025-05-14 13:37:45,040 - INFO - Extracting primitive: Cylinder.001
-2025-05-14 13:37:45,044 - INFO - Primitives created: 1
-2025-05-14 13:37:45,046 - INFO - Extracting primitive: Cylinder.015
-2025-05-14 13:37:45,048 - INFO - Primitives created: 1
-2025-05-14 13:37:45,073 - INFO - Extracting primitive: Cylinder.021
-2025-05-14 13:37:45,217 - INFO - Primitives created: 1
-2025-05-14 13:37:45,232 - INFO - Extracting primitive: Cylinder.016
-2025-05-14 13:37:45,233 - INFO - Primitives created: 1
-2025-05-14 13:37:45,233 - INFO - Extracting primitive: Cylinder.007
-2025-05-14 13:37:45,238 - INFO - Primitives created: 1
-2025-05-14 13:37:45,242 - INFO - Extracting primitive: Cylinder.014
-2025-05-14 13:37:45,248 - INFO - Primitives created: 1
-2025-05-14 13:37:45,250 - INFO - Extracting primitive: Cylinder.013
-2025-05-14 13:37:45,254 - INFO - Primitives created: 1
-2025-05-14 13:37:45,254 - INFO - Extracting primitive: Cylinder.011
-2025-05-14 13:37:45,263 - INFO - Primitives created: 1
-2025-05-14 13:37:45,267 - INFO - Extracting primitive: Cylinder.009
-2025-05-14 13:37:45,271 - INFO - Primitives created: 1
-2025-05-14 13:37:45,277 - INFO - Extracting primitive: Cylinder.008
-2025-05-14 13:37:45,280 - INFO - Primitives created: 1
-2025-05-14 13:37:45,280 - INFO - Extracting primitive: Cylinder.012
-2025-05-14 13:37:45,284 - INFO - Primitives created: 1
-2025-05-14 13:37:45,287 - INFO - Extracting primitive: Cylinder.006
-2025-05-14 13:37:45,288 - INFO - Primitives created: 1
-2025-05-14 13:37:45,292 - INFO - Extracting primitive: Cylinder.005
-2025-05-14 13:37:45,300 - INFO - Primitives created: 1
-2025-05-14 13:37:45,303 - INFO - Extracting primitive: Cylinder.062
-2025-05-14 13:37:45,304 - INFO - Primitives created: 1
-2025-05-14 13:37:45,308 - INFO - Extracting primitive: Cylinder.060
-2025-05-14 13:37:45,308 - INFO - Primitives created: 1
-2025-05-14 13:37:45,370 - INFO - Extracting primitive: Cylinder
-2025-05-14 13:37:45,709 - INFO - Primitives created: 1
-2025-05-14 13:37:45,747 - INFO - Extracting primitive: Cylinder.002
-2025-05-14 13:37:45,752 - INFO - Primitives created: 1
-2025-05-14 13:37:45,752 - INFO - Extracting primitive: Cylinder.019
-2025-05-14 13:37:45,760 - INFO - Primitives created: 1
-2025-05-14 13:37:45,760 - INFO - Extracting primitive: Cylinder.018
-2025-05-14 13:37:45,765 - INFO - Primitives created: 1
-2025-05-14 13:37:45,815 - INFO - Extracting primitive: Cube.039
-2025-05-14 13:37:45,976 - INFO - Primitives created: 1
-2025-05-14 13:37:45,997 - INFO - Extracting primitive: Cube.043
-2025-05-14 13:37:46,001 - INFO - Primitives created: 1
-2025-05-14 13:37:46,194 - INFO - Extracting primitive: Cube.037
-2025-05-14 13:37:48,066 - INFO - Primitives created: 1
-2025-05-14 13:37:48,285 - INFO - Extracting primitive: Cube.038
-2025-05-14 13:37:48,287 - INFO - Primitives created: 1
-2025-05-14 13:37:48,337 - INFO - Extracting primitive: Cube.042
-2025-05-14 13:37:48,575 - INFO - Primitives created: 1
-2025-05-14 13:37:48,609 - INFO - Extracting primitive: Cube.036
-2025-05-14 13:37:48,609 - INFO - Primitives created: 1
-2025-05-14 13:37:48,613 - INFO - Extracting primitive: Cube.035
-2025-05-14 13:37:48,613 - INFO - Primitives created: 1
-2025-05-14 13:37:48,613 - INFO - Extracting primitive: Cube.034
-2025-05-14 13:37:48,620 - INFO - Primitives created: 1
-2025-05-14 13:37:48,799 - INFO - Extracting primitive: Cube.033
-2025-05-14 13:37:50,155 - INFO - Primitives created: 2
-2025-05-14 13:37:50,306 - INFO - Extracting primitive: Cube.032
-2025-05-14 13:37:50,306 - INFO - Primitives created: 1
-2025-05-14 13:37:50,308 - INFO - Extracting primitive: Cube.031
-2025-05-14 13:37:50,308 - INFO - Primitives created: 1
-2025-05-14 13:37:50,481 - INFO - Extracting primitive: Cube.030
-2025-05-14 13:37:52,212 - INFO - Primitives created: 2
-2025-05-14 13:37:52,444 - INFO - Extracting primitive: Cube.029
-2025-05-14 13:37:52,444 - INFO - Primitives created: 1
-2025-05-14 13:37:52,448 - INFO - Extracting primitive: Cube.028
-2025-05-14 13:37:52,448 - INFO - Primitives created: 1
-2025-05-14 13:37:52,472 - INFO - Extracting primitive: Cube.021
-2025-05-14 13:37:52,554 - INFO - Primitives created: 1
-2025-05-14 13:37:52,558 - INFO - Extracting primitive: Cube.025
-2025-05-14 13:37:52,564 - INFO - Primitives created: 1
-2025-05-14 13:37:52,564 - INFO - Extracting primitive: Cube.024
-2025-05-14 13:37:52,565 - INFO - Primitives created: 1
-2025-05-14 13:37:52,580 - INFO - Extracting primitive: Cube.023
-2025-05-14 13:37:52,724 - INFO - Primitives created: 1
-2025-05-14 13:37:52,742 - INFO - Extracting primitive: Cube.022
-2025-05-14 13:37:52,744 - INFO - Primitives created: 1
-2025-05-14 13:37:52,744 - INFO - Extracting primitive: Cube.026
-2025-05-14 13:37:52,747 - INFO - Primitives created: 1
-2025-05-14 13:37:52,751 - INFO - Extracting primitive: Cube.020
-2025-05-14 13:37:52,753 - INFO - Primitives created: 1
-2025-05-14 13:37:52,753 - INFO - Extracting primitive: Cube.019
-2025-05-14 13:37:52,755 - INFO - Primitives created: 1
-2025-05-14 13:37:52,755 - INFO - Extracting primitive: Cube.018
-2025-05-14 13:37:52,755 - INFO - Primitives created: 1
-2025-05-14 13:37:52,780 - INFO - Extracting primitive: Cube.017
-2025-05-14 13:37:52,931 - INFO - Primitives created: 1
-2025-05-14 13:37:52,946 - INFO - Extracting primitive: Cube.016
-2025-05-14 13:37:52,947 - INFO - Primitives created: 1
-2025-05-14 13:37:52,948 - INFO - Extracting primitive: Cube.015
-2025-05-14 13:37:52,948 - INFO - Primitives created: 1
-2025-05-14 13:37:52,948 - INFO - Extracting primitive: Cube.012
-2025-05-14 13:37:52,957 - INFO - Primitives created: 2
-2025-05-14 13:37:52,957 - INFO - Extracting primitive: Cube.011
-2025-05-14 13:37:52,961 - INFO - Primitives created: 1
-2025-05-14 13:37:52,961 - INFO - Extracting primitive: Cube.010
-2025-05-14 13:37:52,961 - INFO - Primitives created: 1
-2025-05-14 13:37:52,961 - INFO - Extracting primitive: Cube.009
-2025-05-14 13:37:52,965 - INFO - Primitives created: 1
-2025-05-14 13:37:52,965 - INFO - Extracting primitive: Cube.008
-2025-05-14 13:37:52,969 - INFO - Primitives created: 1
-2025-05-14 13:37:52,969 - INFO - Extracting primitive: Cube.004
-2025-05-14 13:37:52,969 - INFO - Primitives created: 1
-2025-05-14 13:37:52,974 - INFO - Extracting primitive: Cube.002
-2025-05-14 13:37:52,974 - INFO - Primitives created: 1
-2025-05-14 13:37:53,154 - INFO - Extracting primitive: Cube.001
-2025-05-14 13:37:54,516 - INFO - Primitives created: 3
-2025-05-14 13:37:54,670 - INFO - Extracting primitive: Cube
-2025-05-14 13:37:54,679 - INFO - Primitives created: 1
-2025-05-14 13:37:54,916 - INFO - Extracting primitive: Cube.014
-2025-05-14 13:37:58,514 - INFO - Primitives created: 1
-2025-05-14 13:37:59,000 - INFO - Extracting primitive: Cube.005
-2025-05-14 13:37:59,008 - INFO - Primitives created: 1
-2025-05-14 13:37:59,113 - INFO - Extracting primitive: Circle.006
-2025-05-14 13:37:59,959 - INFO - Primitives created: 1
-2025-05-14 13:38:00,086 - INFO - Extracting primitive: Circle.004
-2025-05-14 13:38:01,057 - INFO - Primitives created: 1
-2025-05-14 13:38:01,223 - INFO - Extracting primitive: Circle.001
-2025-05-14 13:38:02,176 - INFO - Primitives created: 1
-2025-05-14 13:38:02,295 - INFO - Extracting primitive: Circle.002
-2025-05-14 13:38:03,140 - INFO - Primitives created: 1
-2025-05-14 13:38:03,182 - INFO - Extracting primitive: BÃ©zierCurve.013
-2025-05-14 13:38:03,322 - INFO - Primitives created: 1
-2025-05-14 13:38:03,329 - INFO - Extracting primitive: BÃ©zierCurve.007
-2025-05-14 13:38:03,334 - INFO - Primitives created: 1
-2025-05-14 13:38:03,334 - INFO - Extracting primitive: BÃ©zierCurve.005
-2025-05-14 13:38:03,342 - INFO - Primitives created: 1
-2025-05-14 13:38:03,365 - INFO - Extracting primitive: BÃ©zierCurve.004
-2025-05-14 13:38:03,444 - INFO - Primitives created: 1
-2025-05-14 13:38:03,483 - INFO - Extracting primitive: BÃ©zierCurve.003
-2025-05-14 13:38:03,569 - INFO - Primitives created: 1
-2025-05-14 13:38:03,577 - INFO - Extracting primitive: BÃ©zierCurve.006
-2025-05-14 13:38:03,585 - INFO - Primitives created: 1
-2025-05-14 13:38:03,606 - INFO - Extracting primitive: BÃ©zierCurve.002
-2025-05-14 13:38:03,689 - INFO - Primitives created: 1
-2025-05-14 13:38:03,706 - INFO - Extracting primitive: BÃ©zierCurve.001
-2025-05-14 13:38:03,775 - INFO - Primitives created: 2
-2025-05-14 13:38:03,782 - INFO - Extracting primitive: BÃ©zierCurve.004
-2025-05-14 13:38:03,786 - INFO - Primitives created: 1
-2025-05-14 13:38:03,787 - INFO - Extracting primitive: BÃ©zierCurve.002
-2025-05-14 13:38:03,791 - INFO - Primitives created: 1
-2025-05-14 13:38:03,792 - INFO - Extracting primitive: BÃ©zierCurve.001
-2025-05-14 13:38:03,797 - INFO - Primitives created: 1
-2025-05-14 13:38:03,799 - INFO - Extracting primitive: BÃ©zierCurve
-2025-05-14 13:38:03,805 - INFO - Primitives created: 1
-2025-05-14 13:38:03,813 - INFO - Extracting primitive: Cylinder.077
-2025-05-14 13:38:03,867 - INFO - Primitives created: 1
-2025-05-14 13:38:08,485 - INFO - Finished glTF 2.0 export in 30.077723026275635 s
-2025-05-14 13:38:08,623 - INFO - Export rÃ©ussi: C:\Users\admin\Desktop\odoo\models\681\pantografo.gltf
+2025-05-14 15:26:27,532 - INFO - Nettoyage de la scÃ¨ne...
+2025-05-14 15:26:27,532 - INFO - Chargement du fichier .blend: C:\Users\admin\Desktop\odoo\models\2\pantografo.blend
+2025-05-14 15:26:27,608 - INFO - ChargÃ© 171 objets et 13 collections
+2025-05-14 15:26:27,608 - INFO - Exportation au format GLTF: C:\Users\admin\Desktop\odoo\models\2\pantografo.gltf
+2025-05-14 15:26:31,446 - INFO - Starting glTF 2.0 export
+2025-05-14 15:26:31,455 - INFO - Extracting primitive: Cylinder.171
+2025-05-14 15:26:31,465 - INFO - Primitives created: 1
+2025-05-14 15:26:31,467 - INFO - Extracting primitive: Cylinder.167
+2025-05-14 15:26:31,469 - INFO - Primitives created: 1
+2025-05-14 15:26:31,490 - INFO - Extracting primitive: Cylinder.051
+2025-05-14 15:26:32,887 - INFO - Primitives created: 1
+2025-05-14 15:26:32,956 - INFO - Extracting primitive: BÃ©zierCurve.012
+2025-05-14 15:26:33,125 - INFO - Primitives created: 1
+2025-05-14 15:26:33,188 - INFO - Extracting primitive: BÃ©zierCurve.011
+2025-05-14 15:26:33,416 - INFO - Primitives created: 1
+2025-05-14 15:26:33,461 - INFO - Extracting primitive: BÃ©zierCurve.010
+2025-05-14 15:26:33,564 - INFO - Primitives created: 1
+2025-05-14 15:26:33,596 - INFO - Extracting primitive: BÃ©zierCurve.009
+2025-05-14 15:26:33,690 - INFO - Primitives created: 1
+2025-05-14 15:26:33,728 - INFO - Extracting primitive: BÃ©zierCurve.008
+2025-05-14 15:26:33,826 - INFO - Primitives created: 1
+2025-05-14 15:26:33,861 - INFO - Extracting primitive: BÃ©zierCurve.007
+2025-05-14 15:26:33,933 - INFO - Primitives created: 1
+2025-05-14 15:26:33,960 - INFO - Extracting primitive: BÃ©zierCurve.006
+2025-05-14 15:26:34,024 - INFO - Primitives created: 1
+2025-05-14 15:26:34,051 - INFO - Extracting primitive: BÃ©zierCurve.005
+2025-05-14 15:26:34,111 - INFO - Primitives created: 1
+2025-05-14 15:26:34,128 - INFO - Extracting primitive: NurbsCurve.001
+2025-05-14 15:26:34,256 - INFO - Primitives created: 2
+2025-05-14 15:26:34,275 - INFO - Extracting primitive: NurbsCurve
+2025-05-14 15:26:34,349 - INFO - Primitives created: 2
+2025-05-14 15:26:34,357 - INFO - Extracting primitive: NurbsCurve.003
+2025-05-14 15:26:34,375 - INFO - Primitives created: 1
+2025-05-14 15:26:34,379 - INFO - Extracting primitive: NurbsCurve.005
+2025-05-14 15:26:34,383 - INFO - Primitives created: 1
+2025-05-14 15:26:34,385 - INFO - Extracting primitive: NurbsCurve.004
+2025-05-14 15:26:34,390 - INFO - Primitives created: 1
+2025-05-14 15:26:34,390 - INFO - Extracting primitive: NurbsCurve.003
+2025-05-14 15:26:34,399 - INFO - Primitives created: 1
+2025-05-14 15:26:34,399 - INFO - Extracting primitive: NurbsCurve.009
+2025-05-14 15:26:34,408 - INFO - Primitives created: 1
+2025-05-14 15:26:34,412 - INFO - Extracting primitive: NurbsCurve.007
+2025-05-14 15:26:34,423 - INFO - Primitives created: 1
+2025-05-14 15:26:34,424 - INFO - Extracting primitive: NurbsCurve.006
+2025-05-14 15:26:34,433 - INFO - Primitives created: 1
+2025-05-14 15:26:34,435 - INFO - Extracting primitive: NurbsCurve.002
+2025-05-14 15:26:34,441 - INFO - Primitives created: 1
+2025-05-14 15:26:34,441 - INFO - Extracting primitive: NurbsCurve.001
+2025-05-14 15:26:34,454 - INFO - Primitives created: 1
+2025-05-14 15:26:34,454 - INFO - Extracting primitive: NurbsCurve
+2025-05-14 15:26:34,465 - INFO - Primitives created: 1
+2025-05-14 15:26:34,466 - INFO - Extracting primitive: Cube.027
+2025-05-14 15:26:34,470 - INFO - Primitives created: 1
+2025-05-14 15:26:34,470 - INFO - Extracting primitive: Cylinder.099
+2025-05-14 15:26:34,470 - INFO - Primitives created: 1
+2025-05-14 15:26:34,474 - INFO - Extracting primitive: Cylinder.092
+2025-05-14 15:26:34,474 - INFO - Primitives created: 1
+2025-05-14 15:26:34,474 - INFO - Extracting primitive: Cylinder.091
+2025-05-14 15:26:34,474 - INFO - Primitives created: 1
+2025-05-14 15:26:34,478 - INFO - Extracting primitive: Cylinder.042
+2025-05-14 15:26:34,478 - INFO - Primitives created: 1
+2025-05-14 15:26:34,478 - INFO - Extracting primitive: Cylinder.090
+2025-05-14 15:26:34,482 - INFO - Primitives created: 1
+2025-05-14 15:26:34,482 - INFO - Extracting primitive: Cylinder.089
+2025-05-14 15:26:34,482 - INFO - Primitives created: 1
+2025-05-14 15:26:34,482 - INFO - Extracting primitive: Cylinder.088
+2025-05-14 15:26:34,486 - INFO - Primitives created: 1
+2025-05-14 15:26:34,486 - INFO - Extracting primitive: Cylinder.087
+2025-05-14 15:26:34,486 - INFO - Primitives created: 1
+2025-05-14 15:26:34,486 - INFO - Extracting primitive: Cylinder.086
+2025-05-14 15:26:34,486 - INFO - Primitives created: 1
+2025-05-14 15:26:34,490 - INFO - Extracting primitive: Cylinder.085
+2025-05-14 15:26:34,490 - INFO - Primitives created: 1
+2025-05-14 15:26:34,490 - INFO - Extracting primitive: Cylinder.084
+2025-05-14 15:26:34,490 - INFO - Primitives created: 1
+2025-05-14 15:26:34,490 - INFO - Extracting primitive: Cylinder.083
+2025-05-14 15:26:34,490 - INFO - Primitives created: 1
+2025-05-14 15:26:34,494 - INFO - Extracting primitive: Cylinder.082
+2025-05-14 15:26:34,494 - INFO - Primitives created: 1
+2025-05-14 15:26:34,494 - INFO - Extracting primitive: Cylinder.081
+2025-05-14 15:26:34,494 - INFO - Primitives created: 1
+2025-05-14 15:26:34,494 - INFO - Extracting primitive: Cylinder.080
+2025-05-14 15:26:34,498 - INFO - Primitives created: 1
+2025-05-14 15:26:34,499 - INFO - Extracting primitive: Cylinder.079
+2025-05-14 15:26:34,499 - INFO - Primitives created: 1
+2025-05-14 15:26:34,499 - INFO - Extracting primitive: Cylinder.098
+2025-05-14 15:26:34,499 - INFO - Primitives created: 1
+2025-05-14 15:26:34,499 - INFO - Extracting primitive: Cylinder.074
+2025-05-14 15:26:34,504 - INFO - Primitives created: 1
+2025-05-14 15:26:34,504 - INFO - Extracting primitive: Cylinder.073
+2025-05-14 15:26:34,504 - INFO - Primitives created: 1
+2025-05-14 15:26:34,508 - INFO - Extracting primitive: Cylinder.072
+2025-05-14 15:26:34,512 - INFO - Primitives created: 1
+2025-05-14 15:26:34,512 - INFO - Extracting primitive: Cylinder.070
+2025-05-14 15:26:34,519 - INFO - Primitives created: 1
+2025-05-14 15:26:34,519 - INFO - Extracting primitive: Cylinder.178
+2025-05-14 15:26:34,521 - INFO - Primitives created: 1
+2025-05-14 15:26:34,521 - INFO - Extracting primitive: Cylinder.177
+2025-05-14 15:26:34,523 - INFO - Primitives created: 1
+2025-05-14 15:26:34,523 - INFO - Extracting primitive: Cylinder.097
+2025-05-14 15:26:34,523 - INFO - Primitives created: 1
+2025-05-14 15:26:34,614 - INFO - Extracting primitive: Cylinder.071
+2025-05-14 15:26:35,291 - INFO - Primitives created: 3
+2025-05-14 15:26:35,366 - INFO - Extracting primitive: Cylinder.069
+2025-05-14 15:26:35,367 - INFO - Primitives created: 1
+2025-05-14 15:26:35,367 - INFO - Extracting primitive: Cylinder.068
+2025-05-14 15:26:35,367 - INFO - Primitives created: 1
+2025-05-14 15:26:35,369 - INFO - Extracting primitive: Cylinder.067
+2025-05-14 15:26:35,371 - INFO - Primitives created: 1
+2025-05-14 15:26:35,371 - INFO - Extracting primitive: Cylinder.066
+2025-05-14 15:26:35,375 - INFO - Primitives created: 1
+2025-05-14 15:26:35,379 - INFO - Extracting primitive: Cylinder.065
+2025-05-14 15:26:35,379 - INFO - Primitives created: 1
+2025-05-14 15:26:35,382 - INFO - Extracting primitive: Cylinder.064
+2025-05-14 15:26:35,383 - INFO - Primitives created: 1
+2025-05-14 15:26:35,383 - INFO - Extracting primitive: Cylinder.061
+2025-05-14 15:26:35,386 - INFO - Primitives created: 1
+2025-05-14 15:26:35,387 - INFO - Extracting primitive: Cylinder.037
+2025-05-14 15:26:35,392 - INFO - Primitives created: 1
+2025-05-14 15:26:35,392 - INFO - Extracting primitive: Cylinder.017
+2025-05-14 15:26:35,396 - INFO - Primitives created: 1
+2025-05-14 15:26:35,400 - INFO - Extracting primitive: Cylinder.004
+2025-05-14 15:26:35,400 - INFO - Primitives created: 1
+2025-05-14 15:26:35,403 - INFO - Extracting primitive: Cylinder.059
+2025-05-14 15:26:35,403 - INFO - Primitives created: 1
+2025-05-14 15:26:35,410 - INFO - Extracting primitive: Cylinder.058
+2025-05-14 15:26:35,424 - INFO - Primitives created: 1
+2025-05-14 15:26:35,424 - INFO - Extracting primitive: Cylinder.057
+2025-05-14 15:26:35,424 - INFO - Primitives created: 1
+2025-05-14 15:26:35,457 - INFO - Extracting primitive: Cylinder.056
+2025-05-14 15:26:35,557 - INFO - Primitives created: 2
+2025-05-14 15:26:35,570 - INFO - Extracting primitive: Cylinder.055
+2025-05-14 15:26:35,570 - INFO - Primitives created: 1
+2025-05-14 15:26:35,575 - INFO - Extracting primitive: Cylinder.054
+2025-05-14 15:26:35,579 - INFO - Primitives created: 1
+2025-05-14 15:26:35,579 - INFO - Extracting primitive: Cylinder.053
+2025-05-14 15:26:35,579 - INFO - Primitives created: 1
+2025-05-14 15:26:35,628 - INFO - Extracting primitive: Cylinder.052
+2025-05-14 15:26:35,880 - INFO - Primitives created: 1
+2025-05-14 15:26:35,904 - INFO - Extracting primitive: Cylinder.050
+2025-05-14 15:26:35,908 - INFO - Primitives created: 1
+2025-05-14 15:26:35,908 - INFO - Extracting primitive: Cylinder.049
+2025-05-14 15:26:35,908 - INFO - Primitives created: 1
+2025-05-14 15:26:35,908 - INFO - Extracting primitive: Cylinder.048
+2025-05-14 15:26:35,908 - INFO - Primitives created: 1
+2025-05-14 15:26:35,908 - INFO - Extracting primitive: Cylinder.047
+2025-05-14 15:26:35,908 - INFO - Primitives created: 1
+2025-05-14 15:26:35,913 - INFO - Extracting primitive: Cylinder.046
+2025-05-14 15:26:35,913 - INFO - Primitives created: 1
+2025-05-14 15:26:35,913 - INFO - Extracting primitive: Cylinder.045
+2025-05-14 15:26:35,916 - INFO - Primitives created: 1
+2025-05-14 15:26:35,916 - INFO - Extracting primitive: Cylinder.044
+2025-05-14 15:26:35,916 - INFO - Primitives created: 1
+2025-05-14 15:26:35,958 - INFO - Extracting primitive: Cylinder.043
+2025-05-14 15:26:36,187 - INFO - Primitives created: 1
+2025-05-14 15:26:36,216 - INFO - Extracting primitive: Cylinder.041
+2025-05-14 15:26:36,217 - INFO - Primitives created: 1
+2025-05-14 15:26:36,217 - INFO - Extracting primitive: Cylinder.040
+2025-05-14 15:26:36,217 - INFO - Primitives created: 1
+2025-05-14 15:26:36,217 - INFO - Extracting primitive: Cylinder.039
+2025-05-14 15:26:36,217 - INFO - Primitives created: 1
+2025-05-14 15:26:36,217 - INFO - Extracting primitive: Cylinder.038
+2025-05-14 15:26:36,221 - INFO - Primitives created: 1
+2025-05-14 15:26:36,221 - INFO - Extracting primitive: Cylinder.003
+2025-05-14 15:26:36,224 - INFO - Primitives created: 1
+2025-05-14 15:26:36,224 - INFO - Extracting primitive: Cylinder.036
+2025-05-14 15:26:36,228 - INFO - Primitives created: 1
+2025-05-14 15:26:36,228 - INFO - Extracting primitive: Cylinder.035
+2025-05-14 15:26:36,233 - INFO - Primitives created: 1
+2025-05-14 15:26:36,233 - INFO - Extracting primitive: Cylinder.034
+2025-05-14 15:26:36,237 - INFO - Primitives created: 1
+2025-05-14 15:26:36,237 - INFO - Extracting primitive: Cylinder.033
+2025-05-14 15:26:36,241 - INFO - Primitives created: 1
+2025-05-14 15:26:36,287 - INFO - Extracting primitive: Cylinder.032
+2025-05-14 15:26:36,564 - INFO - Primitives created: 2
+2025-05-14 15:26:36,683 - INFO - Extracting primitive: Cylinder.031
+2025-05-14 15:26:37,526 - INFO - Primitives created: 1
+2025-05-14 15:26:37,619 - INFO - Extracting primitive: Cylinder.030
+2025-05-14 15:26:37,621 - INFO - Primitives created: 1
+2025-05-14 15:26:37,632 - INFO - Extracting primitive: Cylinder.029
+2025-05-14 15:26:37,680 - INFO - Primitives created: 1
+2025-05-14 15:26:37,687 - INFO - Extracting primitive: Cylinder.028
+2025-05-14 15:26:37,687 - INFO - Primitives created: 1
+2025-05-14 15:26:37,687 - INFO - Extracting primitive: Cylinder.027
+2025-05-14 15:26:37,687 - INFO - Primitives created: 1
+2025-05-14 15:26:37,722 - INFO - Extracting primitive: Cylinder.026
+2025-05-14 15:26:37,867 - INFO - Primitives created: 1
+2025-05-14 15:26:37,884 - INFO - Extracting primitive: Cylinder.025
+2025-05-14 15:26:37,884 - INFO - Primitives created: 1
+2025-05-14 15:26:37,888 - INFO - Extracting primitive: Cylinder.096
+2025-05-14 15:26:37,888 - INFO - Primitives created: 1
+2025-05-14 15:26:37,888 - INFO - Extracting primitive: Cylinder.023
+2025-05-14 15:26:37,888 - INFO - Primitives created: 1
+2025-05-14 15:26:37,888 - INFO - Extracting primitive: Cylinder.022
+2025-05-14 15:26:37,888 - INFO - Primitives created: 1
+2025-05-14 15:26:37,973 - INFO - Extracting primitive: Cylinder.020
+2025-05-14 15:26:38,651 - INFO - Primitives created: 2
+2025-05-14 15:26:38,716 - INFO - Extracting primitive: Cylinder.001
+2025-05-14 15:26:38,718 - INFO - Primitives created: 1
+2025-05-14 15:26:38,720 - INFO - Extracting primitive: Cylinder.015
+2025-05-14 15:26:38,726 - INFO - Primitives created: 1
+2025-05-14 15:26:38,770 - INFO - Extracting primitive: Cylinder.021
+2025-05-14 15:26:38,897 - INFO - Primitives created: 1
+2025-05-14 15:26:38,909 - INFO - Extracting primitive: Cylinder.016
+2025-05-14 15:26:38,914 - INFO - Primitives created: 1
+2025-05-14 15:26:38,915 - INFO - Extracting primitive: Cylinder.007
+2025-05-14 15:26:38,917 - INFO - Primitives created: 1
+2025-05-14 15:26:38,919 - INFO - Extracting primitive: Cylinder.014
+2025-05-14 15:26:38,922 - INFO - Primitives created: 1
+2025-05-14 15:26:38,924 - INFO - Extracting primitive: Cylinder.013
+2025-05-14 15:26:38,928 - INFO - Primitives created: 1
+2025-05-14 15:26:38,930 - INFO - Extracting primitive: Cylinder.011
+2025-05-14 15:26:38,934 - INFO - Primitives created: 1
+2025-05-14 15:26:38,936 - INFO - Extracting primitive: Cylinder.009
+2025-05-14 15:26:38,941 - INFO - Primitives created: 1
+2025-05-14 15:26:38,942 - INFO - Extracting primitive: Cylinder.008
+2025-05-14 15:26:38,944 - INFO - Primitives created: 1
+2025-05-14 15:26:38,944 - INFO - Extracting primitive: Cylinder.012
+2025-05-14 15:26:38,945 - INFO - Primitives created: 1
+2025-05-14 15:26:38,947 - INFO - Extracting primitive: Cylinder.006
+2025-05-14 15:26:38,953 - INFO - Primitives created: 1
+2025-05-14 15:26:38,958 - INFO - Extracting primitive: Cylinder.005
+2025-05-14 15:26:38,963 - INFO - Primitives created: 1
+2025-05-14 15:26:38,964 - INFO - Extracting primitive: Cylinder.062
+2025-05-14 15:26:38,965 - INFO - Primitives created: 1
+2025-05-14 15:26:38,966 - INFO - Extracting primitive: Cylinder.060
+2025-05-14 15:26:38,968 - INFO - Primitives created: 1
+2025-05-14 15:26:39,014 - INFO - Extracting primitive: Cylinder
+2025-05-14 15:26:39,255 - INFO - Primitives created: 1
+2025-05-14 15:26:39,280 - INFO - Extracting primitive: Cylinder.002
+2025-05-14 15:26:39,284 - INFO - Primitives created: 1
+2025-05-14 15:26:39,284 - INFO - Extracting primitive: Cylinder.019
+2025-05-14 15:26:39,288 - INFO - Primitives created: 1
+2025-05-14 15:26:39,288 - INFO - Extracting primitive: Cylinder.018
+2025-05-14 15:26:39,291 - INFO - Primitives created: 1
+2025-05-14 15:26:39,319 - INFO - Extracting primitive: Cube.039
+2025-05-14 15:26:39,417 - INFO - Primitives created: 1
+2025-05-14 15:26:39,426 - INFO - Extracting primitive: Cube.043
+2025-05-14 15:26:39,429 - INFO - Primitives created: 1
+2025-05-14 15:26:39,561 - INFO - Extracting primitive: Cube.037
+2025-05-14 15:26:40,672 - INFO - Primitives created: 1
+2025-05-14 15:26:40,781 - INFO - Extracting primitive: Cube.038
+2025-05-14 15:26:40,781 - INFO - Primitives created: 1
+2025-05-14 15:26:40,811 - INFO - Extracting primitive: Cube.042
+2025-05-14 15:26:40,911 - INFO - Primitives created: 1
+2025-05-14 15:26:40,927 - INFO - Extracting primitive: Cube.036
+2025-05-14 15:26:40,928 - INFO - Primitives created: 1
+2025-05-14 15:26:40,928 - INFO - Extracting primitive: Cube.035
+2025-05-14 15:26:40,928 - INFO - Primitives created: 1
+2025-05-14 15:26:40,928 - INFO - Extracting primitive: Cube.034
+2025-05-14 15:26:40,931 - INFO - Primitives created: 1
+2025-05-14 15:26:41,044 - INFO - Extracting primitive: Cube.033
+2025-05-14 15:26:41,773 - INFO - Primitives created: 2
+2025-05-14 15:26:41,848 - INFO - Extracting primitive: Cube.032
+2025-05-14 15:26:41,852 - INFO - Primitives created: 1
+2025-05-14 15:26:41,852 - INFO - Extracting primitive: Cube.031
+2025-05-14 15:26:41,852 - INFO - Primitives created: 1
+2025-05-14 15:26:41,970 - INFO - Extracting primitive: Cube.030
+2025-05-14 15:26:42,845 - INFO - Primitives created: 2
+2025-05-14 15:26:42,935 - INFO - Extracting primitive: Cube.029
+2025-05-14 15:26:42,943 - INFO - Primitives created: 1
+2025-05-14 15:26:42,943 - INFO - Extracting primitive: Cube.028
+2025-05-14 15:26:42,943 - INFO - Primitives created: 1
+2025-05-14 15:26:42,952 - INFO - Extracting primitive: Cube.021
+2025-05-14 15:26:42,989 - INFO - Primitives created: 1
+2025-05-14 15:26:42,989 - INFO - Extracting primitive: Cube.025
+2025-05-14 15:26:42,989 - INFO - Primitives created: 1
+2025-05-14 15:26:42,994 - INFO - Extracting primitive: Cube.024
+2025-05-14 15:26:42,994 - INFO - Primitives created: 1
+2025-05-14 15:26:43,004 - INFO - Extracting primitive: Cube.023
+2025-05-14 15:26:43,069 - INFO - Primitives created: 1
+2025-05-14 15:26:43,074 - INFO - Extracting primitive: Cube.022
+2025-05-14 15:26:43,074 - INFO - Primitives created: 1
+2025-05-14 15:26:43,074 - INFO - Extracting primitive: Cube.026
+2025-05-14 15:26:43,074 - INFO - Primitives created: 1
+2025-05-14 15:26:43,074 - INFO - Extracting primitive: Cube.020
+2025-05-14 15:26:43,074 - INFO - Primitives created: 1
+2025-05-14 15:26:43,074 - INFO - Extracting primitive: Cube.019
+2025-05-14 15:26:43,078 - INFO - Primitives created: 1
+2025-05-14 15:26:43,078 - INFO - Extracting primitive: Cube.018
+2025-05-14 15:26:43,078 - INFO - Primitives created: 1
+2025-05-14 15:26:43,089 - INFO - Extracting primitive: Cube.017
+2025-05-14 15:26:43,144 - INFO - Primitives created: 1
+2025-05-14 15:26:43,148 - INFO - Extracting primitive: Cube.016
+2025-05-14 15:26:43,153 - INFO - Primitives created: 1
+2025-05-14 15:26:43,153 - INFO - Extracting primitive: Cube.015
+2025-05-14 15:26:43,153 - INFO - Primitives created: 1
+2025-05-14 15:26:43,153 - INFO - Extracting primitive: Cube.012
+2025-05-14 15:26:43,156 - INFO - Primitives created: 2
+2025-05-14 15:26:43,156 - INFO - Extracting primitive: Cube.011
+2025-05-14 15:26:43,156 - INFO - Primitives created: 1
+2025-05-14 15:26:43,156 - INFO - Extracting primitive: Cube.010
+2025-05-14 15:26:43,161 - INFO - Primitives created: 1
+2025-05-14 15:26:43,161 - INFO - Extracting primitive: Cube.009
+2025-05-14 15:26:43,161 - INFO - Primitives created: 1
+2025-05-14 15:26:43,161 - INFO - Extracting primitive: Cube.008
+2025-05-14 15:26:43,161 - INFO - Primitives created: 1
+2025-05-14 15:26:43,161 - INFO - Extracting primitive: Cube.004
+2025-05-14 15:26:43,161 - INFO - Primitives created: 1
+2025-05-14 15:26:43,161 - INFO - Extracting primitive: Cube.002
+2025-05-14 15:26:43,165 - INFO - Primitives created: 1
+2025-05-14 15:26:43,244 - INFO - Extracting primitive: Cube.001
+2025-05-14 15:26:43,978 - INFO - Primitives created: 3
+2025-05-14 15:26:44,055 - INFO - Extracting primitive: Cube
+2025-05-14 15:26:44,057 - INFO - Primitives created: 1
+2025-05-14 15:26:44,225 - INFO - Extracting primitive: Cube.014
+2025-05-14 15:26:46,125 - INFO - Primitives created: 1
+2025-05-14 15:26:46,328 - INFO - Extracting primitive: Cube.005
+2025-05-14 15:26:46,337 - INFO - Primitives created: 1
+2025-05-14 15:26:46,406 - INFO - Extracting primitive: Circle.006
+2025-05-14 15:26:46,841 - INFO - Primitives created: 1
+2025-05-14 15:26:46,907 - INFO - Extracting primitive: Circle.004
+2025-05-14 15:26:47,385 - INFO - Primitives created: 1
+2025-05-14 15:26:47,462 - INFO - Extracting primitive: Circle.001
+2025-05-14 15:26:47,960 - INFO - Primitives created: 1
+2025-05-14 15:26:48,035 - INFO - Extracting primitive: Circle.002
+2025-05-14 15:26:48,501 - INFO - Primitives created: 1
+2025-05-14 15:26:48,529 - INFO - Extracting primitive: BÃ©zierCurve.013
+2025-05-14 15:26:48,576 - INFO - Primitives created: 1
+2025-05-14 15:26:48,580 - INFO - Extracting primitive: BÃ©zierCurve.007
+2025-05-14 15:26:48,584 - INFO - Primitives created: 1
+2025-05-14 15:26:48,584 - INFO - Extracting primitive: BÃ©zierCurve.005
+2025-05-14 15:26:48,591 - INFO - Primitives created: 1
+2025-05-14 15:26:48,601 - INFO - Extracting primitive: BÃ©zierCurve.004
+2025-05-14 15:26:48,672 - INFO - Primitives created: 1
+2025-05-14 15:26:48,690 - INFO - Extracting primitive: BÃ©zierCurve.003
+2025-05-14 15:26:48,734 - INFO - Primitives created: 1
+2025-05-14 15:26:48,743 - INFO - Extracting primitive: BÃ©zierCurve.006
+2025-05-14 15:26:48,748 - INFO - Primitives created: 1
+2025-05-14 15:26:48,759 - INFO - Extracting primitive: BÃ©zierCurve.002
+2025-05-14 15:26:48,809 - INFO - Primitives created: 1
+2025-05-14 15:26:48,818 - INFO - Extracting primitive: BÃ©zierCurve.001
+2025-05-14 15:26:48,855 - INFO - Primitives created: 2
+2025-05-14 15:26:48,859 - INFO - Extracting primitive: BÃ©zierCurve.004
+2025-05-14 15:26:48,861 - INFO - Primitives created: 1
+2025-05-14 15:26:48,863 - INFO - Extracting primitive: BÃ©zierCurve.002
+2025-05-14 15:26:48,863 - INFO - Primitives created: 1
+2025-05-14 15:26:48,863 - INFO - Extracting primitive: BÃ©zierCurve.001
+2025-05-14 15:26:48,863 - INFO - Primitives created: 1
+2025-05-14 15:26:48,863 - INFO - Extracting primitive: BÃ©zierCurve
+2025-05-14 15:26:48,871 - INFO - Primitives created: 1
+2025-05-14 15:26:48,875 - INFO - Extracting primitive: Cylinder.077
+2025-05-14 15:26:48,892 - INFO - Primitives created: 1
+2025-05-14 15:26:51,222 - INFO - Finished glTF 2.0 export in 19.775436878204346 s
+2025-05-14 15:26:51,307 - INFO - Export rÃ©ussi: C:\Users\admin\Desktop\odoo\models\2\pantografo.gltf
