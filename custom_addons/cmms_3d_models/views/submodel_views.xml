@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- custom_addons/cmms_3d_models/views/submodel_views.xml -->
+<odoo>
+    <!-- Form View -->
+    <record id="view_cmms_submodel3d_form" model="ir.ui.view">
+        <field name="name">cmms.submodel3d.form</field>
+        <field name="model">cmms.submodel3d</field>
+        <field name="arch" type="xml">
+            <form string="Sous-modèle 3D">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button name="action_view_3d" type="object" class="oe_stat_button" icon="fa-cube"
+                                attrs="{'invisible': [('gltf_url', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Visualiser</span>
+                                <span class="o_stat_text">Sous-modèle 3D</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du sous-modèle"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Informations">
+                            <field name="parent_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                            <field name="relative_id" readonly="1"/>
+                            <field name="description"/>
+                        </group>
+                        <group string="Fichiers">
+                            <field name="gltf_filename" readonly="1"/>
+                            <field name="bin_filename" readonly="1"/>
+                            <field name="gltf_url" widget="url" readonly="1"/>
+                            <field name="bin_url" widget="url" readonly="1" attrs="{'invisible': [('bin_url', '=', False)]}"/>
+                        </group>
+                    </group>
+
+                    <group string="Paramètres d'affichage">
+                        <field name="scale"/>
+                        <label for="position_x" string="Position"/>
+                        <div>
+                            <field name="position_x" class="oe_inline"/> X,
+                            <field name="position_y" class="oe_inline"/> Y,
+                            <field name="position_z" class="oe_inline"/> Z
+                        </div>
+                        <label for="rotation_x" string="Rotation"/>
+                        <div>
+                            <field name="rotation_x" class="oe_inline"/> X,
+                            <field name="rotation_y" class="oe_inline"/> Y,
+                            <field name="rotation_z" class="oe_inline"/> Z
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_cmms_submodel3d_tree" model="ir.ui.view">
+        <field name="name">cmms.submodel3d.tree</field>
+        <field name="model">cmms.submodel3d</field>
+        <field name="arch" type="xml">
+            <tree string="Sous-modèles 3D">
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="relative_id"/>
+                <field name="gltf_filename"/>
+                <field name="active"/>
+                <button name="action_view_3d" type="object"
+                        string="Voir en 3D" class="btn-sm btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_cmms_submodel3d_search" model="ir.ui.view">
+        <field name="name">cmms.submodel3d.search</field>
+        <field name="model">cmms.submodel3d</field>
+        <field name="arch" type="xml">
+            <search string="Sous-modèles 3D">
+                <field name="name"/>
+                <field name="parent_id"/>
+                <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Modèle parent" name="group_by_parent" context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action (non visible dans le menu) -->
+    <record id="action_cmms_submodel3d" model="ir.actions.act_window">
+        <field name="name">Sous-modèles 3D</field>
+        <field name="res_model">cmms.submodel3d</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cmms_submodel3d_search"/>
+        <field name="domain">[('parent_id.id', '=', active_id)]</field>
+        <field name="context">{'default_parent_id': active_id}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun sous-modèle trouvé
+            </p>
+            <p>
+                Les sous-modèles sont extraits automatiquement lors de l'importation d'un modèle 3D principal.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour accéder aux sous-modèles d'un modèle spécifique (pour le bouton sur la vue modèle) -->
+    <record id="action_view_submodels_from_model" model="ir.actions.act_window">
+        <field name="name">Sous-modèles 3D</field>
+        <field name="res_model">cmms.submodel3d</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cmms_submodel3d_search"/>
+        <field name="domain">[('parent_id', '=', active_id)]</field>
+        <field name="context">{'default_parent_id': active_id}</field>
+    </record>
+
+</odoo>

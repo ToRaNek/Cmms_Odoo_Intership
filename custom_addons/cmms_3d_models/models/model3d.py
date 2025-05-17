@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+from odoo.tools.safe_eval import safe_eval
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -89,6 +90,14 @@ class Model3D(models.Model):
     # Nouveau champ pour stocker les sous-modèles en JSON
     submodels_json = fields.Text('Sous-modèles (JSON)', default='[]',
                                help="Structure hiérarchique des sous-modèles au format JSON")
+
+    submodel_ids = fields.One2many('cmms.submodel3d', 'parent_id', string='Sous-modèles')
+    submodel_count = fields.Integer('Nombre de sous-modèles', compute='_compute_submodel_count')
+
+    @api.depends('submodel_ids')
+    def _compute_submodel_count(self):
+        for record in self:
+            record.submodel_count = len(record.submodel_ids)
 
     @api.depends('child_ids')
     def _compute_child_count(self):
@@ -827,31 +836,70 @@ class Model3D(models.Model):
         """Affiche la liste des sous-modèles"""
         self.ensure_one()
 
-        # Si on utilise le nouveau système JSON, adapter la vue
-        if self.submodels_json:
-            # Créer une action de client personnalisée pour afficher les sous-modèles
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _("Sous-modèles"),
-                    'message': _("Ce modèle contient %s sous-modèles dans sa structure JSON. "
-                                "Utilisez le visualiseur 3D pour les voir.") % self.child_count,
-                    'sticky': False,
-                    'type': 'info',
-                }
-            }
+        # Utiliser le nouveau système avec cmms.submodel3d
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Sous-modèles'),
+            'res_model': 'cmms.submodel3d',
+            'view_mode': 'tree,form',
+            'domain': [('parent_id', '=', self.id)],
+            'context': {'default_parent_id': self.id}
+        }
+
+    def _create_equipment_for_submodels(self, parent_model):
+        """Crée des équipements pour les sous-modèles"""
+        # Cette méthode peut être améliorée selon vos besoins
+        # Pour l'instant, on vérifie juste qu'elle est appelée
+        _logger.info(f"Création d'équipements pour les sous-modèles du modèle {parent_model.id}")
+
+        # Exemple de comment créer des équipements pour chaque sous-modèle
+        if hasattr(self, 'auto_create_equipment') and parent_model.auto_create_equipment:
+            submodels = self.env['cmms.submodel3d'].search([('parent_id', '=', parent_model.id)])
+
+            # Récupérer l'équipement parent
+            parent_equipment = parent_model.auto_equipment_id or self.env['maintenance.equipment'].search(
+                [('model3d_id', '=', parent_model.id)], limit=1)
+
+            # Si l'équipement parent n'existe pas, on peut le créer
+            if not parent_equipment and parent_model.auto_create_equipment:
+                parent_equipment = self.env['maintenance.equipment'].create({
+                    'name': f"Équipement {parent_model.name}",
+                    'model3d_id': parent_model.id,
+                })
+                parent_model.write({'auto_equipment_id': parent_equipment.id})
+
+            # Créer des équipements pour chaque sous-modèle
+            for submodel in submodels:
+                # Vérifier si cet équipement existe déjà
+                equipment_name = f"Équipement {submodel.name}"
+                existing_equipment = self.env['maintenance.equipment'].search([
+                    ('name', '=', equipment_name),
+                    ('parent_id', '=', parent_equipment.id if parent_equipment else False)
+                ], limit=1)
+
+                if not existing_equipment:
+                    equipment_vals = {
+                        'name': equipment_name,
+                        'parent_id': parent_equipment.id if parent_equipment else False,
+                        'model3d_scale': submodel.scale,
+                        'model3d_position_x': submodel.position_x,
+                        'model3d_position_y': submodel.position_y,
+                        'model3d_position_z': submodel.position_z,
+                        'model3d_rotation_x': submodel.rotation_x,
+                        'model3d_rotation_y': submodel.rotation_y,
+                        'model3d_rotation_z': submodel.rotation_z,
+                    }
+
+                    self.env['maintenance.equipment'].create(equipment_vals)
+                    _logger.info(f"Équipement créé pour le sous-modèle: {equipment_name}")
         else:
-            # Ancien système - utiliser l'action standard
-            action = self.env.ref('cmms_3d_models.action_cmms_model3d').read()[0]
-            action['domain'] = [('parent_id', '=', self.id)]
-            action['context'] = {'default_parent_id': self.id}
-            return action
+            _logger.info("Création automatique d'équipements désactivée pour ce modèle")
 
     def import_hierarchy_from_gltf(self, gltf_data, parent_id=False):
         """
         Crée la hiérarchie de sous-modèles selon la structure glTF,
         en utilisant Blender pour extraire chaque nœud individuellement.
+        Crée des enregistrements réels dans la table cmms.submodel3d.
         """
         parent_model = self.browse(parent_id)
         if not parent_model.exists():
@@ -937,65 +985,119 @@ class Model3D(models.Model):
             _logger.error(f"Erreur lors du chargement des métadonnées: {str(e)}")
             return False
 
-        # Charger la structure existante ou créer une nouvelle
-        submodels = []
-        if parent_model.submodels_json:
-            try:
-                submodels = json.loads(parent_model.submodels_json)
-            except json.JSONDecodeError:
-                _logger.warning(f"Impossible de décoder le JSON des sous-modèles pour ID {parent_id}")
-                submodels = []
+        # Supprimer les anciens sous-modèles s'il y en a
+        old_submodels = self.env['cmms.submodel3d'].search([('parent_id', '=', parent_id)])
+        if old_submodels:
+            _logger.info(f"Suppression de {len(old_submodels)} anciens sous-modèles")
+            old_submodels.unlink()
 
-        # Convertir les métadonnées en sous-modèles
+        # Créer les sous-modèles en tant qu'enregistrements réels dans cmms.submodel3d
+        submodels_created = 0
         for node_id, node_data in nodes_data.items():
-            # Vérifier que le nœud a été exporté correctement
-            node_dir = os.path.join(childs_dir, str(node_id))
-            gltf_path = node_data.get("gltf_path")
-            bin_path = node_data.get("bin_path")
+            try:
+                node_id_int = int(node_id)  # Convertir l'ID en entier
 
-            if not os.path.isdir(node_dir) or not gltf_path:
-                _logger.warning(f"Dossier ou fichier GLTF manquant pour le nœud {node_id}")
+                # Vérifier que le nœud a été exporté correctement
+                node_dir = os.path.join(childs_dir, str(node_id))
+                gltf_path = node_data.get("gltf_path")
+                bin_path = node_data.get("bin_path")
+
+                if not os.path.isdir(node_dir) or not gltf_path:
+                    _logger.warning(f"Dossier ou fichier GLTF manquant pour le nœud {node_id}")
+                    continue
+
+                # Ajustement de l'échelle selon les règles définies
+                original_scale = float(node_data.get("scale", 1.0))
+                adjusted_scale = original_scale
+                if original_scale < 0.1:
+                    # Si échelle < 0.1, ajouter +2
+                    adjusted_scale = original_scale + 2.0
+                elif original_scale < 0.5:
+                    # Si échelle < 0.5 mais >= 0.1, ajouter +1
+                    adjusted_scale = original_scale + 1.0
+                else:
+                    # Sinon, laisser à 1 par défaut
+                    adjusted_scale = 1.0
+
+                _logger.info(f"Échelle ajustée pour le sous-modèle {node_data['name']}: {original_scale} → {adjusted_scale}")
+
+                # Créer un sous-modèle pour ce nœud
+                submodel_vals = {
+                    "name": node_data["name"],
+                    "description": f"Sous-modèle extrait de {parent_model.name}: {node_data['name']}",
+                    "parent_id": parent_id,
+                    "relative_id": node_id_int,
+                    "gltf_filename": os.path.basename(gltf_path),
+                    "bin_filename": os.path.basename(bin_path) if bin_path else False,
+                    "scale": adjusted_scale,  # Utiliser l'échelle ajustée
+                    "position_x": float(node_data.get("position", {}).get("x", 0)),
+                    "position_y": float(node_data.get("position", {}).get("y", 0)),
+                    "position_z": float(node_data.get("position", {}).get("z", 0)),
+                    "rotation_x": float(node_data.get("rotation", {}).get("x", 0)),
+                    "rotation_y": float(node_data.get("rotation", {}).get("y", 0)),
+                    "rotation_z": float(node_data.get("rotation", {}).get("z", 0)),
+                }
+
+                # Créer l'enregistrement du sous-modèle
+                submodel = self.env['cmms.submodel3d'].create(submodel_vals)
+                submodels_created += 1
+
+                _logger.info(f"Sous-modèle créé: {submodel.name} (ID: {submodel.id}, Relatif: {submodel.relative_id}, Échelle: {adjusted_scale})")
+
+            except Exception as e:
+                _logger.error(f"Erreur lors de la création du sous-modèle {node_id}: {str(e)}")
                 continue
 
-            # Créer un sous-modèle pour ce nœud
-            submodel_data = {
-                "id": int(node_id),
-                "name": node_data["name"],
-                "gltf_path": f"childs/{node_id}/{gltf_path}",
-                "bin_path": f"childs/{node_id}/{bin_path}" if bin_path else None,
-                "description": f"Sous-modèle extrait de {parent_model.name}: {node_data['name']}",
-                "scale": node_data.get("scale", 1.0),
-                "position": {
-                    "x": node_data.get("position", {}).get("x", 0),
-                    "y": node_data.get("position", {}).get("y", 0),
-                    "z": node_data.get("position", {}).get("z", 0)
-                },
-                "rotation": {
-                    "x": node_data.get("rotation", {}).get("x", 0),
-                    "y": node_data.get("rotation", {}).get("y", 0),
-                    "z": node_data.get("rotation", {}).get("z", 0)
-                },
-                "parent_id": node_data.get("parent_id"),
-                "children": []  # Sera rempli ultérieurement
-            }
+        # Conserver la structure JSON pour la rétrocompatibilité
+        try:
+            # Conversion des données des sous-modèles au format JSON
+            submodels_json = []
+            for node_id, node_data in nodes_data.items():
+                # Appliquer la même logique d'ajustement d'échelle pour le JSON
+                original_scale = float(node_data.get("scale", 1.0))
+                adjusted_scale = original_scale
+                if original_scale < 0.1:
+                    adjusted_scale = original_scale + 2.0
+                elif original_scale < 0.5:
+                    adjusted_scale = original_scale + 1.0
+                else:
+                    adjusted_scale = 1.0
 
-            # Ajouter ce sous-modèle à la liste
-            submodels.append(submodel_data)
+                submodel_data = {
+                    "id": int(node_id),
+                    "name": node_data["name"],
+                    "gltf_path": f"childs/{node_id}/{os.path.basename(node_data.get('gltf_path', ''))}",
+                    "bin_path": f"childs/{node_id}/{os.path.basename(node_data.get('bin_path', ''))}" if node_data.get('bin_path') else None,
+                    "description": f"Sous-modèle extrait de {parent_model.name}: {node_data['name']}",
+                    "scale": adjusted_scale,  # Utiliser l'échelle ajustée
+                    "position": {
+                        "x": node_data.get("position", {}).get("x", 0),
+                        "y": node_data.get("position", {}).get("y", 0),
+                        "z": node_data.get("position", {}).get("z", 0)
+                    },
+                    "rotation": {
+                        "x": node_data.get("rotation", {}).get("x", 0),
+                        "y": node_data.get("rotation", {}).get("y", 0),
+                        "z": node_data.get("rotation", {}).get("z", 0)
+                    },
+                    "parent_id": node_data.get("parent_id")
+                }
+                submodels_json.append(submodel_data)
 
-        # Vérifier si des sous-modèles ont été créés
-        if not submodels:
-            _logger.warning(f"Aucun sous-modèle n'a été créé pour le modèle {parent_id}")
-            return False
-
-        # Mettre à jour la structure JSON du modèle parent
-        parent_model.write({
-            'submodels_json': json.dumps(submodels, indent=2)
-        })
+            # Mettre à jour la structure JSON du modèle parent (pour rétrocompatibilité)
+            parent_model.write({
+                'submodels_json': json.dumps(submodels_json, indent=2)
+            })
+        except Exception as e:
+            _logger.error(f"Erreur lors de la mise à jour du JSON des sous-modèles: {str(e)}")
 
         # Créer les équipements automatiquement pour les sous-modèles
-        self._create_equipment_for_submodels(parent_model, submodels)
+        try:
+            self._create_equipment_for_submodels(parent_model)
+        except Exception as e:
+            _logger.error(f"Erreur lors de la création des équipements pour les sous-modèles: {str(e)}")
 
-        _logger.info(f"Hiérarchie importée avec succès: {len(submodels)} sous-modèles ajoutés au modèle {parent_id}")
+        _logger.info(f"Hiérarchie importée avec succès: {submodels_created} sous-modèles ajoutés au modèle {parent_id}")
         return True
 
     def _create_equipment_for_submodels(self, parent_model, submodels):

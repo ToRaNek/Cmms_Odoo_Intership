@@ -25,10 +25,12 @@ Features:
         'security/ir.model.access.csv',
         'views/model3d_views.xml',
         'views/maintenance_views.xml',
+        'views/submodel_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'cmms_3d_models/static/src/js/model_viewer.js',
+            'cmms_3d_models/static/src/js/submodel_viewer.js',
             'cmms_3d_models/static/src/css/model_viewer.css',
             # Three.js libraries
             'cmms_3d_models/static/lib/three/three.js',
@@ -38,6 +40,7 @@ Features:
         ],
         'web.assets_qweb': [
             'cmms_3d_models/static/src/xml/model_viewer_template.xml',
+            'cmms_3d_models/static/src/xml/submodel_viewer_template.xml',
         ],
     },
     'installable': True,

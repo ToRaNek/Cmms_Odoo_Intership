@@ -976,6 +976,433 @@ class CMMS3DController(http.Controller):
             }
         }
 
+    # custom_addons/cmms_3d_models/controllers/main.py - Ajouts
+
+    # Ajouter ces routes à la classe CMMS3DController
+
+    @http.route('/web/cmms/submodel/<int:parent_id>/<int:submodel_id>', type='http', auth="public")
+    def submodel_viewer(self, parent_id, submodel_id, **kw):
+        """Page de visualisation 3D d'un sous-modèle spécifique"""
+        try:
+            # Vérifie que le modèle parent existe
+            parent_model = request.env['cmms.model3d'].sudo().browse(parent_id)
+            if not parent_model.exists():
+                return request.not_found()
+
+            # Vérifie que le sous-modèle existe
+            submodel = request.env['cmms.submodel3d'].sudo().search([
+                ('parent_id', '=', parent_id),
+                ('relative_id', '=', submodel_id)
+            ], limit=1)
+
+            if not submodel:
+                return request.not_found()
+
+            # Préparer les données pour le visualiseur
+            submodel_data = {
+                'id': submodel.id,
+                'name': submodel.name,
+                'description': submodel.description or '',
+                'parent_id': parent_id,
+                'relative_id': submodel_id,
+                'gltf_url': submodel.gltf_url,
+                'bin_url': submodel.bin_url,
+                'scale': submodel.scale,
+                'position_x': submodel.position_x,
+                'position_y': submodel.position_y,
+                'position_z': submodel.position_z,
+                'rotation_x': submodel.rotation_x,
+                'rotation_y': submodel.rotation_y,
+                'rotation_z': submodel.rotation_z,
+            }
+
+            # Création d'une simple page HTML avec un visualiseur 3D
+            html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>CMMS 3D Sous-modèle Viewer - %s</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+                    #viewer { width: 100%%; height: 100vh; }
+                    #loading {
+                        position: absolute;
+                        top: 50%%;
+                        left: 50%%;
+                        transform: translate(-50%%, -50%%);
+                        background: rgba(255,255,255,0.8);
+                        padding: 20px;
+                        border-radius: 10px;
+                        text-align: center;
+                        z-index: 100;
+                    }
+                    #spinner {
+                        border: 5px solid #f3f3f3;
+                        border-top: 5px solid #3498db;
+                        border-radius: 50%%;
+                        width: 50px;
+                        height: 50px;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 10px auto;
+                    }
+                    @keyframes spin {
+                        0%% { transform: rotate(0deg); }
+                        100%% { transform: rotate(360deg); }
+                    }
+                    #controls {
+                        position: absolute;
+                        bottom: 20px;
+                        left: 20px;
+                        background: rgba(0,0,0,0.5);
+                        color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                    }
+                    #modelInfo {
+                        position: absolute;
+                        top: 20px;
+                        left: 20px;
+                        background: rgba(0,0,0,0.5);
+                        color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        max-width: 300px;
+                    }
+                    #error {
+                        display: none;
+                        position: absolute;
+                        top: 50%%;
+                        left: 50%%;
+                        transform: translate(-50%%, -50%%);
+                        background: rgba(220,53,69,0.8);
+                        color: white;
+                        padding: 20px;
+                        border-radius: 10px;
+                        text-align: center;
+                        z-index: 100;
+                        max-width: 80%%;
+                    }
+                    #info {
+                        position: absolute;
+                        top: 0px;
+                        width: 100%%;
+                        padding: 10px;
+                        box-sizing: border-box;
+                        text-align: center;
+                        z-index: 1;
+                        color: #fff;
+                        background-color: rgba(0,0,0,0.5);
+                        font-size: 14px;
+                    }
+                    .close-button {
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        background: rgba(0,0,0,0.5);
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        padding: 5px 10px;
+                        cursor: pointer;
+                    }
+                    .close-button:hover {
+                        background: rgba(0,0,0,0.8);
+                    }
+                    .return-button {
+                        position: absolute;
+                        top: 10px;
+                        right: 100px;
+                        background: rgba(0,0,0,0.5);
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        padding: 5px 10px;
+                        cursor: pointer;
+                    }
+                    .return-button:hover {
+                        background: rgba(0,0,0,0.8);
+                    }
+                </style>
+            </head>
+            <body>
+                <div id="viewer"></div>
+                <div id="info">
+                    <b>CMMS 3D Viewer - Sous-modèle: <span id="currentModelName">%s</span></b><br>
+                    Cliquer et glisser pour faire pivoter | Molette pour zoomer | Clic droit pour déplacer
+                </div>
+                <button class="close-button" onclick="window.close()">Fermer</button>
+                <button class="return-button" onclick="window.location.href='/web/cmms/viewer/%s'">Retour au modèle principal</button>
+
+                <div id="loading">
+                    <div id="spinner"></div>
+                    <div id="progress">Chargement... 0%%</div>
+                </div>
+                <div id="modelInfo">
+                    <h3>%s</h3>
+                    <p>%s</p>
+                    <p><small>ID relatif: %s</small></p>
+                </div>
+                <div id="error">
+                    <h3>Erreur de chargement</h3>
+                    <p id="errorMessage"></p>
+                    <p>Vérifiez que tous les fichiers nécessaires (textures, binaires) ont été téléchargés correctement.</p>
+                </div>
+
+                <!-- Import Three.js et ses extensions depuis les CDN -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
+                <script>
+                    // Données du sous-modèle
+                    const submodelData = %s;
+                    console.log("Données du sous-modèle:", submodelData);
+
+                    // Variables pour Three.js
+                    let scene, camera, renderer, controls, model;
+
+                    // Initialiser la scène
+                    init();
+
+                    // Fonction d'initialisation principale
+                    function init() {
+                        // Créer la scène
+                        scene = new THREE.Scene();
+                        scene.background = new THREE.Color(0xf0f0f0);
+
+                        // Setup caméra
+                        const container = document.getElementById('viewer');
+                        const width = container.clientWidth;
+                        const height = container.clientHeight;
+                        camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                        camera.position.z = 5;
+
+                        // Setup renderer
+                        try {
+                            renderer = new THREE.WebGLRenderer({ antialias: true });
+                            renderer.setSize(width, height);
+                            renderer.setPixelRatio(window.devicePixelRatio);
+                            renderer.outputEncoding = THREE.sRGBEncoding;
+                            container.appendChild(renderer.domElement);
+                        } catch (e) {
+                            showError("Erreur d'initialisation WebGL: " + e.message);
+                            return;
+                        }
+
+                        // Setup controls
+                        try {
+                            controls = new THREE.OrbitControls(camera, renderer.domElement);
+                            controls.enableDamping = true;
+                            controls.dampingFactor = 0.25;
+                        } catch (e) {
+                            showError("Erreur d'initialisation des contrôles: " + e.message);
+                            return;
+                        }
+
+                        // Ajouter des lumières
+                        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                        scene.add(ambientLight);
+
+                        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+                        directionalLight1.position.set(1, 1, 1);
+                        scene.add(directionalLight1);
+
+                        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+                        directionalLight2.position.set(-1, -1, -1);
+                        scene.add(directionalLight2);
+
+                        // Charger le sous-modèle
+                        loadModel();
+
+                        // Animation
+                        animate();
+
+                        // Gestion du redimensionnement
+                        window.addEventListener('resize', onWindowResize);
+                    }
+
+                    // Fonction pour charger le sous-modèle
+                    function loadModel() {
+                        const loader = new THREE.GLTFLoader();
+
+                        // Setup DRACO decoder for compressed models
+                        if (typeof THREE.DRACOLoader !== 'undefined') {
+                            const dracoLoader = new THREE.DRACOLoader();
+                            dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+                            loader.setDRACOLoader(dracoLoader);
+                        }
+
+                        // Ajouter un indicateur de chargement
+                        document.getElementById('loading').style.display = 'block';
+
+                        // Pour GLTFLoader, le chemin est critique pour trouver les textures
+                        // Toutes les textures doivent être dans le même répertoire que le fichier GLTF principal
+                        const modelUrl = submodelData.gltf_url;
+                        const modelUrlDir = modelUrl.substring(0, modelUrl.lastIndexOf('/') + 1);
+
+                        // Set resource path for loader to help find textures
+                        loader.setResourcePath(modelUrlDir);
+
+                        loader.load(
+                            modelUrl,
+                            function (gltf) {
+                                try {
+                                    model = gltf.scene;
+
+                                    // Appliquer les transformations
+                                    model.scale.set(
+                                        submodelData.scale,
+                                        submodelData.scale,
+                                        submodelData.scale
+                                    );
+
+                                    model.position.set(
+                                        submodelData.position_x,
+                                        submodelData.position_y,
+                                        submodelData.position_z
+                                    );
+
+                                    model.rotation.set(
+                                        THREE.Math.degToRad(submodelData.rotation_x),
+                                        THREE.Math.degToRad(submodelData.rotation_y),
+                                        THREE.Math.degToRad(submodelData.rotation_z)
+                                    );
+
+                                    // Ajouter le modèle à la scène
+                                    scene.add(model);
+
+                                    // Centre la caméra sur le modèle
+                                    centerCameraOnModel(model);
+
+                                    // Masque l'indicateur de chargement
+                                    document.getElementById('loading').style.display = 'none';
+                                } catch (e) {
+                                    showError("Erreur lors du traitement du modèle 3D: " + e.message);
+                                    console.error("Model processing error:", e);
+                                }
+                            },
+                            function (xhr) {
+                                const percent = xhr.loaded / xhr.total * 100;
+                                document.getElementById('progress').textContent = 'Chargement... ' + Math.round(percent) + '%%';
+                            },
+                            function (error) {
+                                console.error('Error loading 3D model:', error);
+                                showError("Erreur lors du chargement du modèle 3D: " + error.message);
+                            }
+                        );
+                    }
+
+                    // Centrer la caméra sur un modèle
+                    function centerCameraOnModel(model) {
+                        const box = new THREE.Box3().setFromObject(model);
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size = box.getSize(new THREE.Vector3());
+
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const fov = camera.fov * (Math.PI / 180);
+                        const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+                        camera.position.z = center.z + cameraZ * 1.5;
+                        controls.target.set(center.x, center.y, center.z);
+                        controls.update();
+                    }
+
+                    // Fonctions standard de Three.js
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        if (controls) controls.update();
+                        if (renderer && scene && camera) {
+                            renderer.render(scene, camera);
+                        }
+                    }
+
+                    function onWindowResize() {
+                        const container = document.getElementById('viewer');
+                        const width = container.clientWidth;
+                        const height = container.clientHeight;
+
+                        camera.aspect = width / height;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(width, height);
+                    }
+
+                    function showError(message) {
+                        document.getElementById('loading').style.display = 'none';
+                        const errorDiv = document.getElementById('error');
+                        const errorMessage = document.getElementById('errorMessage');
+                        errorDiv.style.display = 'block';
+                        errorMessage.textContent = message;
+                    }
+                </script>
+            </body>
+            </html>
+            """ % (
+                submodel.name,  # Title
+                submodel.name,  # Current model name display
+                parent_id,      # Parent ID for the return button
+                submodel.name,  # Model info header
+                submodel.description or "",  # Model info description
+                submodel.relative_id,  # Relative ID
+                json.dumps(submodel_data)  # Données du sous-modèle en JSON
+            )
+
+            return request.make_response(
+                html,
+                headers=[('Content-Type', 'text/html')]
+            )
+
+        except Exception as e:
+            _logger.error(f"Error serving submodel viewer: {str(e)}")
+            return request.not_found()
+
+    @http.route('/web/cmms/submodel/<int:parent_id>/<int:submodel_id>/info', type='json', auth="user")
+    def get_submodel_info(self, parent_id, submodel_id, **kw):
+        """Récupère les informations d'un sous-modèle pour le visualiseur"""
+        try:
+            # Vérifie que le modèle parent existe
+            parent_model = request.env['cmms.model3d'].sudo().browse(parent_id)
+            if not parent_model.exists():
+                return {'error': 'Modèle parent non trouvé'}
+
+            # Vérifie que le sous-modèle existe
+            submodel = request.env['cmms.submodel3d'].sudo().search([
+                ('parent_id', '=', parent_id),
+                ('relative_id', '=', submodel_id)
+            ], limit=1)
+
+            if not submodel:
+                return {'error': 'Sous-modèle non trouvé'}
+
+            # Retourne les informations du sous-modèle
+            return {
+                'parent': {
+                    'id': parent_model.id,
+                    'name': parent_model.name
+                },
+                'submodel': {
+                    'id': submodel.id,
+                    'name': submodel.name,
+                    'description': submodel.description or '',
+                    'relative_id': submodel.relative_id,
+                    'gltf_url': submodel.gltf_url,
+                    'bin_url': submodel.bin_url,
+                    'scale': submodel.scale,
+                    'position_x': submodel.position_x,
+                    'position_y': submodel.position_y,
+                    'position_z': submodel.position_z,
+                    'rotation_x': submodel.rotation_x,
+                    'rotation_y': submodel.rotation_y,
+                    'rotation_z': submodel.rotation_z
+                }
+            }
+        except Exception as e:
+            _logger.error(f"Error getting submodel info: {str(e)}")
+            return {'error': str(e)}
+
     @http.route('/web/cmms/submodels/<int:model3d_id>', type='json', auth="user")
     def get_model_submodels(self, model3d_id, **kw):
         """Récupère les sous-modèles d'un modèle 3D"""

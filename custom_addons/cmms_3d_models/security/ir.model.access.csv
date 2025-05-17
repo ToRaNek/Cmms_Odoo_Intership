@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_cmms_model3d_user,cmms.model3d.user,model_cmms_model3d,base.group_user,1,0,0,0
 access_cmms_model3d_manager,cmms.model3d.manager,model_cmms_model3d,maintenance.group_equipment_manager,1,1,1,1
+access_cmms_submodel3d_user,cmms.submodel3d.user,model_cmms_submodel3d,base.group_user,1,0,0,0
+access_cmms_submodel3d_manager,cmms.submodel3d.manager,model_cmms_submodel3d,maintenance.group_equipment_manager,1,1,1,1

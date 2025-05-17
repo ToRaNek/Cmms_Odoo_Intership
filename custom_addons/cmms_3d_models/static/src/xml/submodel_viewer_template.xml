@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- custom_addons/cmms_3d_models/static/src/xml/submodel_viewer_template.xml -->
+<!-- Ajouter ce template après le template CMMS3DViewer dans model_viewer_template.xml -->
+<t t-name="CMMS3DSubmodelViewer">
+    <div class="o_3d_viewer">
+        <div class="o_3d_viewer_header">
+            <div class="o_3d_viewer_title">Visualiseur Sous-modèle 3D</div>
+            <button class="btn btn-secondary o_close_viewer">
+                <i class="fa fa-times"/> Fermer
+            </button>
+        </div>
+        <div class="o_3d_container">
+            <div class="o_3d_loading">
+                <div class="o_3d_loading_spinner"></div>
+                <div>Chargement du sous-modèle 3D...</div>
+                <div class="o_3d_loading_progress">0%</div>
+            </div>
+            <div class="o_3d_error d-none">
+                <i class="fa fa-exclamation-triangle fa-3x mb-2"></i>
+                <div class="o_3d_error_message">Erreur lors du chargement du sous-modèle 3D</div>
+            </div>
+        </div>
+    </div>
+</t>

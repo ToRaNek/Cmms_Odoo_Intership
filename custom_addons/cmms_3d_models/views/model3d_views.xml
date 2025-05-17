@@ -27,9 +27,8 @@
                             </div>
                         </button>
                         <button name="action_view_submodels" type="object"
-                                class="oe_stat_button" icon="fa-sitemap"
-                                attrs="{'invisible': [('child_ids', '=', [])]}">
-                            <field name="child_count" string="Sous-modèles" widget="statinfo"/>
+                                class="oe_stat_button" icon="fa-sitemap">
+                            <field name="submodel_count" string="Sous-modèles" widget="statinfo"/>
                         </button>
                     </div>
 
@@ -129,6 +128,28 @@
                                     <field name="active"/>
                                     <button name="action_view_3d" type="object"
                                             string="Voir en 3D" class="btn-primary"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Sous-modèles" name="submodels_page">
+                            <group>
+                                <field name="submodel_count" invisible="1"/>
+                                <div class="alert alert-info" role="alert" attrs="{'invisible': [('submodel_count', '>', 0)]}">
+                                    <p><strong>Extraction de sous-modèles</strong></p>
+                                    <p>Les sous-modèles sont extraits automatiquement lors de l'importation d'un modèle 3D au format glTF/GLB.</p>
+                                    <p>Pour extraire des sous-modèles, importez un fichier glTF/GLB contenant une hiérarchie de nœuds, ou un fichier Blender qui sera converti.</p>
+                                </div>
+                            </group>
+                            <field name="submodel_ids" context="{'default_parent_id': active_id}">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="relative_id"/>
+                                    <field name="gltf_filename"/>
+                                    <field name="scale"/>
+                                    <field name="active"/>
+                                    <button name="action_view_3d" type="object"
+                                            string="Voir en 3D" class="btn-sm btn-primary"/>
                                 </tree>
                             </field>
                         </page>
