@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action pour les Personnes (définie en premier) -->
+    <record id="action_maintenance_person" model="ir.actions.act_window">
+        <field name="name">Personnes de maintenance</field>
+        <field name="res_model">maintenance.person</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajouter votre première personne de maintenance
+            </p>
+            <p>
+                Gérez vos équipes de maintenance en ajoutant des personnes avec leurs rôles et compétences.
+                Un utilisateur Odoo sera automatiquement créé pour chaque personne.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action pour les Rôles -->
+    <record id="action_maintenance_role" model="ir.actions.act_window">
+        <field name="name">Rôles de maintenance</field>
+        <field name="res_model">maintenance.role</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre premier rôle de maintenance
+            </p>
+            <p>
+                Les rôles permettent de classifier les personnes selon leur niveau d'expertise et leurs responsabilités.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue Formulaire pour les Rôles -->
+    <record id="view_maintenance_role_form" model="ir.ui.view">
+        <field name="name">maintenance.role.form</field>
+        <field name="model">maintenance.role</field>
+        <field name="arch" type="xml">
+            <form string="Rôle de maintenance">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button name="%(action_maintenance_person)d" type="action" class="oe_stat_button" icon="fa-users"
+                                context="{'search_default_role_id': active_id, 'default_role_id': active_id}">
+                            <field name="person_count" string="Personnes" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom du rôle"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <!-- Placeholder pour permissions futures -->
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Description du rôle..."/>
+                        </page>
+                        <page string="Permissions" name="permissions">
+                            <group string="Permissions de base">
+                                <field name="can_create_request"/>
+                                <field name="can_assign_request"/>
+                                <field name="can_manage_all_requests"/>
+                                <field name="can_validate_requests"/>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>Note:</strong> Les permissions détaillées seront implémentées dans une version future.</p>
+                            </div>
+                        </page>
+                        <page string="Personnes">
+                            <field name="person_ids" mode="tree">
+                                <tree>
+                                    <field name="display_name"/>
+                                    <field name="email"/>
+                                    <field name="phone"/>
+                                    <field name="active"/>
+                                    <field name="available"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue Liste pour les Rôles -->
+    <record id="view_maintenance_role_tree" model="ir.ui.view">
+        <field name="name">maintenance.role.tree</field>
+        <field name="model">maintenance.role</field>
+        <field name="arch" type="xml">
+            <tree string="Rôles de maintenance">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="person_count"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Recherche pour les Rôles -->
+    <record id="view_maintenance_role_search" model="ir.ui.view">
+        <field name="name">maintenance.role.search</field>
+        <field name="model">maintenance.role</field>
+        <field name="arch" type="xml">
+            <search string="Rôles de maintenance">
+                <field name="name"/>
+                <filter string="Actifs" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Statut" name="group_by_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue Formulaire pour les Personnes -->
+    <record id="view_maintenance_person_form" model="ir.ui.view">
+        <field name="name">maintenance.person.form</field>
+        <field name="model">maintenance.person</field>
+        <field name="arch" type="xml">
+            <form string="Personne de maintenance">
+                <header>
+                    <button name="action_create_user" type="object" string="Créer utilisateur" 
+                            class="btn-primary" attrs="{'invisible': [('user_id', '!=', False)]}"/>
+                    <button name="action_reset_password" type="object" string="Renvoyer invitation" 
+                            class="btn-secondary" attrs="{'invisible': [('user_id', '=', False)]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button name="action_view_requests" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <field name="request_count" string="Demandes" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <field name="available" widget="boolean_toggle"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="first_name" placeholder="Prénom" class="o_text_overflow"/>
+                            <field name="name" placeholder="Nom" class="o_text_overflow"/>
+                        </h1>
+                        <h3>
+                            <field name="role_id" placeholder="Sélectionner un rôle..." options="{'no_create': True}"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Contact">
+                            <field name="email" attrs="{'required': [('user_id', '=', False)]}"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                        </group>
+                        <group string="Informations professionnelles">
+                            <field name="employee_number"/>
+                            <field name="hire_date"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Compte utilisateur">
+                            <group>
+                                <field name="user_id" readonly="1"/>
+                                <field name="partner_id" readonly="1"/>
+                            </group>
+                            <div class="alert alert-info" role="alert" attrs="{'invisible': [('user_id', '!=', False)]}">
+                                <p><strong>Aucun utilisateur associé</strong></p>
+                                <p>Cliquez sur "Créer utilisateur" pour créer automatiquement un compte Odoo pour cette personne.</p>
+                            </div>
+                            <div class="alert alert-success" role="alert" attrs="{'invisible': [('user_id', '=', False)]}">
+                                <p><strong>Utilisateur créé avec succès</strong></p>
+                                <p>Un email d'invitation a été envoyé à <field name="email" readonly="1" class="oe_inline"/>.</p>
+                            </div>
+                        </page>
+                        <page string="Compétences">
+                            <group>
+                                <field name="specialties" placeholder="Spécialités techniques..."/>
+                                <field name="certifications" placeholder="Certifications professionnelles..."/>
+                            </group>
+                        </page>
+                        <page string="Équipes">
+                            <field name="team_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue Liste pour les Personnes -->
+    <record id="view_maintenance_person_tree" model="ir.ui.view">
+        <field name="name">maintenance.person.tree</field>
+        <field name="model">maintenance.person</field>
+        <field name="arch" type="xml">
+            <tree string="Personnes de maintenance">
+                <field name="display_name"/>
+                <field name="role_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="request_count"/>
+                <field name="available" widget="boolean_toggle"/>
+                <field name="active" invisible="1"/>
+                <button name="action_view_requests" type="object" 
+                        string="Voir demandes" class="btn-sm btn-primary"
+                        attrs="{'invisible': [('request_count', '=', 0)]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Kanban pour les Personnes -->
+    <record id="view_maintenance_person_kanban" model="ir.ui.view">
+        <field name="name">maintenance.person.kanban</field>
+        <field name="model">maintenance.person</field>
+        <field name="arch" type="xml">
+            <kanban string="Personnes de maintenance">
+                <field name="id"/>
+                <field name="display_name"/>
+                <field name="role_id"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="available"/>
+                <field name="request_count"/>
+                <field name="user_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <t t-esc="record.display_name.value"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <t t-esc="record.role_id.value"/>
+                                </div>
+                                <ul>
+                                    <li t-if="record.email.value">📧 <t t-esc="record.email.value"/></li>
+                                    <li t-if="record.phone.value">📞 <t t-esc="record.phone.value"/></li>
+                                </ul>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span t-if="record.request_count.value gt 0" class="badge badge-pill badge-info">
+                                            <t t-esc="record.request_count.value"/> demandes
+                                        </span>
+                                        <span t-if="!record.available.value" class="badge badge-pill badge-warning">
+                                            Indisponible
+                                        </span>
+                                        <span t-if="!record.user_id.value" class="badge badge-pill badge-danger">
+                                            Pas d'utilisateur
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Vue Recherche pour les Personnes -->
+    <record id="view_maintenance_person_search" model="ir.ui.view">
+        <field name="name">maintenance.person.search</field>
+        <field name="model">maintenance.person</field>
+        <field name="arch" type="xml">
+            <search string="Personnes de maintenance">
+                <field name="display_name"/>
+                <field name="email"/>
+                <field name="role_id"/>
+                <field name="team_ids"/>
+                <filter string="Disponibles" name="available" domain="[('available', '=', True)]"/>
+                <filter string="Non disponibles" name="unavailable" domain="[('available', '=', False)]"/>
+                <filter string="Avec utilisateur" name="has_user" domain="[('user_id', '!=', False)]"/>
+                <filter string="Sans utilisateur" name="no_user" domain="[('user_id', '=', False)]"/>
+                <filter string="Actifs" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Rôle" name="group_by_role" context="{'group_by': 'role_id'}"/>
+                    <filter string="Disponibilité" name="group_by_available" context="{'group_by': 'available'}"/>
+                    <filter string="Équipe" name="group_by_team" context="{'group_by': 'team_ids'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Définir les vues sur les actions -->
+    <record id="action_maintenance_person" model="ir.actions.act_window">
+        <field name="search_view_id" ref="view_maintenance_person_search"/>
+    </record>
+
+    <record id="action_maintenance_role" model="ir.actions.act_window">
+        <field name="search_view_id" ref="view_maintenance_role_search"/>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_maintenance_roles" 
+              name="Rôles" 
+              parent="maintenance.menu_maintenance_configuration" 
+              action="action_maintenance_role" 
+              sequence="25"/>
+              
+    <menuitem id="menu_maintenance_persons" 
+              name="Personnes" 
+              parent="maintenance.menu_maintenance_configuration" 
+              action="action_maintenance_person" 
+              sequence="26"/>
+</odoo>

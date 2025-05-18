@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Étendre la vue formulaire des équipes de maintenance -->
+    <record id="view_maintenance_team_form_inherit_persons" model="ir.ui.view">
+        <field name="name">maintenance.team.form.inherit.persons</field>
+        <field name="model">maintenance.team</field>
+        <field name="inherit_id" ref="maintenance.maintenance_team_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajouter un onglet pour gérer les personnes à la fin du formulaire -->
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Personnes de maintenance" name="maintenance_persons">
+                        <field name="person_ids">
+                            <tree editable="bottom">
+                                <field name="display_name"/>
+                                <field name="role_id"/>
+                                <field name="email"/>
+                                <field name="phone"/>
+                                <field name="available" widget="boolean_toggle"/>
+                                <field name="active" invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Étendre la vue liste des équipes de maintenance -->
+    <record id="view_maintenance_team_tree_inherit_persons" model="ir.ui.view">
+        <field name="name">maintenance.team.tree.inherit.persons</field>
+        <field name="model">maintenance.team</field>
+        <field name="inherit_id" ref="maintenance.maintenance_team_view_tree"/>
+        <field name="arch" type="xml">
+            <!-- Ajouter la colonne nombre de personnes -->
+            <xpath expr="//tree" position="inside">
+                <field name="person_count" string="Personnes"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
