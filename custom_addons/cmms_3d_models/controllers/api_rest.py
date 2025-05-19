@@ -99,9 +99,7 @@ class CMSAPIController(http.Controller):
             # Si pas de personne de maintenance, chercher dans les équipes directement via user
             # Fallback pour les utilisateurs standards
             teams = request.env['maintenance.team'].search([
-                '|', 
-                ('member_ids', 'in', [user.id]),
-                ('leader_id', '=', user.id)
+                ('member_ids', 'in', [user.id])
             ])
             return teams.ids
     
@@ -109,8 +107,35 @@ class CMSAPIController(http.Controller):
         """Construire le domaine pour les demandes autorisées"""
         user = request.env.user
         
-        # Domaine de base : demandes assignées à l'utilisateur
-        domain = ['|', ('assigned_user_id', '=', user.id), ('user_id', '=', user.id)]
+        # Dans Odoo 16, les champs standards sont :
+        # - user_id : créateur de la demande
+        # - owner_user_id : propriétaire 
+        # - technician_user_id : technicien assigné (optionnel)
+        # - assigned_user_id : notre champ personnalisé (peut ne pas exister)
+        # - assigned_person_id : personne de maintenance assignée (notre extension)
+        
+        # Créer le domaine avec les champs qui existent vraiment
+        domain = []
+        request_model = request.env['maintenance.request']
+        
+        # Toujours inclure les demandes créées par l'utilisateur
+        domain.append(('user_id', '=', user.id))
+        
+        # Ajouter les demandes dont il est propriétaire (si le champ existe)
+        if 'owner_user_id' in request_model._fields:
+            domain = ['|'] + domain + [('owner_user_id', '=', user.id)]
+        
+        # Ajouter les demandes dont il est technicien (si le champ existe)
+        if 'technician_user_id' in request_model._fields:
+            domain = ['|'] + domain + [('technician_user_id', '=', user.id)]
+        
+        # Ajouter notre champ personnalisé assigned_user_id (si il existe)
+        if 'assigned_user_id' in request_model._fields:
+            domain = ['|'] + domain + [('assigned_user_id', '=', user.id)]
+        
+        # IMPORTANT: Ajouter les demandes assignées via assigned_person_id
+        if 'assigned_person_id' in request_model._fields:
+            domain = ['|'] + domain + [('assigned_person_id.user_id', '=', user.id)]
         
         # Ajouter les demandes des équipes
         team_ids = self._get_user_teams()
@@ -147,6 +172,15 @@ class CMSAPIController(http.Controller):
         if request_record.equipment_id and request_record.equipment_id.model3d_id:
             viewer_url = request_record.equipment_id.model3d_id.viewer_url
         
+        # Gérer l'utilisateur assigné (plusieurs champs possibles)
+        assigned_user = None
+        if hasattr(request_record, 'assigned_user_id') and request_record.assigned_user_id:
+            assigned_user = request_record.assigned_user_id
+        elif hasattr(request_record, 'technician_user_id') and request_record.technician_user_id:
+            assigned_user = request_record.technician_user_id
+        elif hasattr(request_record, 'owner_user_id') and request_record.owner_user_id:
+            assigned_user = request_record.owner_user_id
+        
         return {
             'id': request_record.id,
             'name': request_record.name,
@@ -165,14 +199,14 @@ class CMSAPIController(http.Controller):
                 'model_3d_viewer_url': viewer_url
             } if request_record.equipment_id else None,
             'assigned_user_id': {
-                'id': request_record.assigned_user_id.id,
-                'name': request_record.assigned_user_id.name
-            } if request_record.assigned_user_id else None,
+                'id': assigned_user.id,
+                'name': assigned_user.name
+            } if assigned_user else None,
             'assigned_person_id': {
                 'id': request_record.assigned_person_id.id,
                 'name': request_record.assigned_person_id.display_name,
                 'role': request_record.assigned_person_id.role_id.name if request_record.assigned_person_id.role_id else None
-            } if request_record.assigned_person_id else None,
+            } if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id else None,
             'maintenance_team_id': {
                 'id': request_record.maintenance_team_id.id,
                 'name': request_record.maintenance_team_id.name
@@ -182,8 +216,21 @@ class CMSAPIController(http.Controller):
             'kanban_state': request_record.kanban_state,
             'color': request_record.color,
             'duration': request_record.duration,
-            'archive': not request_record.active,
+            # Supprimé: 'archive': not request_record.active (le champ active n'existe pas)
             'close_date': request_record.close_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.close_date else None,
+            # Champs utilisateur standard
+            'user_id': {
+                'id': request_record.user_id.id,
+                'name': request_record.user_id.name
+            } if request_record.user_id else None,
+            'owner_user_id': {
+                'id': request_record.owner_user_id.id,
+                'name': request_record.owner_user_id.name
+            } if hasattr(request_record, 'owner_user_id') and request_record.owner_user_id else None,
+            'technician_user_id': {
+                'id': request_record.technician_user_id.id,
+                'name': request_record.technician_user_id.name
+            } if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else None,
         }
     
     def _serialize_equipment(self, equipment_record):
@@ -239,7 +286,8 @@ class CMSAPIController(http.Controller):
         '/api/maintenance/teams',
         '/api/maintenance/persons',
         '/api/maintenance/dashboard',
-        '/api/maintenance/all'
+        '/api/maintenance/all',
+        '/api/maintenance/debug'
     ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
     def api_options(self, **kwargs):
         """Gestion des requêtes OPTIONS pour CORS"""
@@ -256,10 +304,10 @@ class CMSAPIController(http.Controller):
     # ===== MAINTENANCE REQUESTS =====
     @http.route('/api/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_requests(self, limit=100, offset=0, status=None, equipment_id=None, **kwargs):
+    def get_requests(self, limit=10000, offset=0, status=None, equipment_id=None, **kwargs):
         """Récupérer les demandes de maintenance de l'utilisateur"""
         try:
-            limit = int(limit) if limit else 100
+            limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
             
             # Construire le domaine de recherche
@@ -436,10 +484,10 @@ class CMSAPIController(http.Controller):
     # ===== EQUIPMENT =====
     @http.route('/api/maintenance/equipment', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_equipment(self, limit=100, offset=0, category_id=None, has_3d_model=None, **kwargs):
+    def get_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
         """Récupérer les équipements"""
         try:
-            limit = int(limit) if limit else 100
+            limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
             
             # Utiliser la nouvelle fonction pour le domaine
@@ -499,10 +547,10 @@ class CMSAPIController(http.Controller):
     # ===== MAINTENANCE PREVENTIVE =====
     @http.route('/api/maintenance/preventive', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_preventive_maintenance(self, limit=100, offset=0, **kwargs):
+    def get_preventive_maintenance(self, limit=10000, offset=0, **kwargs):
         """Récupérer les maintenances préventives de l'utilisateur"""
         try:
-            limit = int(limit) if limit else 100
+            limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
             
             # Domaine pour les maintenances préventives
@@ -534,10 +582,10 @@ class CMSAPIController(http.Controller):
     # ===== MAINTENANCE HISTORY =====
     @http.route('/api/maintenance/history', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_maintenance_history(self, limit=100, offset=0, equipment_id=None, **kwargs):
+    def get_maintenance_history(self, limit=10000, offset=0, equipment_id=None, **kwargs):
         """Récupérer l'historique des maintenances"""
         try:
-            limit = int(limit) if limit else 100
+            limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
             
             # Domaine pour l'historique (demandes terminées)
@@ -585,7 +633,7 @@ class CMSAPIController(http.Controller):
                     'name': team.name,
                     'color': team.color,
                     'member_ids': [{'id': member.id, 'name': member.name} for member in team.member_ids],
-                    'person_count': team.person_count if hasattr(team, 'person_count') else 0,
+                    'member_count': len(team.member_ids),
                 }
                 data.append(team_data)
             
@@ -744,7 +792,7 @@ class CMSAPIController(http.Controller):
                     'name': team.name,
                     'color': team.color,
                     'member_ids': [{'id': member.id, 'name': member.name} for member in team.member_ids],
-                    'person_count': team.person_count if hasattr(team, 'person_count') else 0,
+                    'member_count': len(team.member_ids),
                 }
                 dashboard_data['teams'].append(team_data)
             
@@ -792,3 +840,51 @@ class CMSAPIController(http.Controller):
     def get_all_data(self, **kwargs):
         """Alias pour récupérer toutes les données (même que dashboard)"""
         return self.get_dashboard(**kwargs)
+    
+    # ===== DEBUG ENDPOINT =====
+    @http.route('/api/maintenance/debug', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def debug_fields(self, **kwargs):
+        """Endpoint de debug pour voir les champs disponibles"""
+        try:
+            user = request.env.user
+            debug_info = {
+                'user_info': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login
+                },
+                'request_fields': list(request.env['maintenance.request']._fields.keys()),
+                'equipment_fields': list(request.env['maintenance.equipment']._fields.keys()),
+                'team_fields': list(request.env['maintenance.team']._fields.keys()),
+                'test_requests': []
+            }
+            
+            # Tester quelques demandes
+            all_requests = request.env['maintenance.request'].search([], limit=5)
+            for req in all_requests:
+                req_info = {
+                    'id': req.id,
+                    'name': req.name,
+                    'user_id': req.user_id.name if req.user_id else None,
+                    'has_assigned_user_id': hasattr(req, 'assigned_user_id'),
+                    'has_technician_user_id': hasattr(req, 'technician_user_id'),
+                    'has_owner_user_id': hasattr(req, 'owner_user_id'),
+                    'maintenance_team_id': req.maintenance_team_id.name if req.maintenance_team_id else None,
+                }
+                
+                # Ajouter les valeurs des champs s'ils existent
+                if hasattr(req, 'assigned_user_id'):
+                    req_info['assigned_user_id'] = req.assigned_user_id.name if req.assigned_user_id else None
+                if hasattr(req, 'technician_user_id'):
+                    req_info['technician_user_id'] = req.technician_user_id.name if req.technician_user_id else None
+                if hasattr(req, 'owner_user_id'):
+                    req_info['owner_user_id'] = req.owner_user_id.name if req.owner_user_id else None
+                
+                debug_info['test_requests'].append(req_info)
+            
+            return self._success_response(debug_info, "Debug info retrieved successfully")
+            
+        except Exception as e:
+            _logger.error(f"Error getting debug info: {str(e)}")
+            return self._error_response(f"Error retrieving debug info: {str(e)}", 500)
