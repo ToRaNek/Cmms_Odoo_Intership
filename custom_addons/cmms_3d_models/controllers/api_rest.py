@@ -342,7 +342,7 @@ class CMSAPIController(http.Controller):
             
             # Filtres supplémentaires
             if status:
-                # Mapper les statuts courrants
+                # Mapper les statuts courants
                 status_mapping = {
                     'new': [('stage_id.name', 'ilike', 'new')],
                     'in_progress': [('stage_id.name', 'ilike', 'progress')],
@@ -668,6 +668,7 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error updating request {request_id}: {str(e)}")
             return self._error_response(f"Error updating request: {str(e)}", 500)
+    
     @http.route('/api/maintenance/equipment', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
@@ -820,7 +821,8 @@ class CMSAPIController(http.Controller):
                     'sequence': stage.sequence,
                     'fold': stage.fold,
                     'done': stage.done,
-                    'active': stage.active,
+                    # Enlever le champ 'active' qui n'existe pas sur maintenance.stage
+                    # 'active': stage.active,  <-- Commenté car 'active' n'existe pas
                     # Informations sur les demandes dans ce stage
                     'request_count': request.env['maintenance.request'].search_count([('stage_id', '=', stage.id)])
                 }
@@ -893,6 +895,7 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting request states: {str(e)}")
             return self._error_response(f"Error retrieving request states: {str(e)}", 500)
+    
     @http.route('/api/maintenance/teams', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_teams(self, **kwargs):
@@ -1184,6 +1187,7 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error in test PUT: {str(e)}")
             return self._error_response(f"Error in test PUT: {str(e)}", 500)
+    
     @http.route('/api/maintenance/debug', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def debug_fields(self, **kwargs):
@@ -1199,6 +1203,7 @@ class CMSAPIController(http.Controller):
                 'request_fields': list(request.env['maintenance.request']._fields.keys()),
                 'equipment_fields': list(request.env['maintenance.equipment']._fields.keys()),
                 'team_fields': list(request.env['maintenance.team']._fields.keys()),
+                'stage_fields': list(request.env['maintenance.stage']._fields.keys()),  # Ajouté pour debug
                 'test_requests': []
             }
             
