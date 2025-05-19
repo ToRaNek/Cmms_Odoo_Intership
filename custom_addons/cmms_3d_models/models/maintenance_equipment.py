@@ -2,7 +2,8 @@ from odoo import api, fields, models, _
 
 class MaintenanceEquipment(models.Model):
     _inherit = 'maintenance.equipment'
-    
+
+    cost_center = fields.Char(string='Cost Center', help='Cost center for this equipment')
     # Champs de relation hiérarchique
     parent_id = fields.Many2one('maintenance.equipment', string='Parent Equipment', index=True)
     child_ids = fields.One2many('maintenance.equipment', 'parent_id', string='Sub Equipments')

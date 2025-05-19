@@ -274,7 +274,7 @@ class CMSAPIController(http.Controller):
             'note': equipment_record.note or '',
             'warranty_date': equipment_record.warranty_date.strftime('%Y-%m-%d') if equipment_record.warranty_date else None,
             'color': equipment_record.color,
-            'cost_center': equipment_record.cost_center or '',
+            'cost_center': equipment_record.cost_center or '' if hasattr(equipment_record, 'cost_center') else '',
         }
     
     # ===== OPTIONS (CORS) =====
