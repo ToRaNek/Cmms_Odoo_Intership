@@ -7,3 +7,7 @@ access_maintenance_role_user,maintenance.role.user,model_maintenance_role,base.g
 access_maintenance_role_manager,maintenance.role.manager,model_maintenance_role,maintenance.group_equipment_manager,1,1,1,1
 access_maintenance_person_user,maintenance.person.user,model_maintenance_person,base.group_user,1,0,0,0
 access_maintenance_person_manager,maintenance.person.manager,model_maintenance_person,maintenance.group_equipment_manager,1,1,1,1
+access_cmms_api_key_user,cmms.api.key.user,model_cmms_api_key,base.group_user,1,0,0,0
+access_cmms_api_key_manager,cmms.api.key.manager,model_cmms_api_key,maintenance.group_equipment_manager,1,1,1,1
+access_cmms_api_access_log_user,cmms.api.access.log.user,model_cmms_api_access_log,base.group_user,1,0,0,0
+access_cmms_api_access_log_manager,cmms.api.access.log.manager,model_cmms_api_access_log,maintenance.group_equipment_manager,1,1,1,1

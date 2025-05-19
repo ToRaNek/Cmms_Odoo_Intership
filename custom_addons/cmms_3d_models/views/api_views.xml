@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- custom_addons/cmms_3d_models/views/api_views.xml -->
+<odoo>
+    <!-- Vue Formulaire pour les clés API -->
+    <record id="view_cmms_api_key_form" model="ir.ui.view">
+        <field name="name">cmms.api.key.form</field>
+        <field name="model">cmms.api.key</field>
+        <field name="arch" type="xml">
+            <form string="Clé API">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de la clé API"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Informations générales">
+                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="api_key" password="True" readonly="1"/>
+                            <field name="last_used" readonly="1"/>
+                            <field name="usage_count" readonly="1"/>
+                        </group>
+                        <group string="Sécurité">
+                            <field name="rate_limit"/>
+                            <field name="expires_at"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="IPs autorisées">
+                            <field name="allowed_ips" placeholder="127.0.0.1&#10;192.168.1.100&#10;10.0.0.0/24"/>
+                            <div class="text-muted">
+                                <p>Saisissez une adresse IP par ligne. Laissez vide pour autoriser toutes les IPs.</p>
+                                <p>Formats supportés: 192.168.1.100, 10.0.0.0/24</p>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue Liste pour les clés API -->
+    <record id="view_cmms_api_key_tree" model="ir.ui.view">
+        <field name="name">cmms.api.key.tree</field>
+        <field name="model">cmms.api.key</field>
+        <field name="arch" type="xml">
+            <tree string="Clés API">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="api_key" password="True"/>
+                <field name="last_used"/>
+                <field name="usage_count"/>
+                <field name="rate_limit"/>
+                <field name="expires_at"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Recherche pour les clés API -->
+    <record id="view_cmms_api_key_search" model="ir.ui.view">
+        <field name="name">cmms.api.key.search</field>
+        <field name="model">cmms.api.key</field>
+        <field name="arch" type="xml">
+            <search string="Clés API">
+                <field name="name"/>
+                <field name="user_id"/>
+                <filter string="Actives" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Expirées" name="expired" domain="[('expires_at', '&lt;', context_today())]"/>
+                <filter string="Utilisées récemment" name="recent_usage" domain="[('last_used', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Utilisateur" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Statut" name="group_by_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour les clés API -->
+    <record id="action_cmms_api_key" model="ir.actions.act_window">
+        <field name="name">Clés API</field>
+        <field name="res_model">cmms.api.key</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cmms_api_key_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première clé API
+            </p>
+            <p>
+                Gérez les clés API pour l'accès à votre système de maintenance via API REST.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vue Liste pour les logs d'accès API -->
+    <record id="view_cmms_api_access_log_tree" model="ir.ui.view">
+        <field name="name">cmms.api.access.log.tree</field>
+        <field name="model">cmms.api.access.log</field>
+        <field name="arch" type="xml">
+            <tree string="Logs d'accès API" create="false" edit="false">
+                <field name="create_date"/>
+                <field name="user_id"/>
+                <field name="method"/>
+                <field name="endpoint"/>
+                <field name="status_code"/>
+                <field name="response_time"/>
+                <field name="ip_address"/>
+                <field name="error_message"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue Recherche pour les logs d'accès API -->
+    <record id="view_cmms_api_access_log_search" model="ir.ui.view">
+        <field name="name">cmms.api.access.log.search</field>
+        <field name="model">cmms.api.access.log</field>
+        <field name="arch" type="xml">
+            <search string="Logs d'accès API">
+                <field name="user_id"/>
+                <field name="endpoint"/>
+                <field name="ip_address"/>
+                <filter string="Succès" name="success" domain="[('status_code', '&lt;', 400)]"/>
+                <filter string="Erreur client" name="client_error" domain="[('status_code', '&gt;=', 400), ('status_code', '&lt;', 500)]"/>
+                <filter string="Erreur serveur" name="server_error" domain="[('status_code', '&gt;=', 500)]"/>
+                <filter string="Aujourd'hui" name="today" domain="[('create_date', '&gt;=', context_today())]"/>
+                <filter string="Cette semaine" name="this_week" domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Utilisateur" name="group_by_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Endpoint" name="group_by_endpoint" context="{'group_by': 'endpoint'}"/>
+                    <filter string="Code de statut" name="group_by_status" context="{'group_by': 'status_code'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action pour les logs d'accès API -->
+    <record id="action_cmms_api_access_log" model="ir.actions.act_window">
+        <field name="name">Logs d'accès API</field>
+        <field name="res_model">cmms.api.access.log</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_cmms_api_access_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun log d'accès API
+            </p>
+            <p>
+                Les logs d'accès API apparaitront ici une fois que des requêtes auront été effectuées.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu pour la gestion API -->
+    <menuitem id="menu_cmms_api_management" 
+              name="Gestion API" 
+              parent="maintenance.menu_maintenance_configuration" 
+              sequence="35"/>
+              
+    <menuitem id="menu_cmms_api_keys" 
+              name="Clés API" 
+              parent="menu_cmms_api_management" 
+              action="action_cmms_api_key" 
+              sequence="10"/>
+              
+    <menuitem id="menu_cmms_api_logs" 
+              name="Logs d'accès" 
+              parent="menu_cmms_api_management" 
+              action="action_cmms_api_access_log" 
+              sequence="20"/>
+</odoo>

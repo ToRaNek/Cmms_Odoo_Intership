@@ -1,0 +1,22 @@
+# external_apps/odoo_client_app/requirements.txt
+# Aucune dépendance externe requise pour le client XML-RPC de base
+# Le module xmlrpc.client est inclus dans la bibliothèque standard Python
+
+# Dépendances optionnelles pour améliorer l'expérience de développement:
+
+# Pour un logging plus avancé (optionnel)
+# colorlog>=6.7.0
+
+# Pour la gestion de configuration via fichiers .env (optionnel)
+# python-dotenv>=1.0.0
+
+# Pour les tests unitaires (optionnel)
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+
+# Pour l'analyse de code (optionnel)
+# pylint>=2.15.0
+# black>=22.0.0
+# flake8>=5.0.0
+
+# Si vous souhaitez installer ces dépendances optionnelles, décommentez les lignes ci-dessus
