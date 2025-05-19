@@ -293,6 +293,8 @@ class CMSAPIController(http.Controller):
         '/api/maintenance/debug',
         '/api/maintenance/stages',
         '/api/maintenance/request-states',
+        '/api/user/profile',
+        '/api/user/profile/email-check',
         '/api/test/cors',
         '/api/test/cors-auth',
         '/api/test/cors-put'
@@ -1119,6 +1121,252 @@ class CMSAPIController(http.Controller):
         """Alias pour récupérer toutes les données (même que dashboard)"""
         return self.get_dashboard(**kwargs)
     
+    # ===== USER PROFILE =====
+    @http.route('/api/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_user_profile(self, **kwargs):
+        """Récupérer le profil de l'utilisateur connecté"""
+        try:
+            user = request.env.user
+            
+            # Récupérer la personne de maintenance associée si elle existe
+            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+            
+            # Récupérer les équipes de l'utilisateur
+            team_ids = self._get_user_teams()
+            teams = request.env['maintenance.team'].browse(team_ids)
+            
+            # Construire les données du profil
+            profile_data = {
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email or '',
+                    'has_email': bool(user.email),
+                    'active': user.active,
+                    'lang': user.lang,
+                    'tz': user.tz,
+                    'company_id': {
+                        'id': user.company_id.id,
+                        'name': user.company_id.name
+                    } if user.company_id else None,
+                    'partner_id': {
+                        'id': user.partner_id.id,
+                        'name': user.partner_id.name,
+                        'email': user.partner_id.email or '',
+                        'phone': user.partner_id.phone or '',
+                        'mobile': user.partner_id.mobile or ''
+                    } if user.partner_id else None
+                },
+                'maintenance_person': {
+                    'id': person.id,
+                    'display_name': person.display_name,
+                    'first_name': person.first_name or '',
+                    'name': person.name or '',
+                    'email': person.email or '',
+                    'phone': person.phone or '',
+                    'mobile': person.mobile or '',
+                    'available': person.available,
+                    'role': {
+                        'id': person.role_id.id,
+                        'name': person.role_id.name,
+                        'description': person.role_id.description or ''
+                    } if person.role_id else None,
+                    'specialties': person.specialties or '',
+                    'certifications': person.certifications or '',
+                    'hire_date': person.hire_date.strftime('%Y-%m-%d') if person.hire_date else None,
+                    'employee_number': person.employee_number or '',
+                    'request_count': person.request_count,
+                } if person else None,
+                'teams': [
+                    {
+                        'id': team.id,
+                        'name': team.name,
+                        'color': team.color,
+                        'member_count': len(team.member_ids)
+                    } for team in teams
+                ],
+                'permissions': {
+                    'can_create_request': True,  # Tous les utilisateurs peuvent créer des demandes
+                    'can_manage_team_requests': bool(team_ids),  # Peut gérer les demandes d'équipe s'il appartient à une équipe
+                    'can_assign_requests': person.role_id.can_assign_request if person and person.role_id else False,
+                    'can_manage_all_requests': person.role_id.can_manage_all_requests if person and person.role_id else False,
+                    'can_validate_requests': person.role_id.can_validate_requests if person and person.role_id else False,
+                }
+            }
+            
+            return self._success_response(profile_data, "User profile retrieved successfully")
+            
+        except Exception as e:
+            _logger.error(f"Error getting user profile: {str(e)}")
+            return self._error_response(f"Error retrieving user profile: {str(e)}", 500)
+    
+    @http.route('/api/user/profile', type='http', auth='none', methods=['PUT'], csrf=False)
+    @basic_auth_required
+    def update_user_profile(self, **kwargs):
+        """Mettre à jour le profil de l'utilisateur connecté"""
+        try:
+            user = request.env.user
+            
+            # Récupérer les données JSON du body
+            try:
+                body = request.httprequest.data.decode('utf-8')
+                data = json.loads(body) if body else {}
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                _logger.error(f"Error parsing JSON data: {str(e)}")
+                return self._error_response("Invalid JSON data", 400)
+            
+            if not data:
+                return self._error_response("No data provided", 400)
+            
+            # Champs autorisés pour la mise à jour
+            user_updates = {}
+            partner_updates = {}
+            person_updates = {}
+            
+            # Mise à jour de l'email (priorité principale)
+            if 'email' in data and data['email']:
+                email = data['email'].strip()
+                
+                # Vérifier que l'email est valide (simple validation)
+                if '@' in email and '.' in email:
+                    # Vérifier que l'email n'est pas déjà utilisé par un autre utilisateur
+                    existing_user = request.env['res.users'].search([
+                        ('email', '=', email),
+                        ('id', '!=', user.id)
+                    ], limit=1)
+                    
+                    if existing_user:
+                        return self._error_response(f"Email {email} is already used by another user", 400)
+                    
+                    # Mettre à jour l'email sur l'utilisateur et son partner
+                    user_updates['email'] = email
+                    if user.partner_id:
+                        partner_updates['email'] = email
+                    
+                    # Mettre à jour l'email sur la personne de maintenance si elle existe
+                    person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+                    if person:
+                        person_updates['email'] = email
+                else:
+                    return self._error_response("Invalid email format", 400)
+            
+            # Autres champs optionnels
+            if 'name' in data and data['name']:
+                user_updates['name'] = data['name']
+                if user.partner_id:
+                    partner_updates['name'] = data['name']
+            
+            if 'phone' in data:
+                if user.partner_id:
+                    partner_updates['phone'] = data['phone']
+                # Mettre à jour sur la personne de maintenance si elle existe
+                person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+                if person:
+                    person_updates['phone'] = data['phone']
+            
+            if 'mobile' in data:
+                if user.partner_id:
+                    partner_updates['mobile'] = data['mobile']
+                # Mettre à jour sur la personne de maintenance si elle existe
+                person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+                if person:
+                    person_updates['mobile'] = data['mobile']
+            
+            # Champs spécifiques à la personne de maintenance
+            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+            if person:
+                if 'first_name' in data:
+                    person_updates['first_name'] = data['first_name']
+                if 'specialties' in data:
+                    person_updates['specialties'] = data['specialties']
+                if 'certifications' in data:
+                    person_updates['certifications'] = data['certifications']
+                if 'available' in data:
+                    person_updates['available'] = bool(data['available'])
+            
+            # Appliquer les mises à jour
+            updated_fields = []
+            
+            if user_updates:
+                user.write(user_updates)
+                updated_fields.extend([f"user.{field}" for field in user_updates.keys()])
+            
+            if partner_updates and user.partner_id:
+                user.partner_id.write(partner_updates)
+                updated_fields.extend([f"partner.{field}" for field in partner_updates.keys()])
+            
+            if person_updates and person:
+                person.write(person_updates)
+                updated_fields.extend([f"person.{field}" for field in person_updates.keys()])
+            
+            # Récupérer le profil mis à jour
+            updated_profile = self.get_user_profile()
+            
+            # Si c'est un objet Response (succès), extraire les données
+            if hasattr(updated_profile, 'data'):
+                # Parser la réponse JSON
+                import json
+                profile_data = json.loads(updated_profile.data.decode('utf-8'))['data']
+            else:
+                # Fallback si erreur
+                profile_data = {}
+            
+            return self._success_response(
+                {
+                    'profile': profile_data,
+                    'updated_fields': updated_fields,
+                    'message': f"Profile updated successfully. Fields modified: {', '.join(updated_fields)}"
+                },
+                "Profile updated successfully"
+            )
+            
+        except Exception as e:
+            _logger.error(f"Error updating user profile: {str(e)}")
+            return self._error_response(f"Error updating profile: {str(e)}", 500)
+    
+    @http.route('/api/user/profile/email-check', type='http', auth='none', methods=['POST'], csrf=False)
+    @basic_auth_required
+    def check_email_availability(self, **kwargs):
+        """Vérifier si un email est disponible"""
+        try:
+            # Récupérer les données JSON du body
+            try:
+                body = request.httprequest.data.decode('utf-8')
+                data = json.loads(body) if body else {}
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                return self._error_response("Invalid JSON data", 400)
+            
+            email = data.get('email', '').strip()
+            
+            if not email:
+                return self._error_response("Email is required", 400)
+            
+            # Vérification basique du format
+            if '@' not in email or '.' not in email:
+                return self._error_response("Invalid email format", 400)
+            
+            # Vérifier si l'email est déjà utilisé (excluant l'utilisateur actuel)
+            existing_user = request.env['res.users'].search([
+                ('email', '=', email),
+                ('id', '!=', request.env.user.id)
+            ], limit=1)
+            
+            is_available = not bool(existing_user)
+            current_user_has_this_email = request.env.user.email == email
+            
+            return self._success_response({
+                'email': email,
+                'available': is_available,
+                'current_user_email': current_user_has_this_email,
+                'message': 'Available' if is_available else 'Email already in use'
+            }, "Email availability checked")
+            
+        except Exception as e:
+            _logger.error(f"Error checking email availability: {str(e)}")
+            return self._error_response(f"Error checking email: {str(e)}", 500)
+
     # ===== FLUTTER WEB TEST ENDPOINT =====
     @http.route('/api/test/cors', type='http', auth='none', methods=['GET'], csrf=False)
     def test_cors_flutter(self, **kwargs):
