@@ -38,6 +38,7 @@ Features:
         'views/maintenance_person_views.xml',
         'views/maintenance_request_views_extended.xml',
         'views/maintenance_team_views_extended.xml',
+        'views/maintenance_equipment_views_3d.xml',  # Nouveau fichier pour les vues équipement 3D
         'views/api_views.xml',
     ],
     'assets': {

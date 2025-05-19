@@ -30,6 +30,15 @@
                                 class="oe_stat_button" icon="fa-sitemap">
                             <field name="submodel_count" string="Sous-modèles" widget="statinfo"/>
                         </button>
+                        <!-- NOUVEAU BOUTON POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ -->
+                        <button name="action_view_auto_equipment" type="object"
+                                class="oe_stat_button" icon="fa-wrench"
+                                attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Équipement</span>
+                                <span class="o_stat_text">créé auto.</span>
+                            </div>
+                        </button>
                     </div>
 
                     <!-- Indiquer si c'est un sous-modèle -->
@@ -40,12 +49,43 @@
                         </p>
                     </div>
 
+                    <!-- NOUVELLE ALERTE POUR INFORMER SUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT -->
+                    <div class="alert alert-success" role="alert"
+                         attrs="{'invisible': ['|', ('is_submodel', '=', True), ('has_auto_equipment', '=', False)]}">
+                        <p>
+                            <strong>Équipement auto-créé:</strong> 
+                            <field name="auto_created_equipment_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
+                        </p>
+                        <p>Un équipement de maintenance a été créé automatiquement et lié à ce modèle 3D.</p>
+                    </div>
+
+                    <div class="alert alert-info" role="alert"
+                         attrs="{'invisible': [('is_submodel', '=', True)]}">
+                        <p><strong>Création automatique d'équipement</strong></p>
+                        <p>Un équipement de maintenance sera créé automatiquement pour ce modèle 3D.</p>
+                        <p><small>Note: Vous pouvez optionnellement sélectionner une catégorie d'équipement ci-dessous. Cette fonctionnalité n'est disponible que pour les modèles parents (non sous-modèles).</small></p>
+                    </div>
+
                     <field name="thumbnail" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <h1>
                             <field name="name" placeholder="Nom du modèle"/>
                         </h1>
                     </div>
+
+                    <!-- NOUVEAU GROUPE POUR LA CATÉGORIE D'ÉQUIPEMENT -->
+                    <group attrs="{'invisible': [('is_submodel', '=', True)]}">
+                        <group string="Équipement de maintenance">
+                            <field name="equipment_category_id" 
+                                   options="{'no_create': True, 'no_open': True}"
+                                   help="Catégorie d'équipement (optionnel)"/>
+                            <field name="auto_created_equipment_id" readonly="1" 
+                                   attrs="{'invisible': [('auto_created_equipment_id', '=', False)]}"
+                                   options="{'no_open': True}"/>
+                            <field name="has_auto_equipment" invisible="1"/>
+                            <field name="is_submodel" invisible="1"/>
+                        </group>
+                    </group>
 
                     <notebook>
                         <page string="Fichiers du modèle 3D">
@@ -115,7 +155,6 @@
                         <page string="Hiérarchie de modèles" name="hierarchy_page">
                             <group>
                                 <field name="parent_id" domain="[('id', '!=', active_id)]"/>
-                                <field name="is_submodel" invisible="1"/>
                                 <field name="complete_name" invisible="1"/>
                             </group>
 
@@ -163,6 +202,18 @@
                                     <field name="location"/>
                                 </tree>
                             </field>
+                            
+                            <!-- NOUVELLE SECTION POUR L'ÉQUIPEMENT AUTO-CRÉÉ -->
+                            <div class="alert alert-success" role="alert"
+                                 attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
+                                <p>
+                                    <strong>Équipement créé automatiquement:</strong>
+                                    <field name="auto_created_equipment_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
+                                </p>
+                                <p>Cet équipement a été créé automatiquement lors de la sélection de la catégorie d'équipement.</p>
+                                <button name="action_view_auto_equipment" type="object" 
+                                        string="Voir l'équipement" class="btn btn-primary"/>
+                            </div>
                         </page>
                     </notebook>
                 </sheet>
@@ -176,15 +227,19 @@
         <field name="model">cmms.model3d</field>
         <field name="arch" type="xml">
             <tree string="Modèles 3D">
-                <!-- Utiliser name au lieu de complete_name -->
                 <field name="name"/>
                 <field name="parent_id"/>
                 <field name="model_format"/>
+                <field name="equipment_category_id"/>
+                <field name="has_auto_equipment" widget="boolean_icon"/>
                 <field name="has_external_files"/>
                 <field name="is_submodel"/>
                 <field name="active"/>
                 <button name="action_view_3d" type="object"
                         string="Voir en 3D" class="btn-sm btn-primary"/>
+                <button name="action_view_auto_equipment" type="object"
+                        string="Voir équipement" class="btn-sm btn-success"
+                        attrs="{'invisible': [('has_auto_equipment', '=', False)]}"/>
             </tree>
         </field>
     </record>
@@ -196,8 +251,12 @@
         <field name="arch" type="xml">
             <search string="Modèles 3D">
                 <field name="name"/>
-                <!-- Pas de recherche sur complete_name -->
                 <field name="model_format"/>
+                <field name="equipment_category_id"/>
+                <filter string="Avec équipement auto-créé" name="has_auto_equipment" 
+                        domain="[('auto_created_equipment_id', '!=', False)]"/>
+                <filter string="Sans équipement auto-créé (modèles parents)" name="no_auto_equipment" 
+                        domain="[('auto_created_equipment_id', '=', False), ('parent_id', '=', False)]"/>
                 <filter string="Avec fichiers externes" name="has_external" domain="[('has_external_files', '=', True)]"/>
                 <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
                 <filter string="Sous-modèles" name="submodels" domain="[('parent_id', '!=', False)]"/>
@@ -205,7 +264,11 @@
                 <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
+                    <filter string="Catégorie d'équipement" name="group_by_equipment_category" 
+                            context="{'group_by': 'equipment_category_id'}"/>
                     <filter string="Modèle parent" name="group_by_parent" context="{'group_by': 'parent_id'}"/>
+                    <filter string="Équipement auto-créé" name="group_by_auto_equipment" 
+                            context="{'group_by': 'auto_created_equipment_id'}"/>
                 </group>
             </search>
         </field>
@@ -223,6 +286,9 @@
             </p>
             <p>
                 Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
+            </p>
+            <p>
+                <strong>Nouveau:</strong> Sélectionnez une catégorie d'équipement pour créer automatiquement un équipement de maintenance lié à votre modèle 3D.
             </p>
         </field>
     </record>

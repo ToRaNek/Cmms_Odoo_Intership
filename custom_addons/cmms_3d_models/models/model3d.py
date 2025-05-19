@@ -1,3 +1,5 @@
+# custom_addons/cmms_3d_models/models/model3d.py - Ajout de la création automatique d'équipement
+
 import os
 import base64
 import zipfile
@@ -22,8 +24,6 @@ BLENDER_EXE = r"C:\Program Files\Blender Foundation\Blender 4.4\blender.exe"
 class Model3D(models.Model):
     _name = 'cmms.model3d'
     _description = '3D Model'
-    # Suppression de toutes les options qui nécessitent des colonnes spéciales en base
-    # _rec_name = 'complete_name'  # On utilise le champ 'name' par défaut
 
     name = fields.Char('Name', required=True)
     description = fields.Text('Description')
@@ -80,19 +80,42 @@ class Model3D(models.Model):
     parent_id = fields.Many2one('cmms.model3d', string='Modèle parent',
                                ondelete='cascade', index=True)
     child_ids = fields.One2many('cmms.model3d', 'parent_id', string='Sous-modèles')
-    is_submodel = fields.Boolean(compute='_compute_is_submodel', store=False,
+    is_submodel = fields.Boolean(compute='_compute_is_submodel', store=True,
                                 string='Est un sous-modèle')
-    # Correction: Ajout de recursive=True pour résoudre l'avertissement
     complete_name = fields.Char('Nom complet', compute='_compute_complete_name',
-                              recursive=True, store=False)  # Ne pas stocker ce champ
-    child_count = fields.Integer(compute='_compute_child_count', string='Nombre de sous-modèles')
+                              recursive=True, store=False)
+    child_count = fields.Integer(compute='_compute_child_count', string='Nombre de sous-modèles (ancien système)')
 
     # Nouveau champ pour stocker les sous-modèles en JSON
     submodels_json = fields.Text('Sous-modèles (JSON)', default='[]',
                                help="Structure hiérarchique des sous-modèles au format JSON")
 
     submodel_ids = fields.One2many('cmms.submodel3d', 'parent_id', string='Sous-modèles')
-    submodel_count = fields.Integer('Nombre de sous-modèles', compute='_compute_submodel_count')
+    submodel_count = fields.Integer('Nombre de sous-modèles (nouveau système)', compute='_compute_submodel_count')
+
+    # NOUVEAUX CHAMPS POUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT
+    equipment_category_id = fields.Many2one(
+        'maintenance.equipment.category',
+        string='Catégorie d\'équipement',
+        help="Sélectionnez une catégorie pour créer automatiquement un équipement de maintenance lié à ce modèle 3D. "
+             "Ne fonctionne que pour les modèles parents (non sous-modèles)."
+    )
+    auto_created_equipment_id = fields.Many2one(
+        'maintenance.equipment',
+        string='Équipement créé automatiquement',
+        readonly=True,
+        help="Équipement de maintenance créé automatiquement à partir de ce modèle 3D"
+    )
+    has_auto_equipment = fields.Boolean(
+        compute='_compute_has_auto_equipment',
+        store=True,
+        string='A un équipement auto-créé'
+    )
+
+    @api.depends('auto_created_equipment_id')
+    def _compute_has_auto_equipment(self):
+        for record in self:
+            record.has_auto_equipment = bool(record.auto_created_equipment_id)
 
     @api.depends('submodel_ids')
     def _compute_submodel_count(self):
@@ -171,6 +194,48 @@ class Model3D(models.Model):
             else:
                 record.viewer_url = False
 
+    # MÉTHODE POUR CRÉER/METTRE À JOUR L'ÉQUIPEMENT AUTOMATIQUEMENT
+    def _create_or_update_auto_equipment(self):
+        """Crée ou met à jour l'équipement automatiquement pour les modèles parents"""
+        self.ensure_one()
+        
+        # Ne pas créer d'équipement pour les sous-modèles
+        if self.parent_id:
+            return False
+        
+        # Nom de l'équipement avec préfixe
+        equipment_name = f"Équipement - {self.name}"
+        
+        # Valeurs de base pour l'équipement
+        equipment_vals = {
+            'name': equipment_name,
+            'model3d_id': self.id,
+            'model3d_scale': self.scale,
+            'model3d_position_x': self.position_x,
+            'model3d_position_y': self.position_y,
+            'model3d_position_z': self.position_z,
+            'model3d_rotation_x': self.rotation_x,
+            'model3d_rotation_y': self.rotation_y,
+            'model3d_rotation_z': self.rotation_z,
+        }
+        
+        # Ajouter la catégorie seulement si elle est sélectionnée
+        if self.equipment_category_id:
+            equipment_vals['category_id'] = self.equipment_category_id.id
+        
+        # Si un équipement existe déjà, le mettre à jour
+        if self.auto_created_equipment_id:
+            self.auto_created_equipment_id.write(equipment_vals)
+            _logger.info(f"Équipement auto-créé mis à jour : {equipment_name} (ID: {self.auto_created_equipment_id.id})")
+            return self.auto_created_equipment_id
+        
+        # Sinon, créer un nouvel équipement
+        else:
+            equipment = self.env['maintenance.equipment'].create(equipment_vals)
+            self.write({'auto_created_equipment_id': equipment.id})
+            _logger.info(f"Équipement auto-créé : {equipment_name} (ID: {equipment.id})")
+            return equipment
+
     @api.model
     def create(self, vals):
         # Log initial state for debugging
@@ -218,10 +283,22 @@ class Model3D(models.Model):
                 _logger.error(f"Erreur lors de l'extraction de l'archive ZIP: {str(e)}")
                 raise ValidationError(f"Erreur lors de l'extraction de l'archive ZIP: {str(e)}")
 
+        # NOUVEAU : Créer l'équipement automatiquement si c'est un modèle parent
+        try:
+            res._create_or_update_auto_equipment()
+        except Exception as e:
+            _logger.error(f"Erreur lors de la création automatique de l'équipement: {str(e)}")
+            # Ne pas faire échouer la création du modèle 3D à cause de l'équipement
+
         return res
 
     def write(self, vals):
+        # Sauvegarder les anciennes catégories pour comparer
+        old_categories = {record.id: record.equipment_category_id.id if record.equipment_category_id else False 
+                         for record in self}
+        
         res = super(Model3D, self).write(vals)
+        
         try:
             for record in self:
                 if 'model_file' in vals and vals['model_file']:
@@ -233,11 +310,64 @@ class Model3D(models.Model):
                     self._save_bin_file(record)
                 if 'model_zip' in vals and vals['model_zip'] and bool(vals['model_zip'].strip()):
                     self._extract_zip_model(record)
+                
+                # NOUVEAU : Vérifier si des paramètres ont changé
+                if ('equipment_category_id' in vals or 'name' in vals or 
+                    any(field in vals for field in ['scale', 'position_x', 'position_y', 'position_z', 
+                                                   'rotation_x', 'rotation_y', 'rotation_z'])):
+                    # Créer ou mettre à jour l'équipement automatiquement
+                    record._create_or_update_auto_equipment()
+                        
         except Exception as e:
             _logger.error(f"Erreur lors de la mise à jour du modèle 3D: {str(e)}")
             raise ValidationError(f"Erreur lors de la mise à jour du modèle 3D: {str(e)}")
         return res
 
+    def unlink(self):
+        # NOUVEAU : Supprimer les équipements auto-créés avant de supprimer le modèle
+        equipments_to_delete = self.env['maintenance.equipment']
+        for record in self:
+            if record.auto_created_equipment_id:
+                equipments_to_delete |= record.auto_created_equipment_id
+                _logger.info(f"Marquage de l'équipement auto-créé pour suppression: {record.auto_created_equipment_id.name}")
+        
+        # Supprimer les modèles
+        res = super(Model3D, self).unlink()
+        
+        # Supprimer les équipements auto-créés
+        if equipments_to_delete:
+            equipments_to_delete.unlink()
+            _logger.info(f"Suppression de {len(equipments_to_delete)} équipements auto-créés")
+        
+        return res
+
+    # ACTION POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ
+    def action_view_auto_equipment(self):
+        """Affiche l'équipement auto-créé"""
+        self.ensure_one()
+        if not self.auto_created_equipment_id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Aucun équipement auto-créé'),
+                    'message': _('Ce modèle n\'a pas d\'équipement créé automatiquement. '
+                               'Sélectionnez une catégorie d\'équipement pour en créer un.'),
+                    'sticky': False,
+                    'type': 'warning',
+                }
+            }
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Équipement auto-créé'),
+            'res_model': 'maintenance.equipment',
+            'res_id': self.auto_created_equipment_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    # Toutes les autres méthodes restent inchangées
     def _save_model_file(self, record):
         try:
             # Vérifier que model_filename est bien une chaîne

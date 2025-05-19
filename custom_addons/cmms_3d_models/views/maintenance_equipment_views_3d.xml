@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- custom_addons/cmms_3d_models/views/maintenance_equipment_views_3d.xml -->
+<odoo>
+    <!-- Vue formulaire des équipements étendue avec visualisation 3D -->
+    <record id="view_maintenance_equipment_form_inherit_3d" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.inherit.3d</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Ajouter boutons de visualisation 3D dans la button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_3d" type="object" 
+                        class="oe_stat_button" icon="fa-cube"
+                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Visualiser</span>
+                        <span class="o_stat_text">Modèle 3D</span>
+                    </div>
+                </button>
+                <button name="action_view_3d_with_children" type="object"
+                        class="oe_stat_button" icon="fa-cubes"
+                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Voir avec</span>
+                        <span class="o_stat_text">sous-modèles</span>
+                    </div>
+                </button>
+                <button name="action_view_model3d_form" type="object"
+                        class="oe_stat_button" icon="fa-edit"
+                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Modifier</span>
+                        <span class="o_stat_text">Modèle 3D</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Ajouter une alerte d'information pour le modèle 3D -->
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info" role="alert"
+                     attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <p>
+                        <strong>Modèle 3D associé:</strong> 
+                        <field name="model3d_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
+                    </p>
+                    <p>Cet équipement dispose d'un modèle 3D pour la visualisation et la maintenance.</p>
+                </div>
+            </xpath>
+
+            <!-- Ajouter section modèle 3D après les informations de base -->
+            <xpath expr="//group[last()]" position="after">
+                <group string="Modèle 3D" attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                    <field name="has_3d_model" invisible="1"/>
+                    <field name="model3d_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                    <field name="model3d_scale"/>
+                    <label for="model3d_position_x" string="Position 3D"/>
+                    <div>
+                        <field name="model3d_position_x" class="oe_inline"/> X,
+                        <field name="model3d_position_y" class="oe_inline"/> Y,
+                        <field name="model3d_position_z" class="oe_inline"/> Z
+                    </div>
+                    <label for="model3d_rotation_x" string="Rotation 3D"/>
+                    <div>
+                        <field name="model3d_rotation_x" class="oe_inline"/> X,
+                        <field name="model3d_rotation_y" class="oe_inline"/> Y,
+                        <field name="model3d_rotation_z" class="oe_inline"/> Z
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <!-- Vue recherche des équipements étendue -->
+    <record id="view_maintenance_equipment_search_inherit_3d" model="ir.ui.view">
+        <field name="name">maintenance.equipment.search.inherit.3d</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_search"/>
+        <field name="arch" type="xml">
+            <!-- Ajouter champ de recherche -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="model3d_id"/>
+            </xpath>
+            <!-- Ajouter filtres -->
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter string="Avec modèle 3D" name="has_3d_model"
+                        domain="[('has_3d_model', '=', True)]"/>
+                <filter string="Sans modèle 3D" name="no_3d_model"
+                        domain="[('has_3d_model', '=', False)]"/>
+            </xpath>
+            <!-- Ajouter groupements -->
+            <xpath expr="//group" position="inside">
+                <filter string="Modèle 3D" name="group_by_model3d"
+                        context="{'group_by': 'model3d_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
