@@ -36,6 +36,9 @@ def basic_auth_required(func):
             # L'utilisateur est authentifié, continuer
             return func(self, *args, **kwargs)
             
+        except (ValueError, UnicodeDecodeError) as e:
+            _logger.error(f"Authentication decode error: {str(e)}")
+            return self._error_response('Invalid authentication format', 401)
         except Exception as e:
             _logger.error(f"Authentication error: {str(e)}")
             return self._error_response('Authentication failed', 401)
@@ -43,6 +46,16 @@ def basic_auth_required(func):
     return wrapper
 
 class CMSAPIController(http.Controller):
+    
+    def _get_cors_headers(self):
+        """Retourne les headers CORS standard avec support complet pour Authorization"""
+        return [
+            ('Access-Control-Allow-Origin', '*'),
+            ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
+            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept'),
+            ('Access-Control-Allow-Credentials', 'false'),  # Important pour Flutter Web
+            ('Access-Control-Max-Age', '3600'),
+        ]
     
     def _success_response(self, data=None, message="Success", status_code=200):
         """Format de réponse standardisé pour les succès"""
@@ -55,12 +68,7 @@ class CMSAPIController(http.Controller):
         
         response = request.make_response(
             json.dumps(response_data, default=str),
-            headers=[
-                ('Content-Type', 'application/json'),
-                ('Access-Control-Allow-Origin', '*'),
-                ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
-                ('Access-Control-Allow-Headers', 'Content-Type, Authorization'),
-            ]
+            headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
         )
         response.status_code = status_code
         return response
@@ -76,12 +84,7 @@ class CMSAPIController(http.Controller):
         
         response = request.make_response(
             json.dumps(response_data, default=str),
-            headers=[
-                ('Content-Type', 'application/json'),
-                ('Access-Control-Allow-Origin', '*'),
-                ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
-                ('Access-Control-Allow-Headers', 'Content-Type, Authorization'),
-            ]
+            headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
         )
         response.status_code = status_code
         return response
@@ -287,19 +290,43 @@ class CMSAPIController(http.Controller):
         '/api/maintenance/persons',
         '/api/maintenance/dashboard',
         '/api/maintenance/all',
-        '/api/maintenance/debug'
+        '/api/maintenance/debug',
+        '/api/maintenance/stages',
+        '/api/maintenance/request-states',
+        '/api/test/cors',
+        '/api/test/cors-auth',
+        '/api/test/cors-put'
     ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
     def api_options(self, **kwargs):
         """Gestion des requêtes OPTIONS pour CORS"""
-        return request.make_response(
-            '',
-            headers=[
-                ('Access-Control-Allow-Origin', '*'),
-                ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
-                ('Access-Control-Allow-Headers', 'Content-Type, Authorization'),
-                ('Access-Control-Max-Age', '3600'),
-            ]
-        )
+        return request.make_response('', headers=self._get_cors_headers())
+    
+    # OPTIONS spéciaux pour Flutter Web
+    @http.route([
+        '/api/flutter/maintenance/equipment/<int:equipment_id>',
+        '/api/flutter/maintenance/requests/<int:request_id>'
+    ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
+    def api_options_flutter(self, **kwargs):
+        """Gestion des requêtes OPTIONS pour Flutter Web avec support Authorization"""
+        # Headers CORS spéciaux pour Flutter Web avec Authorization
+        flutter_headers = [
+            ('Access-Control-Allow-Origin', '*'),
+            ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
+            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin'),
+            ('Access-Control-Allow-Credentials', 'false'),
+            ('Access-Control-Max-Age', '86400'),  # Cache plus long
+            ('Vary', 'Origin'),
+        ]
+        
+        response = request.make_response('', headers=flutter_headers)
+        response.status_code = 200
+        return response
+    
+    # OPTIONS pour toutes les autres routes avec motifs dynamiques
+    @http.route('/api/maintenance/<path:path>', type='http', auth='none', methods=['OPTIONS'], csrf=False)
+    def api_options_catch_all(self, path=None, **kwargs):
+        """Gestion des requêtes OPTIONS pour CORS (toutes les autres routes)"""
+        return request.make_response('', headers=self._get_cors_headers())
     
     # ===== MAINTENANCE REQUESTS =====
     @http.route('/api/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
@@ -481,7 +508,166 @@ class CMSAPIController(http.Controller):
             _logger.error(f"Error deleting request {request_id}: {str(e)}")
             return self._error_response(f"Error archiving request: {str(e)}", 500)
     
-    # ===== EQUIPMENT =====
+    # ===== ROUTES SPÉCIALES FLUTTER WEB (sans cookies) =====
+    @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_single_equipment_flutter(self, equipment_id, **kwargs):
+        """Récupérer un équipement spécifique - Version Flutter Web optimisée"""
+        try:
+            equipment = request.env['maintenance.equipment'].browse(equipment_id)
+            
+            if not equipment.exists():
+                return self._error_response("Equipment not found", 404)
+            
+            data = self._serialize_equipment(equipment)
+            
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Equipment retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+            
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            # Ne pas définir de cookies pour Flutter Web
+            return response
+            
+        except Exception as e:
+            _logger.error(f"Error getting equipment {equipment_id}: {str(e)}")
+            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
+    
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_request_flutter(self, request_id, **kwargs):
+        """Récupérer une demande spécifique - Version Flutter Web optimisée"""
+        try:
+            domain = self._get_allowed_requests_domain()
+            domain.append(('id', '=', request_id))
+            
+            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
+            
+            if not maintenance_request:
+                return self._error_response("Request not found", 404)
+            
+            data = self._serialize_request(maintenance_request)
+            
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+            
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            # Ne pas définir de cookies pour Flutter Web
+            return response
+            
+        except Exception as e:
+            _logger.error(f"Error getting request {request_id}: {str(e)}")
+            return self._error_response(f"Error retrieving request: {str(e)}", 500)
+    
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['PUT'], csrf=False)
+    @basic_auth_required
+    def update_request_flutter(self, request_id, **kwargs):
+        """Mettre à jour une demande de maintenance - Version Flutter Web optimisée"""
+        try:
+            # Vérifier les permissions
+            domain = self._get_allowed_requests_domain()
+            domain.append(('id', '=', request_id))
+            
+            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
+            
+            if not maintenance_request:
+                return self._error_response("Request not found", 404)
+            
+            # Récupérer les données JSON du body pour Flutter Web
+            try:
+                # Pour les requêtes HTTP avec Flutter, les données sont dans le body
+                body = request.httprequest.data.decode('utf-8')
+                data = json.loads(body) if body else {}
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                _logger.error(f"Error parsing JSON data: {str(e)}")
+                return self._error_response("Invalid JSON data", 400)
+            
+            # Préparer les valeurs de mise à jour
+            vals = {}
+            allowed_fields = [
+                'name', 'description', 'schedule_date', 'priority', 
+                'kanban_state', 'stage_id', 'assigned_user_id', 'maintenance_team_id',
+                'maintenance_type'
+            ]
+            
+            for field in allowed_fields:
+                if field in data:
+                    vals[field] = data[field]
+            
+            # Gestion spéciale pour le changement de stage
+            if 'stage_id' in vals:
+                stage = request.env['maintenance.stage'].browse(vals['stage_id'])
+                if stage.exists():
+                    vals['stage_id'] = stage.id
+                    # Si le stage est marqué comme "done", fermer automatiquement la demande
+                    if stage.done:
+                        vals['close_date'] = fields.Datetime.now()
+                        vals['kanban_state'] = 'done'
+                    else:
+                        # Si on revient à un stage non-done, réouvrir la demande
+                        vals['close_date'] = False
+                        if vals.get('kanban_state') == 'done':
+                            vals['kanban_state'] = 'normal'
+                else:
+                    return self._error_response(f"Stage with ID {vals['stage_id']} not found", 400)
+            
+            # Gestion spéciale pour kanban_state
+            if 'kanban_state' in vals:
+                valid_states = ['normal', 'blocked', 'done']
+                if vals['kanban_state'] not in valid_states:
+                    return self._error_response(f"Invalid kanban_state. Must be one of: {valid_states}", 400)
+                
+                # Si on marque comme done sans stage done, mettre close_date
+                if vals['kanban_state'] == 'done' and not maintenance_request.stage_id.done:
+                    vals['close_date'] = fields.Datetime.now()
+                elif vals['kanban_state'] != 'done':
+                    # Si on change de done à autre chose, enlever close_date (sauf si stage reste done)
+                    if not (maintenance_request.stage_id.done or 
+                           (vals.get('stage_id') and request.env['maintenance.stage'].browse(vals['stage_id']).done)):
+                        vals['close_date'] = False
+            
+            # Mettre à jour
+            maintenance_request.write(vals)
+            
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request updated successfully",
+                'data': self._serialize_request(maintenance_request),
+                'updated_fields': list(vals.keys()),
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+            
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            # Ne pas définir de cookies pour Flutter Web
+            return response
+            
+        except ValidationError as e:
+            return self._error_response(f"Validation error: {str(e)}", 400)
+        except Exception as e:
+            _logger.error(f"Error updating request {request_id}: {str(e)}")
+            return self._error_response(f"Error updating request: {str(e)}", 500)
     @http.route('/api/maintenance/equipment', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
@@ -617,7 +803,96 @@ class CMSAPIController(http.Controller):
             _logger.error(f"Error getting maintenance history: {str(e)}")
             return self._error_response(f"Error retrieving maintenance history: {str(e)}", 500)
     
-    # ===== TEAMS =====
+    # ===== STAGES ET STATUTS =====
+    @http.route('/api/maintenance/stages', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_maintenance_stages(self, **kwargs):
+        """Récupérer tous les stages disponibles pour les demandes de maintenance"""
+        try:
+            # Récupérer tous les stages de maintenance
+            stages = request.env['maintenance.stage'].search([], order='sequence, name')
+            
+            stages_data = []
+            for stage in stages:
+                stage_data = {
+                    'id': stage.id,
+                    'name': stage.name,
+                    'sequence': stage.sequence,
+                    'fold': stage.fold,
+                    'done': stage.done,
+                    'active': stage.active,
+                    # Informations sur les demandes dans ce stage
+                    'request_count': request.env['maintenance.request'].search_count([('stage_id', '=', stage.id)])
+                }
+                stages_data.append(stage_data)
+            
+            return self._success_response(stages_data, "Stages retrieved successfully")
+            
+        except Exception as e:
+            _logger.error(f"Error getting stages: {str(e)}")
+            return self._error_response(f"Error retrieving stages: {str(e)}", 500)
+    
+    @http.route('/api/maintenance/request-states', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_request_states(self, **kwargs):
+        """Récupérer tous les états possibles pour les demandes de maintenance"""
+        try:
+            # Récupérer les informations sur les champs de statut
+            request_model = request.env['maintenance.request']
+            
+            # Récupérer les stages
+            stages = request.env['maintenance.stage'].search([], order='sequence, name')
+            stages_data = [{'id': s.id, 'name': s.name, 'done': s.done, 'fold': s.fold} for s in stages]
+            
+            # Kanban states possibles
+            kanban_states = [
+                {'key': 'normal', 'name': 'En cours', 'description': 'Progression normale'},
+                {'key': 'blocked', 'name': 'Bloqué', 'description': 'Demande bloquée'},
+                {'key': 'done', 'name': 'Terminé', 'description': 'Travail terminé'}
+            ]
+            
+            # Types de maintenance
+            maintenance_types = [
+                {'key': 'corrective', 'name': 'Corrective', 'description': 'Maintenance corrective'},
+                {'key': 'preventive', 'name': 'Préventive', 'description': 'Maintenance préventive'}
+            ]
+            
+            # Priorités (si le champ existe)
+            priorities = []
+            if 'priority' in request_model._fields:
+                field_info = request_model._fields['priority']
+                if hasattr(field_info, 'selection') and field_info.selection:
+                    priorities = [{'key': k, 'name': v} for k, v in field_info.selection]
+                else:
+                    # Priorités par défaut si pas de sélection définie
+                    priorities = [
+                        {'key': '0', 'name': 'Normal'},
+                        {'key': '1', 'name': 'Priorité basse'},
+                        {'key': '2', 'name': 'Priorité haute'},
+                        {'key': '3', 'name': 'Urgent'}
+                    ]
+            
+            response_data = {
+                'stages': stages_data,
+                'kanban_states': kanban_states,
+                'maintenance_types': maintenance_types,
+                'priorities': priorities,
+                'update_fields': {
+                    'stage_id': 'ID du stage (integer)',
+                    'kanban_state': 'État kanban (normal/blocked/done)',
+                    'priority': 'Priorité (string ou integer selon configuration)',
+                    'maintenance_type': 'Type de maintenance (corrective/preventive)',
+                    'description': 'Description (texte)',
+                    'schedule_date': 'Date programmée (YYYY-MM-DD HH:MM:SS)',
+                    'close_date': 'Date de fermeture (YYYY-MM-DD HH:MM:SS, automatique si stage done=True)'
+                }
+            }
+            
+            return self._success_response(response_data, "Request states retrieved successfully")
+            
+        except Exception as e:
+            _logger.error(f"Error getting request states: {str(e)}")
+            return self._error_response(f"Error retrieving request states: {str(e)}", 500)
     @http.route('/api/maintenance/teams', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_teams(self, **kwargs):
@@ -841,7 +1116,74 @@ class CMSAPIController(http.Controller):
         """Alias pour récupérer toutes les données (même que dashboard)"""
         return self.get_dashboard(**kwargs)
     
-    # ===== DEBUG ENDPOINT =====
+    # ===== FLUTTER WEB TEST ENDPOINT =====
+    @http.route('/api/test/cors', type='http', auth='none', methods=['GET'], csrf=False)
+    def test_cors_flutter(self, **kwargs):
+        """Endpoint de test pour Flutter Web sans authentification"""
+        test_data = {
+            'test': 'success',
+            'message': 'CORS test successful',
+            'headers_received': dict(request.httprequest.headers),
+            'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        }
+        
+        response = request.make_response(
+            json.dumps(test_data, default=str),
+            headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+        )
+        response.status_code = 200
+        return response
+    
+    @http.route('/api/test/cors-auth', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def test_cors_auth_flutter(self, **kwargs):
+        """Endpoint de test pour Flutter Web avec authentification"""
+        test_data = {
+            'test': 'auth_success',
+            'message': 'CORS + Auth test successful',
+            'user': request.env.user.name,
+            'headers_received': dict(request.httprequest.headers),
+            'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        }
+        
+        response = request.make_response(
+            json.dumps(test_data, default=str),
+            headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+        )
+        response.status_code = 200
+        return response
+    
+    @http.route('/api/test/cors-put', type='http', auth='none', methods=['PUT'], csrf=False)
+    @basic_auth_required
+    def test_cors_put_flutter(self, **kwargs):
+        """Endpoint de test PUT pour Flutter Web avec authentification"""
+        try:
+            # Récupérer les données JSON du body pour Flutter Web
+            try:
+                body = request.httprequest.data.decode('utf-8')
+                data = json.loads(body) if body else {}
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                data = {'error': f'Invalid JSON: {str(e)}'}
+            
+            test_data = {
+                'test': 'put_success',
+                'message': 'CORS + PUT + Auth test successful',
+                'user': request.env.user.name,
+                'received_data': data,
+                'headers_received': dict(request.httprequest.headers),
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+            
+            response = request.make_response(
+                json.dumps(test_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
+            
+        except Exception as e:
+            _logger.error(f"Error in test PUT: {str(e)}")
+            return self._error_response(f"Error in test PUT: {str(e)}", 500)
     @http.route('/api/maintenance/debug', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def debug_fields(self, **kwargs):
