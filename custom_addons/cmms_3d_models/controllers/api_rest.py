@@ -1306,8 +1306,7 @@ class CMSAPIController(http.Controller):
             
             # Si c'est un objet Response (succès), extraire les données
             if hasattr(updated_profile, 'data'):
-                # Parser la réponse JSON
-                import json
+                # Parser la réponse JSON (json déjà importé en haut du fichier)
                 profile_data = json.loads(updated_profile.data.decode('utf-8'))['data']
             else:
                 # Fallback si erreur
@@ -1326,26 +1325,79 @@ class CMSAPIController(http.Controller):
             _logger.error(f"Error updating user profile: {str(e)}")
             return self._error_response(f"Error updating profile: {str(e)}", 500)
     
-    @http.route('/api/user/profile/email-check', type='http', auth='none', methods=['POST'], csrf=False)
+    # ===== EMAIL CHECK - VERSION OPTIMISÉE POUR GET ET POST =====
+    @http.route('/api/user/profile/email-check', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     @basic_auth_required
     def check_email_availability(self, **kwargs):
-        """Vérifier si un email est disponible"""
+        """
+        Vérifier si un email est disponible
+        
+        Méthodes acceptées:
+        - GET: /api/user/profile/email-check?email=test@example.com
+        - POST: /api/user/profile/email-check avec {"email": "test@example.com"} dans le body JSON
+        """
         try:
-            # Récupérer les données JSON du body
-            try:
-                body = request.httprequest.data.decode('utf-8')
-                data = json.loads(body) if body else {}
-            except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                return self._error_response("Invalid JSON data", 400)
+            email = None
             
-            email = data.get('email', '').strip()
+            # Récupérer l'email selon la méthode HTTP
+            if request.httprequest.method == 'GET':
+                # Pour GET: récupérer l'email depuis les paramètres de query string
+                email = request.httprequest.args.get('email', '').strip()
+                
+                if not email:
+                    return self._error_response(
+                        "Email parameter is required. Usage: GET /api/user/profile/email-check?email=your@email.com", 
+                        400,
+                        {
+                            'usage': 'GET /api/user/profile/email-check?email=your@email.com',
+                            'method': 'GET',
+                            'parameter_location': 'query_string'
+                        }
+                    )
+                    
+            elif request.httprequest.method == 'POST':
+                # Pour POST: récupérer l'email depuis le body JSON
+                try:
+                    body = request.httprequest.data.decode('utf-8')
+                    data = json.loads(body) if body else {}
+                    email = data.get('email', '').strip()
+                    
+                    if not email:
+                        return self._error_response(
+                            "Email is required in JSON body. Usage: POST /api/user/profile/email-check with {\"email\": \"your@email.com\"}", 
+                            400,
+                            {
+                                'usage': 'POST /api/user/profile/email-check',
+                                'method': 'POST',
+                                'body_format': 'JSON',
+                                'expected_body': {'email': 'your@email.com'}
+                            }
+                        )
+                        
+                except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                    return self._error_response(
+                        "Invalid JSON data in request body", 
+                        400,
+                        {
+                            'error': str(e),
+                            'expected_format': {'email': 'your@email.com'}
+                        }
+                    )
             
+            # Si l'email n'est toujours pas défini (ne devrait pas arriver)
             if not email:
                 return self._error_response("Email is required", 400)
             
-            # Vérification basique du format
-            if '@' not in email or '.' not in email:
-                return self._error_response("Invalid email format", 400)
+            # Validation basique du format email
+            if '@' not in email or '.' not in email.split('@')[-1]:
+                return self._error_response(
+                    "Invalid email format", 
+                    400,
+                    {
+                        'email': email,
+                        'error': 'Email must contain @ and a valid domain'
+                    }
+                )
             
             # Vérifier si l'email est déjà utilisé (excluant l'utilisateur actuel)
             existing_user = request.env['res.users'].search([
@@ -1356,16 +1408,38 @@ class CMSAPIController(http.Controller):
             is_available = not bool(existing_user)
             current_user_has_this_email = request.env.user.email == email
             
-            return self._success_response({
+            # Informations supplémentaires pour la réponse
+            additional_info = {
                 'email': email,
                 'available': is_available,
                 'current_user_email': current_user_has_this_email,
+                'method_used': request.httprequest.method,
                 'message': 'Available' if is_available else 'Email already in use'
-            }, "Email availability checked")
+            }
+            
+            # Si l'email n'est pas disponible, ajouter des détails sur l'utilisateur existant
+            if not is_available and not current_user_has_this_email:
+                additional_info['existing_user'] = {
+                    'id': existing_user.id,
+                    'name': existing_user.name,
+                    'login': existing_user.login
+                }
+            
+            return self._success_response(
+                additional_info,
+                f"Email availability checked using {request.httprequest.method} method"
+            )
             
         except Exception as e:
             _logger.error(f"Error checking email availability: {str(e)}")
-            return self._error_response(f"Error checking email: {str(e)}", 500)
+            return self._error_response(
+                f"Error checking email: {str(e)}", 
+                500,
+                {
+                    'method': request.httprequest.method,
+                    'error_details': str(e)
+                }
+            )
 
     # ===== FLUTTER WEB TEST ENDPOINT =====
     @http.route('/api/test/cors', type='http', auth='none', methods=['GET'], csrf=False)

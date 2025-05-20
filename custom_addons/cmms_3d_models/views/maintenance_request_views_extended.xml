@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- custom_addons/cmms_3d_models/views/maintenance_request_views_extended.xml -->
 <odoo>
     <!-- Étendre la vue formulaire des demandes de maintenance -->
-    <record id="view_maintenance_request_form_inherit_assign" model="ir.ui.view">
-        <field name="name">maintenance.request.form.inherit.assign</field>
+    <record id="view_maintenance_request_form_inherit_required_fields" model="ir.ui.view">
+        <field name="name">maintenance.request.form.inherit.required.fields</field>
         <field name="model">maintenance.request</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
         <field name="arch" type="xml">
+            <!-- Rendre le champ équipement obligatoire -->
+            <xpath expr="//field[@name='equipment_id']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+            
+            <!-- Rendre le responsable obligatoire -->
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+            
+            <!-- Rendre la date prévue obligatoire -->
+            <xpath expr="//field[@name='schedule_date']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+
             <!-- Ajouter les champs d'assignation dans un groupe après les champs existants -->
             <xpath expr="//group[last()]" position="after">
-                <group string="Assignment">
+                <group string="Assignation">
                     <field name="assigned_person_id"
                            options="{'no_create': True, 'no_open': True}"
                            domain="[('active', '=', True), ('available', '=', True)]"/>
@@ -61,29 +77,4 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Vue spécifique pour les demandes assignées à une personne -->
-    <record id="action_maintenance_request_by_person" model="ir.actions.act_window">
-        <field name="name">Demandes par personne</field>
-        <field name="res_model">maintenance.request</field>
-        <field name="view_mode">tree,form,kanban,calendar,graph,pivot</field>
-        <field name="domain">[('assigned_person_id', '!=', False)]</field>
-        <field name="context">{'group_by': 'assigned_person_id'}</field>
-        <field name="search_view_id" ref="view_maintenance_request_search_inherit_assign"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Aucune demande assignée à une personne spécifique
-            </p>
-            <p>
-                Cette vue affiche toutes les demandes de maintenance qui ont été assignées à des personnes spécifiques.
-            </p>
-        </field>
-    </record>
-
-    <!-- Ajouter un menu pour cette vue -->
-    <menuitem id="menu_maintenance_request_by_person"
-              name="Demandes par personne"
-              parent="maintenance.menu_m_request"
-              action="action_maintenance_request_by_person"
-              sequence="15"/>
 </odoo>
