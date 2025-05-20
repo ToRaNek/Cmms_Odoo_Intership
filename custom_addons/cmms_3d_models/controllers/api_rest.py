@@ -1,4 +1,4 @@
-# custom_addons/cmms_3d_models/controllers/api_flutter.py
+# custom_addons/cmms_3d_models/controllers/api_rest.py
 import json
 import base64
 import logging
@@ -45,21 +45,20 @@ def basic_auth_required(func):
 
     return wrapper
 
-class CMSFlutterAPIController(http.Controller):
+class CMSAPIController(http.Controller):
 
     def _get_cors_headers(self):
-        """Retourne les headers CORS optimisés pour Flutter"""
+        """Retourne les headers CORS standard avec support complet pour Authorization"""
         return [
             ('Access-Control-Allow-Origin', '*'),
             ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
-            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin'),
-            ('Access-Control-Allow-Credentials', 'false'),
-            ('Access-Control-Max-Age', '86400'),
-            ('Vary', 'Origin'),
+            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept'),
+            ('Access-Control-Allow-Credentials', 'false'),  # Important pour Flutter Web
+            ('Access-Control-Max-Age', '3600'),
         ]
 
     def _success_response(self, data=None, message="Success", status_code=200):
-        """Format de réponse standardisé pour les succès avec CORS optimisé pour Flutter"""
+        """Format de réponse standardisé pour les succès"""
         response_data = {
             'success': True,
             'message': message,
@@ -75,7 +74,7 @@ class CMSFlutterAPIController(http.Controller):
         return response
 
     def _error_response(self, message="Error", status_code=400, error_details=None):
-        """Format de réponse standardisé pour les erreurs avec CORS optimisé pour Flutter"""
+        """Format de réponse standardisé pour les erreurs"""
         response_data = {
             'success': False,
             'message': message,
@@ -101,6 +100,7 @@ class CMSFlutterAPIController(http.Controller):
             return person.team_ids.ids
         else:
             # Si pas de personne de maintenance, chercher dans les équipes directement via user
+            # Fallback pour les utilisateurs standards
             teams = request.env['maintenance.team'].search([
                 ('member_ids', 'in', [user.id])
             ])
@@ -110,6 +110,14 @@ class CMSFlutterAPIController(http.Controller):
         """Construire le domaine pour les demandes autorisées"""
         user = request.env.user
 
+        # Dans Odoo 16, les champs standards sont :
+        # - user_id : créateur de la demande
+        # - owner_user_id : propriétaire
+        # - technician_user_id : technicien assigné (optionnel)
+        # - assigned_user_id : notre champ personnalisé (peut ne pas exister)
+        # - assigned_person_id : personne de maintenance assignée (notre extension)
+
+        # Créer le domaine avec les champs qui existent vraiment
         domain = []
         request_model = request.env['maintenance.request']
 
@@ -124,11 +132,11 @@ class CMSFlutterAPIController(http.Controller):
         if 'technician_user_id' in request_model._fields:
             domain = ['|'] + domain + [('technician_user_id', '=', user.id)]
 
-        # Ajouter le champ personnalisé assigned_user_id (si il existe)
+        # Ajouter notre champ personnalisé assigned_user_id (si il existe)
         if 'assigned_user_id' in request_model._fields:
             domain = ['|'] + domain + [('assigned_user_id', '=', user.id)]
 
-        # Ajouter les demandes assignées via assigned_person_id
+        # IMPORTANT: Ajouter les demandes assignées via assigned_person_id
         if 'assigned_person_id' in request_model._fields:
             domain = ['|'] + domain + [('assigned_person_id.user_id', '=', user.id)]
 
@@ -150,9 +158,10 @@ class CMSFlutterAPIController(http.Controller):
             ('owner_user_id', '=', user.id)
         ]
 
-        # Ajouter les équipements des équipes
+        # Ajouter les équipements des équipes (si le champ existe)
         team_ids = self._get_user_teams()
         if team_ids:
+            # Vérifier si le champ maintenance_team_id existe
             equipment_model = request.env['maintenance.equipment']
             if 'maintenance_team_id' in equipment_model._fields:
                 domain = ['|'] + domain + [('maintenance_team_id', 'in', team_ids)]
@@ -210,7 +219,9 @@ class CMSFlutterAPIController(http.Controller):
             'kanban_state': request_record.kanban_state,
             'color': request_record.color,
             'duration': request_record.duration,
+            # Supprimé: 'archive': not request_record.active (le champ active n'existe pas)
             'close_date': request_record.close_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.close_date else None,
+            # Champs utilisateur standard
             'user_id': {
                 'id': request_record.user_id.id,
                 'name': request_record.user_id.name
@@ -269,7 +280,7 @@ class CMSFlutterAPIController(http.Controller):
             'cost_center': equipment_record.cost_center or '' if hasattr(equipment_record, 'cost_center') else '',
         }
 
-    # ===== OPTIONS (CORS) POUR FLUTTER =====
+    # ===== OPTIONS (CORS) =====
     @http.route([
         '/api/flutter/maintenance/requests',
         '/api/flutter/maintenance/equipment',
@@ -277,30 +288,50 @@ class CMSFlutterAPIController(http.Controller):
         '/api/flutter/maintenance/history',
         '/api/flutter/maintenance/teams',
         '/api/flutter/maintenance/persons',
+        '/api/flutter/user/profile',
+        '/api/flutter/user/profile/update',
+        '/api/flutter/user/profile/email-check',
         '/api/flutter/maintenance/dashboard',
         '/api/flutter/maintenance/all',
         '/api/flutter/maintenance/stages',
-        '/api/flutter/maintenance/request-states',
-        '/api/flutter/user/profile',
-        '/api/flutter/user/profile/email-check',
+        '/api/flutter/maintenance/request-states'
     ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
-    def api_options_flutter_all(self, **kwargs):
-        """Gestion des requêtes OPTIONS pour Flutter avec support Authorization optimisé"""
-        response = request.make_response('', headers=self._get_cors_headers())
+    def api_options(self, **kwargs):
+        """Gestion des requêtes OPTIONS pour CORS"""
+        return request.make_response('', headers=self._get_cors_headers())
+
+    # OPTIONS spéciaux pour Flutter Web
+    @http.route([
+        '/api/flutter/maintenance/equipment/<int:equipment_id>',
+        '/api/flutter/maintenance/requests/<int:request_id>'
+    ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
+    def api_options_flutter(self, **kwargs):
+        """Gestion des requêtes OPTIONS pour Flutter Web avec support Authorization"""
+        # Headers CORS spéciaux pour Flutter Web avec Authorization
+        flutter_headers = [
+            ('Access-Control-Allow-Origin', '*'),
+            ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
+            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin'),
+            ('Access-Control-Allow-Credentials', 'false'),
+            ('Access-Control-Max-Age', '86400'),  # Cache plus long
+            ('Vary', 'Origin'),
+        ]
+
+        response = request.make_response('', headers=flutter_headers)
         response.status_code = 200
         return response
 
-    # OPTIONS pour toutes les autres routes avec motifs dynamiques pour Flutter
-    @http.route('/api/flutter/maintenance/<path:path>', type='http', auth='none', methods=['OPTIONS'], csrf=False)
-    def api_options_flutter_catch_all(self, path=None, **kwargs):
-        """Gestion des requêtes OPTIONS pour CORS Flutter (toutes les autres routes)"""
+    # OPTIONS pour toutes les autres routes avec motifs dynamiques
+    @http.route('/api/maintenance/<path:path>', type='http', auth='none', methods=['OPTIONS'], csrf=False)
+    def api_options_catch_all(self, path=None, **kwargs):
+        """Gestion des requêtes OPTIONS pour CORS (toutes les autres routes)"""
         return request.make_response('', headers=self._get_cors_headers())
 
-    # ===== MAINTENANCE REQUESTS POUR FLUTTER =====
+    # ===== MAINTENANCE REQUESTS =====
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_flutter_requests(self, limit=10000, offset=0, status=None, equipment_id=None, **kwargs):
-        """Récupérer les demandes de maintenance pour Flutter"""
+    def get_requests(self, limit=10000, offset=0, status=None, equipment_id=None, **kwargs):
+        """Récupérer les demandes de maintenance de l'utilisateur - Version Flutter Web optimisée"""
         try:
             limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
@@ -339,16 +370,29 @@ class CMSFlutterAPIController(http.Controller):
                 'offset': offset
             }
 
-            return self._success_response(data, "Requests retrieved successfully")
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Requests retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error getting requests for Flutter: {str(e)}")
+            _logger.error(f"Error getting requests: {str(e)}")
             return self._error_response(f"Error retrieving requests: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_flutter_request(self, request_id, **kwargs):
-        """Récupérer une demande spécifique pour Flutter"""
+    def get_request(self, request_id, **kwargs):
+        """Récupérer une demande spécifique - Version Flutter Web optimisée"""
         try:
             domain = self._get_allowed_requests_domain()
             domain.append(('id', '=', request_id))
@@ -359,18 +403,32 @@ class CMSFlutterAPIController(http.Controller):
                 return self._error_response("Request not found", 404)
 
             data = self._serialize_request(maintenance_request)
-            return self._success_response(data, "Request retrieved successfully")
+
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error getting request {request_id} for Flutter: {str(e)}")
+            _logger.error(f"Error getting request {request_id}: {str(e)}")
             return self._error_response(f"Error retrieving request: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['POST'], csrf=False)
     @basic_auth_required
-    def create_flutter_request(self, **kwargs):
-        """Créer une nouvelle demande de maintenance pour Flutter"""
+    def create_request(self, **kwargs):
+        """Créer une nouvelle demande de maintenance - Version Flutter Web optimisée"""
         try:
-            # Récupérer les données JSON du body pour Flutter
+            # Récupérer les données JSON du body pour Flutter Web
             try:
                 body = request.httprequest.data.decode('utf-8')
                 data = json.loads(body) if body else {}
@@ -402,28 +460,34 @@ class CMSFlutterAPIController(http.Controller):
                 vals['maintenance_team_id'] = data['maintenance_team_id']
             if data.get('assigned_user_id'):
                 vals['assigned_user_id'] = data['assigned_user_id']
-            if data.get('assigned_person_id'):
-                vals['assigned_person_id'] = data['assigned_person_id']
 
             # Créer la demande
             new_request = request.env['maintenance.request'].create(vals)
 
-            return self._success_response(
-                self._serialize_request(new_request),
-                "Request created successfully",
-                201
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request created successfully",
+                'data': self._serialize_request(new_request),
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
             )
+            response.status_code = 201
+            return response
 
         except ValidationError as e:
             return self._error_response(f"Validation error: {str(e)}", 400)
         except Exception as e:
-            _logger.error(f"Error creating request for Flutter: {str(e)}")
+            _logger.error(f"Error creating request: {str(e)}")
             return self._error_response(f"Error creating request: {str(e)}", 500)
-
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['PUT'], csrf=False)
     @basic_auth_required
-    def update_flutter_request(self, request_id, **kwargs):
-        """Mettre à jour une demande de maintenance pour Flutter"""
+    def update_request_flutter(self, request_id, **kwargs):
+        """Mettre à jour une demande de maintenance - Version Flutter Web optimisée"""
         try:
             # Vérifier les permissions
             domain = self._get_allowed_requests_domain()
@@ -434,8 +498,9 @@ class CMSFlutterAPIController(http.Controller):
             if not maintenance_request:
                 return self._error_response("Request not found", 404)
 
-            # Récupérer les données JSON du body pour Flutter
+            # Récupérer les données JSON du body pour Flutter Web
             try:
+                # Pour les requêtes HTTP avec Flutter, les données sont dans le body
                 body = request.httprequest.data.decode('utf-8')
                 data = json.loads(body) if body else {}
             except (json.JSONDecodeError, UnicodeDecodeError) as e:
@@ -447,7 +512,7 @@ class CMSFlutterAPIController(http.Controller):
             allowed_fields = [
                 'name', 'description', 'schedule_date', 'priority',
                 'kanban_state', 'stage_id', 'assigned_user_id', 'maintenance_team_id',
-                'maintenance_type', 'assigned_person_id'
+                'maintenance_type'
             ]
 
             for field in allowed_fields:
@@ -489,24 +554,32 @@ class CMSFlutterAPIController(http.Controller):
             # Mettre à jour
             maintenance_request.write(vals)
 
-            # Réponse optimisée pour Flutter
+            # Réponse spéciale sans cookie pour Flutter Web
             response_data = {
-                'request': self._serialize_request(maintenance_request),
-                'updated_fields': list(vals.keys())
+                'success': True,
+                'message': "Request updated successfully",
+                'data': self._serialize_request(maintenance_request),
+                'updated_fields': list(vals.keys()),
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
             }
 
-            return self._success_response(response_data, "Request updated successfully")
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except ValidationError as e:
             return self._error_response(f"Validation error: {str(e)}", 400)
         except Exception as e:
-            _logger.error(f"Error updating request {request_id} for Flutter: {str(e)}")
+            _logger.error(f"Error updating request {request_id}: {str(e)}")
             return self._error_response(f"Error updating request: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['DELETE'], csrf=False)
     @basic_auth_required
-    def delete_flutter_request(self, request_id, **kwargs):
-        """Supprimer/archiver une demande de maintenance pour Flutter"""
+    def delete_request(self, request_id, **kwargs):
+        """Supprimer une demande de maintenance - Version Flutter Web optimisée"""
         try:
             # Vérifier les permissions
             domain = self._get_allowed_requests_domain()
@@ -520,22 +593,35 @@ class CMSFlutterAPIController(http.Controller):
             # Archiver au lieu de supprimer pour conserver l'historique
             maintenance_request.action_archive()
 
-            return self._success_response({'request_id': request_id}, "Request archived successfully")
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request archived successfully",
+                'data': None,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error deleting request {request_id} for Flutter: {str(e)}")
+            _logger.error(f"Error deleting request {request_id}: {str(e)}")
             return self._error_response(f"Error archiving request: {str(e)}", 500)
 
-    # ===== EQUIPMENT POUR FLUTTER =====
+    # ===== EQUIPMENT =====
     @http.route('/api/flutter/maintenance/equipment', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_flutter_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
-        """Récupérer les équipements pour Flutter"""
+    def get_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
+        """Récupérer les équipements - Version Flutter Web optimisée"""
         try:
             limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
 
-            # Construire le domaine de recherche
+            # Utiliser la nouvelle fonction pour le domaine
             domain = self._get_allowed_equipment_domain()
 
             # Filtres supplémentaires
@@ -563,420 +649,25 @@ class CMSFlutterAPIController(http.Controller):
                 'offset': offset
             }
 
-            return self._success_response(data, "Equipment retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting equipment for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
-
-    @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_single_flutter_equipment(self, equipment_id, **kwargs):
-        """Récupérer un équipement spécifique pour Flutter"""
-        try:
-            equipment = request.env['maintenance.equipment'].browse(equipment_id)
-
-            if not equipment.exists():
-                return self._error_response("Equipment not found", 404)
-
-            data = self._serialize_equipment(equipment)
-            return self._success_response(data, "Equipment retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting equipment {equipment_id} for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
-
-    # ===== MAINTENANCE PREVENTIVE POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/preventive', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_preventive_maintenance(self, limit=10000, offset=0, **kwargs):
-        """Récupérer les maintenances préventives pour Flutter"""
-        try:
-            limit = int(limit) if limit else 10000
-            offset = int(offset) if offset else 0
-
-            # Domaine pour les maintenances préventives
-            domain = self._get_allowed_requests_domain()
-            domain.append(('maintenance_type', '=', 'preventive'))
-
-            # Récupérer les demandes préventives
-            preventive_requests = request.env['maintenance.request'].search(
-                domain,
-                limit=limit,
-                offset=offset,
-                order='schedule_date asc, id desc'
-            )
-
-            # Sérialiser les données
-            data = {
-                'preventive_maintenance': [self._serialize_request(req) for req in preventive_requests],
-                'total_count': request.env['maintenance.request'].search_count(domain),
-                'limit': limit,
-                'offset': offset
-            }
-
-            return self._success_response(data, "Preventive maintenance retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting preventive maintenance for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving preventive maintenance: {str(e)}", 500)
-
-    # ===== MAINTENANCE HISTORY POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/history', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_maintenance_history(self, limit=10000, offset=0, equipment_id=None, **kwargs):
-        """Récupérer l'historique des maintenances pour Flutter"""
-        try:
-            limit = int(limit) if limit else 10000
-            offset = int(offset) if offset else 0
-
-            # Domaine pour l'historique (demandes terminées)
-            domain = self._get_allowed_requests_domain()
-            domain.append(('stage_id.done', '=', True))
-
-            if equipment_id:
-                domain.append(('equipment_id', '=', int(equipment_id)))
-
-            # Récupérer l'historique
-            history_requests = request.env['maintenance.request'].search(
-                domain,
-                limit=limit,
-                offset=offset,
-                order='close_date desc, id desc'
-            )
-
-            # Sérialiser les données
-            data = {
-                'history': [self._serialize_request(req) for req in history_requests],
-                'total_count': request.env['maintenance.request'].search_count(domain),
-                'limit': limit,
-                'offset': offset
-            }
-
-            return self._success_response(data, "Maintenance history retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting maintenance history for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving maintenance history: {str(e)}", 500)
-
-    # ===== STAGES ET STATUTS POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/stages', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_maintenance_stages(self, **kwargs):
-        """Récupérer tous les stages disponibles pour Flutter"""
-        try:
-            # Récupérer tous les stages de maintenance
-            stages = request.env['maintenance.stage'].search([], order='sequence, name')
-
-            stages_data = []
-            for stage in stages:
-                stage_data = {
-                    'id': stage.id,
-                    'name': stage.name,
-                    'sequence': stage.sequence,
-                    'fold': stage.fold,
-                    'done': stage.done,
-                    'request_count': request.env['maintenance.request'].search_count([('stage_id', '=', stage.id)])
-                }
-                stages_data.append(stage_data)
-
-            return self._success_response(stages_data, "Stages retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting stages for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving stages: {str(e)}", 500)
-
-    @http.route('/api/flutter/maintenance/request-states', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_request_states(self, **kwargs):
-        """Récupérer tous les états possibles pour les demandes pour Flutter"""
-        try:
-            # Récupérer les informations sur les champs de statut
-            request_model = request.env['maintenance.request']
-
-            # Récupérer les stages
-            stages = request.env['maintenance.stage'].search([], order='sequence, name')
-            stages_data = [{'id': s.id, 'name': s.name, 'done': s.done, 'fold': s.fold} for s in stages]
-
-            # Kanban states possibles
-            kanban_states = [
-                {'key': 'normal', 'name': 'En cours', 'description': 'Progression normale'},
-                {'key': 'blocked', 'name': 'Bloqué', 'description': 'Demande bloquée'},
-                {'key': 'done', 'name': 'Terminé', 'description': 'Travail terminé'}
-            ]
-
-            # Types de maintenance
-            maintenance_types = [
-                {'key': 'corrective', 'name': 'Corrective', 'description': 'Maintenance corrective'},
-                {'key': 'preventive', 'name': 'Préventive', 'description': 'Maintenance préventive'}
-            ]
-
-            # Priorités (si le champ existe)
-            priorities = []
-            if 'priority' in request_model._fields:
-                field_info = request_model._fields['priority']
-                if hasattr(field_info, 'selection') and field_info.selection:
-                    priorities = [{'key': k, 'name': v} for k, v in field_info.selection]
-                else:
-                    # Priorités par défaut si pas de sélection définie
-                    priorities = [
-                        {'key': '0', 'name': 'Normal'},
-                        {'key': '1', 'name': 'Priorité basse'},
-                        {'key': '2', 'name': 'Priorité haute'},
-                        {'key': '3', 'name': 'Urgent'}
-                    ]
-
+            # Réponse spéciale sans cookie pour Flutter Web
             response_data = {
-                'stages': stages_data,
-                'kanban_states': kanban_states,
-                'maintenance_types': maintenance_types,
-                'priorities': priorities,
-                'update_fields': {
-                    'stage_id': 'ID du stage (integer)',
-                    'kanban_state': 'État kanban (normal/blocked/done)',
-                    'priority': 'Priorité (string ou integer selon configuration)',
-                    'maintenance_type': 'Type de maintenance (corrective/preventive)',
-                    'description': 'Description (texte)',
-                    'schedule_date': 'Date programmée (YYYY-MM-DD HH:MM:SS)',
-                    'close_date': 'Date de fermeture (YYYY-MM-DD HH:MM:SS, automatique si stage done=True)'
-                }
+                'success': True,
+                'message': "Equipment retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
             }
 
-            return self._success_response(response_data, "Request states retrieved successfully")
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error getting request states for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving request states: {str(e)}", 500)
-
-    # ===== TEAMS POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/teams', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_teams(self, **kwargs):
-        """Récupérer les équipes de maintenance pour Flutter"""
-        try:
-            team_ids = self._get_user_teams()
-            teams = request.env['maintenance.team'].browse(team_ids)
-
-            data = []
-            for team in teams:
-                team_data = {
-                    'id': team.id,
-                    'name': team.name,
-                    'color': team.color,
-                    'member_ids': [{'id': member.id, 'name': member.name} for member in team.member_ids],
-                    'member_count': len(team.member_ids),
-                }
-                data.append(team_data)
-
-            return self._success_response(data, "Teams retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting teams for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving teams: {str(e)}", 500)
-
-    # ===== PERSONS POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/persons', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_persons(self, **kwargs):
-        """Récupérer les personnes de maintenance pour Flutter"""
-        try:
-            team_ids = self._get_user_teams()
-
-            if team_ids:
-                # Récupérer les personnes des équipes de l'utilisateur
-                persons = request.env['maintenance.person'].search([
-                    ('team_ids', 'in', team_ids),
-                    ('active', '=', True)
-                ])
-            else:
-                # Si pas d'équipe, récupérer seulement la personne correspondant à l'utilisateur
-                persons = request.env['maintenance.person'].search([
-                    ('user_id', '=', request.env.user.id),
-                    ('active', '=', True)
-                ])
-
-            data = []
-            for person in persons:
-                person_data = {
-                    'id': person.id,
-                    'name': person.display_name,
-                    'email': person.email or '',
-                    'phone': person.phone or '',
-                    'role': {
-                        'id': person.role_id.id,
-                        'name': person.role_id.name
-                    } if person.role_id else None,
-                    'available': person.available,
-                    'request_count': person.request_count,
-                    'specialties': person.specialties or '',
-                    'teams': [{'id': team.id, 'name': team.name} for team in person.team_ids]
-                }
-                data.append(person_data)
-
-            return self._success_response(data, "Persons retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting persons for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving persons: {str(e)}", 500)
-
-    # ===== DASHBOARD POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/dashboard', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_dashboard(self, **kwargs):
-        """Récupérer toutes les données de tableau de bord pour Flutter"""
-        try:
-            user = request.env.user
-            team_ids = self._get_user_teams()
-            dashboard_data = {}
-
-            # 1. Informations utilisateur
-            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-            dashboard_data['user_info'] = {
-                'id': user.id,
-                'name': user.name,
-                'email': user.email or '',
-                'person_info': {
-                    'id': person.id,
-                    'display_name': person.display_name,
-                    'role': person.role_id.name if person.role_id else None,
-                    'available': person.available,
-                    'phone': person.phone or '',
-                    'specialties': person.specialties or ''
-                } if person else None
-            }
-
-            # 2. Demandes de maintenance (limitées à 20 récentes)
-            request_domain = self._get_allowed_requests_domain()
-            requests = request.env['maintenance.request'].search(
-                request_domain,
-                limit=20,
-                order='request_date desc, id desc'
-            )
-            dashboard_data['requests'] = {
-                'recent': [self._serialize_request(req) for req in requests],
-                'total_count': request.env['maintenance.request'].search_count(request_domain)
-            }
-
-            # 3. Statistiques des demandes par statut
-            stats = {}
-            for status in ['new', 'in_progress', 'done']:
-                if status == 'new':
-                    domain = request_domain + [('stage_id.done', '=', False), ('kanban_state', '!=', 'blocked')]
-                elif status == 'in_progress':
-                    domain = request_domain + [('stage_id.done', '=', False), ('kanban_state', '=', 'normal')]
-                elif status == 'done':
-                    domain = request_domain + [('stage_id.done', '=', True)]
-
-                stats[status] = request.env['maintenance.request'].search_count(domain)
-
-            dashboard_data['request_stats'] = stats
-
-            # 4. Maintenance préventive (prochaines 10)
-            preventive_domain = request_domain + [('maintenance_type', '=', 'preventive')]
-            preventive_requests = request.env['maintenance.request'].search(
-                preventive_domain,
-                limit=10,
-                order='schedule_date asc'
-            )
-            dashboard_data['preventive_maintenance'] = [
-                self._serialize_request(req) for req in preventive_requests
-            ]
-
-            # 5. Équipements avec modèles 3D (limités à 10)
-            equipment_domain = self._get_allowed_equipment_domain()
-
-            equipment_records = request.env['maintenance.equipment'].search(
-                equipment_domain,
-                limit=10,
-                order='name asc'
-            )
-
-            # Séparer les équipements avec et sans modèle 3D
-            equipment_with_3d = [eq for eq in equipment_records if eq.model3d_id]
-            equipment_without_3d = [eq for eq in equipment_records if not eq.model3d_id]
-
-            dashboard_data['equipment'] = {
-                'with_3d_models': [self._serialize_equipment(eq) for eq in equipment_with_3d],
-                'without_3d_models': [self._serialize_equipment(eq) for eq in equipment_without_3d],
-                'total_count': request.env['maintenance.equipment'].search_count(equipment_domain),
-                'with_3d_count': len(equipment_with_3d),
-                'without_3d_count': len(equipment_without_3d)
-            }
-
-            # 6. Historique récent (5 dernières)
-            history_domain = request_domain + [('stage_id.done', '=', True)]
-            history_requests = request.env['maintenance.request'].search(
-                history_domain,
-                limit=5,
-                order='close_date desc'
-            )
-            dashboard_data['recent_history'] = [
-                self._serialize_request(req) for req in history_requests
-            ]
-
-            # 7. Équipes
-            teams = request.env['maintenance.team'].browse(team_ids)
-            dashboard_data['teams'] = []
-            for team in teams:
-                team_data = {
-                    'id': team.id,
-                    'name': team.name,
-                    'color': team.color,
-                    'member_ids': [{'id': member.id, 'name': member.name} for member in team.member_ids],
-                    'member_count': len(team.member_ids),
-                }
-                dashboard_data['teams'].append(team_data)
-
-            # 8. Collègues (personnes des équipes)
-            if team_ids:
-                colleagues = request.env['maintenance.person'].search([
-                    ('team_ids', 'in', team_ids),
-                    ('active', '=', True),
-                    ('id', '!=', person.id if person else 0)  # Exclure l'utilisateur actuel
-                ])
-            else:
-                colleagues = request.env['maintenance.person'].browse([])
-
-            dashboard_data['colleagues'] = []
-            for colleague in colleagues:
-                colleague_data = {
-                    'id': colleague.id,
-                    'name': colleague.display_name,
-                    'role': colleague.role_id.name if colleague.role_id else None,
-                    'available': colleague.available,
-                    'request_count': colleague.request_count,
-                    'teams': [team.name for team in colleague.team_ids]
-                }
-                dashboard_data['colleagues'].append(colleague_data)
-
-            # 9. Résumé rapide
-            dashboard_data['summary'] = {
-                'total_active_requests': stats.get('new', 0) + stats.get('in_progress', 0),
-                'completed_requests': stats.get('done', 0),
-                'preventive_scheduled': len(preventive_requests),
-                'equipment_with_3d': len(equipment_with_3d),
-                'teams_count': len(teams),
-                'colleagues_count': len(colleagues)
-            }
-
-            return self._success_response(dashboard_data, "Dashboard data retrieved successfully")
-
-        except Exception as e:
-            _logger.error(f"Error getting dashboard for Flutter: {str(e)}")
-            return self._error_response(f"Error retrieving dashboard: {str(e)}", 500)
-
-    # ===== ALL DATA POUR FLUTTER =====
-    @http.route('/api/flutter/maintenance/all', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_all_data(self, **kwargs):
-        """Récupérer toutes les données pour Flutter (même que dashboard)"""
-        return self.get_flutter_dashboard(**kwargs)
-
-    # ===== USER PROFILE POUR FLUTTER =====
-    @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_flutter_user_profile(self, **kwargs):
-        """Récupérer le profil de l'utilisateur pour Flutter"""
+            _logger.error(f"Error getting equipment: {str(e)}")
+            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
+        """Récupérer le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
         try:
             user = request.env.user
 
@@ -1047,16 +738,30 @@ class CMSFlutterAPIController(http.Controller):
                 }
             }
 
-            return self._success_response(profile_data, "User profile retrieved successfully")
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "User profile retrieved successfully",
+                'data': profile_data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error getting user profile for Flutter: {str(e)}")
+            _logger.error(f"Error getting user profile: {str(e)}")
             return self._error_response(f"Error retrieving user profile: {str(e)}", 500)
 
-    @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['PUT'], csrf=False)
+    # Route pour mettre à jour le profil utilisateur dans Flutter Web
+    @http.route('/api/flutter/user/profile/update', type='http', auth='none', methods=['PUT'], csrf=False)
     @basic_auth_required
-    def update_flutter_user_profile(self, **kwargs):
-        """Mettre à jour le profil de l'utilisateur pour Flutter"""
+    def update_user_profile_flutter(self, **kwargs):
+        """Mettre à jour le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
         try:
             user = request.env.user
 
@@ -1152,42 +857,30 @@ class CMSFlutterAPIController(http.Controller):
                 person.write(person_updates)
                 updated_fields.extend([f"person.{field}" for field in person_updates.keys()])
 
-            # Récupérer le profil mis à jour
-            # Pour Flutter, nous devons récupérer directement les données à jour
-            updated_profile = {
-                'user': {
-                    'id': user.id,
-                    'name': user.name,
-                    'login': user.login,
-                    'email': user.email or '',
-                    'has_email': bool(user.email),
-                },
-                'maintenance_person': {
-                    'id': person.id,
-                    'display_name': person.display_name,
-                    'email': person.email or '',
-                    'available': person.available,
-                } if person else None,
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Profile updated successfully",
                 'updated_fields': updated_fields,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
             }
 
-            return self._success_response(
-                {
-                    'profile': updated_profile,
-                    'updated_fields': updated_fields,
-                },
-                "Profile updated successfully"
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
             )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error updating user profile for Flutter: {str(e)}")
+            _logger.error(f"Error updating user profile: {str(e)}")
             return self._error_response(f"Error updating profile: {str(e)}", 500)
 
-    # ===== EMAIL CHECK POUR FLUTTER =====
+    # Vérification email pour Flutter
     @http.route('/api/flutter/user/profile/email-check', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     @basic_auth_required
-    def check_flutter_email_availability(self, **kwargs):
-        """Vérifier si un email est disponible pour Flutter"""
+    def check_email_availability_flutter(self, **kwargs):
+        """Vérifier si un email est disponible - Version Flutter Web optimisée"""
         try:
             email = None
 
@@ -1199,12 +892,7 @@ class CMSFlutterAPIController(http.Controller):
                 if not email:
                     return self._error_response(
                         "Email parameter is required. Usage: GET /api/flutter/user/profile/email-check?email=your@email.com",
-                        400,
-                        {
-                            'usage': 'GET /api/flutter/user/profile/email-check?email=your@email.com',
-                            'method': 'GET',
-                            'parameter_location': 'query_string'
-                        }
+                        400
                     )
 
             elif request.httprequest.method == 'POST':
@@ -1217,39 +905,18 @@ class CMSFlutterAPIController(http.Controller):
                     if not email:
                         return self._error_response(
                             "Email is required in JSON body. Usage: POST /api/flutter/user/profile/email-check with {\"email\": \"your@email.com\"}",
-                            400,
-                            {
-                                'usage': 'POST /api/flutter/user/profile/email-check',
-                                'method': 'POST',
-                                'body_format': 'JSON',
-                                'expected_body': {'email': 'your@email.com'}
-                            }
+                            400
                         )
 
                 except (json.JSONDecodeError, UnicodeDecodeError) as e:
                     return self._error_response(
                         "Invalid JSON data in request body",
-                        400,
-                        {
-                            'error': str(e),
-                            'expected_format': {'email': 'your@email.com'}
-                        }
+                        400
                     )
-
-            # Si l'email n'est toujours pas défini (ne devrait pas arriver)
-            if not email:
-                return self._error_response("Email is required", 400)
 
             # Validation basique du format email
             if '@' not in email or '.' not in email.split('@')[-1]:
-                return self._error_response(
-                    "Invalid email format",
-                    400,
-                    {
-                        'email': email,
-                        'error': 'Email must contain @ and a valid domain'
-                    }
-                )
+                return self._error_response("Invalid email format", 400)
 
             # Vérifier si l'email est déjà utilisé (excluant l'utilisateur actuel)
             existing_user = request.env['res.users'].search([
@@ -1265,14 +932,91 @@ class CMSFlutterAPIController(http.Controller):
                 'email': email,
                 'available': is_available,
                 'current_user_email': current_user_has_this_email,
+                'method_used': request.httprequest.method,
                 'message': 'Available' if is_available else 'Email already in use'
             }
 
-            return self._success_response(
-                additional_info,
-                f"Email availability checked successfully"
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': f"Email availability checked",
+                'data': additional_info,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
             )
+            response.status_code = 200
+            return response
 
         except Exception as e:
-            _logger.error(f"Error checking email availability for Flutter: {str(e)}")
+            _logger.error(f"Error checking email availability: {str(e)}")
             return self._error_response(f"Error checking email: {str(e)}", 500)
+
+    # Dashboard pour Flutter
+    @http.route('/api/flutter/maintenance/dashboard', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_dashboard_flutter(self, **kwargs):
+        """Récupérer toutes les données de maintenance en un seul appel - Version Flutter Web optimisée"""
+        try:
+            user = request.env.user
+            team_ids = self._get_user_teams()
+            dashboard_data = {}
+
+            # 1. Informations utilisateur
+            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+            dashboard_data['user_info'] = {
+                'id': user.id,
+                'name': user.name,
+                'email': user.email or '',
+                'person_info': {
+                    'id': person.id,
+                    'display_name': person.display_name,
+                    'role': person.role_id.name if person.role_id else None,
+                    'available': person.available,
+                    'phone': person.phone or '',
+                    'specialties': person.specialties or ''
+                } if person else None
+            }
+
+            # 2. Demandes de maintenance (limitées à 20 récentes)
+            request_domain = self._get_allowed_requests_domain()
+            requests = request.env['maintenance.request'].search(
+                request_domain,
+                limit=20,
+                order='request_date desc, id desc'
+            )
+            dashboard_data['requests'] = {
+                'recent': [self._serialize_request(req) for req in requests],
+                'total_count': request.env['maintenance.request'].search_count(request_domain)
+            }
+
+            # ... Autres parties du dashboard selon vos besoins...
+
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Dashboard data retrieved successfully",
+                'data': dashboard_data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error getting dashboard: {str(e)}")
+            return self._error_response(f"Error retrieving dashboard: {str(e)}", 500)
+
+    # All data pour Flutter
+    @http.route('/api/flutter/maintenance/all', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_all_data_flutter(self, **kwargs):
+        """Récupérer toutes les données (même que dashboard) - Version Flutter Web optimisée"""
+        return self.get_dashboard_flutter(**kwargs)
