@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- custom_addons/cmms_3d_models/views/maintenance_request_views_extended.xml -->
 <odoo>
     <!-- Étendre la vue formulaire des demandes de maintenance -->
     <record id="view_maintenance_request_form_inherit_required_fields" model="ir.ui.view">
@@ -11,20 +10,23 @@
             <xpath expr="//field[@name='equipment_id']" position="attributes">
                 <attribute name="required">1</attribute>
             </xpath>
-            
+
             <!-- Rendre le responsable obligatoire -->
             <xpath expr="//field[@name='user_id']" position="attributes">
                 <attribute name="required">1</attribute>
             </xpath>
-            
+
             <!-- Rendre la date prévue obligatoire -->
             <xpath expr="//field[@name='schedule_date']" position="attributes">
                 <attribute name="required">1</attribute>
             </xpath>
 
-            <!-- Ajouter les champs d'assignation dans un groupe après les champs existants -->
-            <xpath expr="//group[last()]" position="after">
-                <group string="Assignation">
+            <!-- Ajouter les champs d'assignation après la sheet (cette méthode est plus sûre) -->
+            <xpath expr="//sheet" position="inside">
+                <div class="oe_clear"/>
+                <h2>Assignations</h2>
+                <!-- Assignation principale -->
+                <group string="Assignation principale">
                     <field name="assigned_person_id"
                            options="{'no_create': True, 'no_open': True}"
                            domain="[('active', '=', True), ('available', '=', True)]"/>
@@ -32,6 +34,23 @@
                            options="{'no_create': True, 'no_open': True}"
                            attrs="{'readonly': [('assigned_person_id', '!=', False)]}"/>
                     <field name="assigned_person_role" readonly="1"/>
+                </group>
+
+                <!-- Tableau des assignations multiples -->
+                <group string="Assignations multiples">
+                    <field name="assignment_ids" nolabel="1" context="{'default_request_id': active_id}">
+                        <tree editable="bottom">
+                            <field name="person_id" domain="[('active', '=', True), ('available', '=', True)]"/>
+                            <field name="role_id" readonly="1"/>
+                            <field name="user_id" readonly="1" optional="show"/>
+                            <field name="assigned_date"/>
+                            <field name="assigned_by_id" readonly="1" optional="hide"/>
+                            <field name="is_primary"/>
+                            <field name="notes" optional="hide"/>
+                        </tree>
+                    </field>
+                    <field name="assigned_person_ids" widget="many2many_tags" readonly="1"/>
+                    <field name="primary_assignment_id" invisible="1"/>
                 </group>
             </xpath>
         </field>
@@ -46,6 +65,7 @@
             <!-- Ajouter la colonne personne assignée -->
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="assigned_person_id" optional="show"/>
+                <field name="assigned_person_ids" widget="many2many_tags" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -59,13 +79,16 @@
             <!-- Ajouter des champs de recherche -->
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="assigned_person_id"/>
+                <field name="assigned_person_ids"/>
             </xpath>
 
-            <!-- Ajouter des filtres dans le groupe existant -->
+            <!-- Ajouter des filtres -->
             <xpath expr="//filter[last()]" position="after">
                 <separator/>
                 <filter string="Assignées à une personne" name="assigned_person"
                         domain="[('assigned_person_id', '!=', False)]"/>
+                <filter string="Assignées à plusieurs personnes" name="multiple_assigned"
+                        domain="[('assigned_person_ids', '!=', False)]"/>
                 <filter string="Non assignées" name="not_assigned_person"
                         domain="[('assigned_person_id', '=', False)]"/>
             </xpath>
