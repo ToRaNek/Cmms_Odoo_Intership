@@ -110,14 +110,7 @@ class CMSAPIController(http.Controller):
         """Construire le domaine pour les demandes autorisées"""
         user = request.env.user
 
-        # Dans Odoo 16, les champs standards sont :
-        # - user_id : créateur de la demande
-        # - owner_user_id : propriétaire
-        # - technician_user_id : technicien assigné (optionnel)
-        # - assigned_user_id : notre champ personnalisé (peut ne pas exister)
-        # - assigned_person_id : personne de maintenance assignée (notre extension)
-
-        # Créer le domaine avec les champs qui existent vraiment
+        # Domain de base
         domain = []
         request_model = request.env['maintenance.request']
 
@@ -139,6 +132,19 @@ class CMSAPIController(http.Controller):
         # IMPORTANT: Ajouter les demandes assignées via assigned_person_id
         if 'assigned_person_id' in request_model._fields:
             domain = ['|'] + domain + [('assigned_person_id.user_id', '=', user.id)]
+
+        # NOUVELLE PARTIE: Ajouter les demandes assignées via les assignations multiples
+        person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+        if person:
+            # Rechercher toutes les assignations de cette personne
+            assignments = request.env['maintenance.request.assignment'].search([
+                ('person_id', '=', person.id)
+            ])
+
+            # Ajouter les demandes correspondantes au domaine
+            if assignments:
+                request_ids = assignments.mapped('request_id.id')
+                domain = ['|'] + domain + [('id', 'in', request_ids)]
 
         # Ajouter les demandes des équipes
         team_ids = self._get_user_teams()
@@ -184,6 +190,36 @@ class CMSAPIController(http.Controller):
         elif hasattr(request_record, 'owner_user_id') and request_record.owner_user_id:
             assigned_user = request_record.owner_user_id
 
+        # Préparer la liste de toutes les assignations
+        assignments = []
+        if hasattr(request_record, 'assignment_ids') and request_record.assignment_ids:
+            for assignment in request_record.assignment_ids:
+                assignments.append({
+                    'id': assignment.id,
+                    'person_id': {
+                        'id': assignment.person_id.id,
+                        'name': assignment.person_id.display_name,
+                        'role': assignment.person_id.role_id.name if assignment.person_id.role_id else None
+                    },
+                    'user_id': {
+                        'id': assignment.user_id.id,
+                        'name': assignment.user_id.name
+                    } if assignment.user_id else None,
+                    'assigned_date': assignment.assigned_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if assignment.assigned_date else None,
+                    'is_primary': assignment.is_primary,
+                    'notes': assignment.notes or ''
+                })
+
+        # Préparer la liste de toutes les personnes assignées
+        assigned_persons = []
+        if hasattr(request_record, 'assigned_person_ids') and request_record.assigned_person_ids:
+            for person in request_record.assigned_person_ids:
+                assigned_persons.append({
+                    'id': person.id,
+                    'name': person.display_name,
+                    'role': person.role_id.name if person.role_id else None
+                })
+
         return {
             'id': request_record.id,
             'name': request_record.name,
@@ -219,9 +255,7 @@ class CMSAPIController(http.Controller):
             'kanban_state': request_record.kanban_state,
             'color': request_record.color,
             'duration': request_record.duration,
-            # Supprimé: 'archive': not request_record.active (le champ active n'existe pas)
             'close_date': request_record.close_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.close_date else None,
-            # Champs utilisateur standard
             'user_id': {
                 'id': request_record.user_id.id,
                 'name': request_record.user_id.name
@@ -234,6 +268,9 @@ class CMSAPIController(http.Controller):
                 'id': request_record.technician_user_id.id,
                 'name': request_record.technician_user_id.name
             } if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else None,
+            # Nouvelles clés pour toutes les assignations
+            'assignments': assignments,
+            'assigned_person_ids': assigned_persons,
         }
 
     def _serialize_equipment(self, equipment_record):

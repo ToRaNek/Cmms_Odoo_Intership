@@ -1,4 +1,4 @@
-# custom_addons/cmms_3d_models/models/maintenance_person.py - Version simplifiée
+# custom_addons/cmms_3d_models/models/maintenance_person.py - Version modifiée
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
@@ -38,8 +38,18 @@ class MaintenancePerson(models.Model):
     user_id = fields.Many2one('res.users', string='Utilisateur Odoo', readonly=True)
     partner_id = fields.Many2one('res.partner', string='Contact associé', readonly=True)
     
-    # Demandes de maintenance assignées
-    assigned_request_ids = fields.One2many('maintenance.request', 'assigned_user_id', string='Demandes assignées')
+    # Demandes de maintenance assignées (direct + relations inverse)
+    assigned_request_ids = fields.One2many('maintenance.request', 'assigned_person_id', string='Demandes assignées directement')
+    
+    # Nouvelle relation pour les demandes via assignations multiples
+    all_assigned_request_ids = fields.Many2many(
+        'maintenance.request',
+        string='Toutes les demandes assignées',
+        compute='_compute_all_assigned_requests',
+        store=True
+    )
+    
+    # Calcul du nombre total de demandes
     request_count = fields.Integer('Nombre de demandes', compute='_compute_request_count')
     
     # Équipes
@@ -53,15 +63,26 @@ class MaintenancePerson(models.Model):
             else:
                 person.display_name = person.name or person.first_name or 'Personne sans nom'
     
-    @api.depends('user_id')
+    @api.depends('assigned_request_ids', 'all_assigned_request_ids')
     def _compute_request_count(self):
         for person in self:
-            if person.user_id:
-                person.request_count = self.env['maintenance.request'].search_count(
-                    [('assigned_user_id', '=', person.user_id.id)]
-                )
-            else:
-                person.request_count = 0
+            # Combiner les demandes directes et les demandes via assignations
+            all_requests = person.assigned_request_ids | person.all_assigned_request_ids
+            person.request_count = len(all_requests)
+    
+    @api.depends('user_id')
+    def _compute_all_assigned_requests(self):
+        """Calcule toutes les demandes assignées à cette personne via les assignations multiples"""
+        for person in self:
+            # Rechercher les assignations où cette personne est mentionnée
+            assignments = self.env['maintenance.request.assignment'].search([
+                ('person_id', '=', person.id)
+            ])
+            
+            # Récupérer les demandes correspondantes
+            requests = assignments.mapped('request_id')
+            
+            person.all_assigned_request_ids = requests
 
     def _create_odoo_user(self):
         """Crée un utilisateur Odoo pour cette personne - Version simplifiée"""
@@ -193,16 +214,17 @@ class MaintenancePerson(models.Model):
     def action_view_requests(self):
         """Action pour voir les demandes assignées"""
         self.ensure_one()
-        if not self.user_id:
-            raise UserError("Aucun utilisateur associé à cette personne")
+        
+        # Combiner les demandes assignées directement et via assignations multiples
+        all_requests = self.assigned_request_ids | self.all_assigned_request_ids
         
         return {
             'type': 'ir.actions.act_window',
             'name': f'Demandes de {self.display_name}',
             'res_model': 'maintenance.request',
             'view_mode': 'tree,form,kanban',
-            'domain': [('assigned_user_id', '=', self.user_id.id)],
-            'context': {'default_assigned_user_id': self.user_id.id}
+            'domain': [('id', 'in', all_requests.ids)],
+            'context': {'default_assigned_person_id': self.id}
         }
     
     def action_create_user(self):

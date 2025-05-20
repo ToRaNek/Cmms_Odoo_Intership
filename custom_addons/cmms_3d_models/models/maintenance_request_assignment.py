@@ -6,7 +6,7 @@ class MaintenanceRequestAssignment(models.Model):
     _name = 'maintenance.request.assignment'
     _description = 'Assignation de demande de maintenance'
     _rec_name = 'person_id'
-    _order = 'is_primary desc, assigned_date desc'
+    _order = 'assigned_date desc'  # Modification: suppression de is_primary du tri
 
     request_id = fields.Many2one(
         'maintenance.request',
@@ -35,7 +35,7 @@ class MaintenanceRequestAssignment(models.Model):
     is_primary = fields.Boolean(
         'Assigné principal',
         default=False,
-        help="Si coché, cette personne est l'assigné principal pour cette demande"
+        help="Si coché, cette personne est un assigné principal pour cette demande"
     )
     notes = fields.Text('Notes')
 
@@ -44,19 +44,7 @@ class MaintenanceRequestAssignment(models.Model):
          'Une personne ne peut être assignée qu\'une seule fois à une demande!')
     ]
 
-    @api.constrains('is_primary', 'request_id')
-    def _check_single_primary(self):
-        """S'assurer qu'il n'y a qu'un seul assigné principal par demande"""
-        for assignment in self:
-            if assignment.is_primary:
-                other_primary = self.search([
-                    ('request_id', '=', assignment.request_id.id),
-                    ('is_primary', '=', True),
-                    ('id', '!=', assignment.id)
-                ])
-                if other_primary:
-                    # Si un autre assigné principal existe, on le désactive
-                    other_primary.write({'is_primary': False})
+    # Suppression de la méthode _check_single_primary qui empêchait d'avoir plusieurs assignés principaux
 
     @api.model
     def create(self, vals):
@@ -65,4 +53,35 @@ class MaintenanceRequestAssignment(models.Model):
         # S'il n'y a pas d'autre enregistrement pour cette demande, définir celui-ci comme principal
         if not self.search_count([('request_id', '=', res.request_id.id), ('id', '!=', res.id)]):
             res.is_primary = True
+        
+        # Forcer le recalcul des personnes assignées sur la demande
+        if res.request_id:
+            res.request_id._compute_assigned_person_ids()
+            res.request_id._compute_primary_assignment()
+            
         return res
+        
+    def write(self, vals):
+        """Gère les mises à jour d'assignation"""
+        result = super(MaintenanceRequestAssignment, self).write(vals)
+        
+        # Si on modifie is_primary, recalculer les assignations
+        if 'is_primary' in vals or 'person_id' in vals:
+            for record in self:
+                if record.request_id:
+                    record.request_id._compute_assigned_person_ids()
+                    record.request_id._compute_primary_assignment()
+        
+        return result
+        
+    def unlink(self):
+        """Gère la suppression d'assignation"""
+        request_ids = self.mapped('request_id')
+        result = super(MaintenanceRequestAssignment, self).unlink()
+        
+        # Recalculer les assignations pour les demandes concernées
+        for request in request_ids:
+            request._compute_assigned_person_ids()
+            request._compute_primary_assignment()
+            
+        return result

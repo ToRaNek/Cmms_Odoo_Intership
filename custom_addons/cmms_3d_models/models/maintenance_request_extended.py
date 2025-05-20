@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 class MaintenanceRequestExtended(models.Model):
     _inherit = 'maintenance.request'
-    
+
     # Hériter des champs pour les rendre obligatoires
     equipment_id = fields.Many2one(
         'maintenance.equipment',
@@ -69,6 +69,14 @@ class MaintenanceRequestExtended(models.Model):
         store=True
     )
 
+    # Ajout d'un nouveau champ pour stocker tous les assignés principaux
+    primary_assignment_ids = fields.Many2many(
+        'maintenance.request.assignment',
+        string='Assignations principales',
+        compute='_compute_primary_assignment',
+        store=True
+    )
+
     @api.depends('assignment_ids.person_id')
     def _compute_assigned_person_ids(self):
         for request in self:
@@ -77,21 +85,29 @@ class MaintenanceRequestExtended(models.Model):
     @api.depends('assignment_ids.is_primary')
     def _compute_primary_assignment(self):
         for request in self:
-            primary = request.assignment_ids.filtered(lambda a: a.is_primary)
-            if primary:
-                request.primary_assignment_id = primary[0]
-                # Mise à jour des champs de compatibilité
-                request.assigned_person_id = primary[0].person_id
-                if primary[0].person_id and primary[0].person_id.user_id:
-                    request.assigned_user_id = primary[0].person_id.user_id
+            # Récupérer toutes les assignations principales
+            primary_assignments = request.assignment_ids.filtered(lambda a: a.is_primary)
+            request.primary_assignment_ids = primary_assignments
+
+            # Pour la compatibilité, on utilise toujours une seule assignation principale
+            # On prend la plus récente si plusieurs sont définies
+            if primary_assignments:
+                # Trier par date d'assignation décroissante
+                sorted_primaries = primary_assignments.sorted(lambda a: a.assigned_date, reverse=True)
+                request.primary_assignment_id = sorted_primaries[0]
+                request.assigned_person_id = sorted_primaries[0].person_id
+                if sorted_primaries[0].person_id and sorted_primaries[0].person_id.user_id:
+                    request.assigned_user_id = sorted_primaries[0].person_id.user_id
             else:
-                request.primary_assignment_id = False
                 # Si aucun assigné principal mais des assignés existent
                 if request.assignment_ids:
+                    request.primary_assignment_id = False
+                    # Prendre juste le premier assigné pour la compatibilité
                     request.assigned_person_id = request.assignment_ids[0].person_id
                     if request.assignment_ids[0].person_id.user_id:
                         request.assigned_user_id = request.assignment_ids[0].person_id.user_id
                 else:
+                    request.primary_assignment_id = False
                     request.assigned_person_id = False
                     request.assigned_user_id = False
 
@@ -130,7 +146,7 @@ class MaintenanceRequestExtended(models.Model):
         else:
             self.assigned_person_id = False
 
-    @api.constrains('equipment_id', 'user_id', 'schedule_date', 'assigned_user_id', 'assigned_person_id')
+    @api.constrains('equipment_id', 'user_id', 'schedule_date')
     def _check_required_fields(self):
         """Vérifier que tous les champs obligatoires sont définis"""
         for record in self:
@@ -247,4 +263,11 @@ class MaintenanceRequestExtended(models.Model):
                 assignment = self.assignment_ids.filtered(lambda a: a.person_id.id == person_id)
                 assignment.write({'is_primary': True})
 
+        return True
+
+    def set_all_as_primary(self):
+        """Définit toutes les assignations comme principales"""
+        for request in self:
+            if request.assignment_ids:
+                request.assignment_ids.write({'is_primary': True})
         return True
