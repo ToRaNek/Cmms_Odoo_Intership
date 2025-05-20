@@ -330,7 +330,7 @@ class CMSAPIController(http.Controller):
     # ===== MAINTENANCE REQUESTS =====
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_requests(self, limit=10000, offset=0, status=None, equipment_id=None, **kwargs):
+    def get_requests(self, limit=10000, offset=0, stage_id=None, status=None, equipment_id=None, **kwargs):
         """Récupérer les demandes de maintenance de l'utilisateur - Version Flutter Web optimisée"""
         try:
             limit = int(limit) if limit else 10000
@@ -339,8 +339,15 @@ class CMSAPIController(http.Controller):
             # Construire le domaine de recherche
             domain = self._get_allowed_requests_domain()
 
+            # Filtre par stage_id (prioritaire sur status)
+            if stage_id:
+                try:
+                    stage_id_int = int(stage_id)
+                    domain.append(('stage_id', '=', stage_id_int))
+                except (ValueError, TypeError):
+                    _logger.warning(f"Ignoring invalid stage_id: {stage_id}")
             # Filtres supplémentaires
-            if status:
+            elif status:
                 # Mapper les statuts courants
                 status_mapping = {
                     'new': [('stage_id.name', 'ilike', 'new')],
@@ -352,7 +359,11 @@ class CMSAPIController(http.Controller):
                     domain.extend(status_mapping[status])
 
             if equipment_id:
-                domain.append(('equipment_id', '=', int(equipment_id)))
+                try:
+                    equipment_id_int = int(equipment_id)
+                    domain.append(('equipment_id', '=', equipment_id_int))
+                except (ValueError, TypeError):
+                    _logger.warning(f"Ignoring invalid equipment_id: {equipment_id}")
 
             # Récupérer les demandes
             requests = request.env['maintenance.request'].search(
@@ -367,7 +378,12 @@ class CMSAPIController(http.Controller):
                 'requests': [self._serialize_request(req) for req in requests],
                 'total_count': request.env['maintenance.request'].search_count(domain),
                 'limit': limit,
-                'offset': offset
+                'offset': offset,
+                'filters': {
+                    'stage_id': int(stage_id) if stage_id and stage_id.isdigit() else None,
+                    'equipment_id': int(equipment_id) if equipment_id and equipment_id.isdigit() else None,
+                    'status': status
+                }
             }
 
             # Réponse spéciale sans cookie pour Flutter Web
@@ -388,6 +404,40 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting requests: {str(e)}")
             return self._error_response(f"Error retrieving requests: {str(e)}", 500)
+
+    @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_equipment_by_id(self, equipment_id, **kwargs):
+        """Récupérer un équipement spécifique - Version Flutter Web optimisée"""
+        try:
+            domain = self._get_allowed_equipment_domain()
+            domain.append(('id', '=', equipment_id))
+
+            equipment = request.env['maintenance.equipment'].search(domain, limit=1)
+
+            if not equipment:
+                return self._error_response("Equipment not found", 404)
+
+            data = self._serialize_equipment(equipment)
+
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Equipment retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error getting equipment {equipment_id}: {str(e)}")
+            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
@@ -484,6 +534,7 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error creating request: {str(e)}")
             return self._error_response(f"Error creating request: {str(e)}", 500)
+
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['PUT'], csrf=False)
     @basic_auth_required
     def update_request_flutter(self, request_id, **kwargs):
@@ -752,6 +803,38 @@ class CMSAPIController(http.Controller):
             )
             response.status_code = 200
             return response
+
+        except Exception as e:
+            _logger.error(f"Error getting user profile: {str(e)}")
+            return self._error_response(f"Error retrieving user profile: {str(e)}", 500)
+
+    @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_user_profile(self, **kwargs):
+        """Récupérer le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
+        try:
+            user = request.env.user
+
+            # Récupérer la personne de maintenance associée si elle existe
+            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
+
+            # Récupérer les équipes de l'utilisateur
+            team_ids = self._get_user_teams()
+            teams = request.env['maintenance.team'].browse(team_ids)
+
+            # Construire les données du profil
+            profile_data = {
+                'user': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email or '',
+                    # Ajoutez d'autres champs selon vos besoins
+                },
+                # Ajoutez d'autres sections selon vos besoins
+            }
+
+            return self._success_response(profile_data, "User profile retrieved successfully")
 
         except Exception as e:
             _logger.error(f"Error getting user profile: {str(e)}")
