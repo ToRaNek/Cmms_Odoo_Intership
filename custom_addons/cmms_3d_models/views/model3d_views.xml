@@ -20,10 +20,10 @@
                         </button>
                         <button name="action_view_3d_with_children" type="object"
                                 class="oe_stat_button" icon="fa-cubes"
-                                attrs="{'invisible': [('child_ids', '=', [])]}">
+                                attrs="{'invisible': [('submodel_count', '=', 0)]}">
                             <div class="o_stat_info">
-                                <span class="o_stat_text">Voir hiérarchie</span>
-                                <span class="o_stat_text">complète</span>
+                                <span class="o_stat_text">Voir avec</span>
+                                <span class="o_stat_text">sous-modèles</span>
                             </div>
                         </button>
                         <button name="action_view_submodels" type="object"
@@ -41,17 +41,9 @@
                         </button>
                     </div>
 
-                    <!-- Indiquer si c'est un sous-modèle -->
-                    <div class="alert alert-info" role="alert"
-                         attrs="{'invisible': [('is_submodel', '=', False)]}">
-                        <p><strong>Ce modèle est un sous-modèle de: </strong>
-                            <field name="parent_id" readonly="1" class="oe_inline"/>
-                        </p>
-                    </div>
-
                     <!-- NOUVELLE ALERTE POUR INFORMER SUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT -->
                     <div class="alert alert-success" role="alert"
-                         attrs="{'invisible': ['|', ('is_submodel', '=', True), ('has_auto_equipment', '=', False)]}">
+                         attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
                         <p>
                             <strong>Équipement auto-créé:</strong> 
                             <field name="auto_created_equipment_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
@@ -59,11 +51,10 @@
                         <p>Un équipement de maintenance a été créé automatiquement et lié à ce modèle 3D.</p>
                     </div>
 
-                    <div class="alert alert-info" role="alert"
-                         attrs="{'invisible': [('is_submodel', '=', True)]}">
+                    <div class="alert alert-info" role="alert">
                         <p><strong>Création automatique d'équipement</strong></p>
                         <p>Un équipement de maintenance sera créé automatiquement pour ce modèle 3D.</p>
-                        <p><small>Note: Vous pouvez optionnellement sélectionner une catégorie d'équipement ci-dessous. Cette fonctionnalité n'est disponible que pour les modèles parents (non sous-modèles).</small></p>
+                        <p><small>Note: Vous pouvez optionnellement sélectionner une catégorie d'équipement ci-dessous.</small></p>
                     </div>
 
                     <field name="thumbnail" widget="image" class="oe_avatar"/>
@@ -74,7 +65,7 @@
                     </div>
 
                     <!-- NOUVEAU GROUPE POUR LA CATÉGORIE D'ÉQUIPEMENT -->
-                    <group attrs="{'invisible': [('is_submodel', '=', True)]}">
+                    <group>
                         <group string="Équipement de maintenance">
                             <field name="equipment_category_id" 
                                    options="{'no_create': True, 'no_open': True}"
@@ -83,7 +74,6 @@
                                    attrs="{'invisible': [('auto_created_equipment_id', '=', False)]}"
                                    options="{'no_open': True}"/>
                             <field name="has_auto_equipment" invisible="1"/>
-                            <field name="is_submodel" invisible="1"/>
                         </group>
                     </group>
 
@@ -152,25 +142,6 @@
                             <field name="description" placeholder="Description du modèle..."/>
                         </page>
 
-                        <page string="Hiérarchie de modèles" name="hierarchy_page">
-                            <group>
-                                <field name="parent_id" domain="[('id', '!=', active_id)]"/>
-                                <field name="complete_name" invisible="1"/>
-                            </group>
-
-                            <field name="child_ids" mode="tree">
-                                <tree string="Sous-modèles">
-                                    <field name="name"/>
-                                    <field name="model_format"/>
-                                    <field name="has_external_files"/>
-                                    <field name="is_converted_from_blend"/>
-                                    <field name="active"/>
-                                    <button name="action_view_3d" type="object"
-                                            string="Voir en 3D" class="btn-primary"/>
-                                </tree>
-                            </field>
-                        </page>
-
                         <page string="Sous-modèles" name="submodels_page">
                             <group>
                                 <field name="submodel_count" invisible="1"/>
@@ -228,12 +199,10 @@
         <field name="arch" type="xml">
             <tree string="Modèles 3D">
                 <field name="name"/>
-                <field name="parent_id"/>
                 <field name="model_format"/>
                 <field name="equipment_category_id"/>
                 <field name="has_auto_equipment" widget="boolean_icon"/>
                 <field name="has_external_files"/>
-                <field name="is_submodel"/>
                 <field name="active"/>
                 <button name="action_view_3d" type="object"
                         string="Voir en 3D" class="btn-sm btn-primary"/>
@@ -255,18 +224,15 @@
                 <field name="equipment_category_id"/>
                 <filter string="Avec équipement auto-créé" name="has_auto_equipment" 
                         domain="[('auto_created_equipment_id', '!=', False)]"/>
-                <filter string="Sans équipement auto-créé (modèles parents)" name="no_auto_equipment" 
-                        domain="[('auto_created_equipment_id', '=', False), ('parent_id', '=', False)]"/>
+                <filter string="Sans équipement auto-créé" name="no_auto_equipment" 
+                        domain="[('auto_created_equipment_id', '=', False)]"/>
                 <filter string="Avec fichiers externes" name="has_external" domain="[('has_external_files', '=', True)]"/>
                 <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
-                <filter string="Sous-modèles" name="submodels" domain="[('parent_id', '!=', False)]"/>
-                <filter string="Modèles principaux" name="main_models" domain="[('parent_id', '=', False)]"/>
                 <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
                     <filter string="Catégorie d'équipement" name="group_by_equipment_category" 
                             context="{'group_by': 'equipment_category_id'}"/>
-                    <filter string="Modèle parent" name="group_by_parent" context="{'group_by': 'parent_id'}"/>
                     <filter string="Équipement auto-créé" name="group_by_auto_equipment" 
                             context="{'group_by': 'auto_created_equipment_id'}"/>
                 </group>
