@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- custom_addons/cmms_3d_models/views/maintenance_equipment_views_3d.xml -->
+<!-- custom_addons/cmms_3d_models/views/maintenance_equipment_views_3d.xml - Corrigé pour Odoo 16 -->
 <odoo>
     <!-- Vue formulaire des équipements étendue avec visualisation 3D -->
     <record id="view_maintenance_equipment_form_inherit_3d" model="ir.ui.view">
@@ -7,32 +7,35 @@
         <field name="model">maintenance.equipment</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
         <field name="arch" type="xml">
-            <!-- Ajouter boutons de visualisation 3D dans la button box -->
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_3d" type="object" 
-                        class="oe_stat_button" icon="fa-cube"
-                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
-                    <div class="o_stat_info">
-                        <span class="o_stat_text">Visualiser</span>
-                        <span class="o_stat_text">Modèle 3D</span>
-                    </div>
-                </button>
-                <button name="action_view_3d_with_children" type="object"
-                        class="oe_stat_button" icon="fa-cubes"
-                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
-                    <div class="o_stat_info">
-                        <span class="o_stat_text">Voir avec</span>
-                        <span class="o_stat_text">sous-modèles</span>
-                    </div>
-                </button>
-                <button name="action_view_model3d_form" type="object"
-                        class="oe_stat_button" icon="fa-edit"
-                        attrs="{'invisible': [('has_3d_model', '=', False)]}">
-                    <div class="o_stat_info">
-                        <span class="o_stat_text">Modifier</span>
-                        <span class="o_stat_text">Modèle 3D</span>
-                    </div>
-                </button>
+            <!-- Créer la button_box si elle n'existe pas -->
+            <xpath expr="//sheet" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <!-- Boutons de visualisation 3D -->
+                    <button name="action_view_3d" type="object"
+                            class="oe_stat_button" icon="fa-cube"
+                            attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Visualiser</span>
+                            <span class="o_stat_text">Modèle 3D</span>
+                        </div>
+                    </button>
+                    <button name="action_view_3d_with_children" type="object"
+                            class="oe_stat_button" icon="fa-cubes"
+                            attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Voir avec</span>
+                            <span class="o_stat_text">sous-modèles</span>
+                        </div>
+                    </button>
+                    <button name="action_view_model3d_form" type="object"
+                            class="oe_stat_button" icon="fa-edit"
+                            attrs="{'invisible': [('has_3d_model', '=', False)]}">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Modifier</span>
+                            <span class="o_stat_text">Modèle 3D</span>
+                        </div>
+                    </button>
+                </div>
             </xpath>
 
             <!-- Ajouter une alerte d'information pour le modèle 3D -->
@@ -40,7 +43,7 @@
                 <div class="alert alert-info" role="alert"
                      attrs="{'invisible': [('has_3d_model', '=', False)]}">
                     <p>
-                        <strong>Modèle 3D associé:</strong> 
+                        <strong>Modèle 3D associé:</strong>
                         <field name="model3d_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
                     </p>
                     <p>Cet équipement dispose d'un modèle 3D pour la visualisation et la maintenance.</p>
@@ -69,6 +72,7 @@
             </xpath>
         </field>
     </record>
+
     <!-- Vue recherche des équipements étendue -->
     <record id="view_maintenance_equipment_search_inherit_3d" model="ir.ui.view">
         <field name="name">maintenance.equipment.search.inherit.3d</field>

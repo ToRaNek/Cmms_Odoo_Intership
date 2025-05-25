@@ -1,14 +1,19 @@
-# custom_addons/cmms_3d_models/__manifest__.py
 {
     'name': 'CMMS 3D Models Integration',
     'version': '1.0',
     'category': 'Maintenance',
-    'summary': 'Integration of 3D models (glTF) from Blender with CMMS and personnel management',
+    'summary': 'Integration of 3D models (glTF) from Blender with CMMS and personnel management - Compatible Odoo 16',
     'description': """
-CMMS 3D Models Integration with Personnel Management
-====================================================
+CMMS 3D Models Integration with Personnel Management - Odoo 16 Compatible
+=========================================================================
 This module integrates 3D models in glTF format exported from Blender with the Maintenance module
 and adds comprehensive personnel and role management for maintenance operations.
+
+Corrections Odoo 16:
+--------------------
+* Fixed button_box inheritance issues
+* Compatible with Odoo 16 maintenance module structure
+* Optimized view inheritance for better stability
 
 Features:
 ---------
@@ -38,10 +43,10 @@ Features:
         'views/maintenance_views.xml',
         'views/submodel_views.xml',
         'views/maintenance_person_views.xml',
-        'views/maintenance_request_views_extended.xml',
-        'views/maintenance_request_views_parts.xml',  # Nouvelle vue pour les pièces
+        'views/maintenance_request_views_parts.xml',  # Vue corrigée principale
+        'views/maintenance_request_views_extended.xml',  # Vue simplifiée
         'views/maintenance_team_views_extended.xml',
-        'views/maintenance_equipment_views_3d.xml',
+        'views/maintenance_equipment_views_3d.xml',  # Vue corrigée
         'views/api_views.xml',
     ],
     'assets': {

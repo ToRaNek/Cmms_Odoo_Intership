@@ -27,6 +27,14 @@ class MaintenanceRequestExtended(models.Model):
         help="Date prévue pour effectuer la maintenance"
     )
 
+    # NOUVEAU CHAMP: Calculer si l'équipement a un modèle 3D
+    equipment_has_3d_model = fields.Boolean(
+        string='L\'équipement a un modèle 3D',
+        compute='_compute_equipment_has_3d_model',
+        store=True,
+        help="Indique si l'équipement sélectionné dispose d'un modèle 3D"
+    )
+
     # Champs d'assignation existants (avec assignation obligatoire)
     assigned_user_id = fields.Many2one(
         'res.users',
@@ -76,6 +84,12 @@ class MaintenanceRequestExtended(models.Model):
         compute='_compute_primary_assignment',
         store=True
     )
+
+    @api.depends('equipment_id', 'equipment_id.has_3d_model')
+    def _compute_equipment_has_3d_model(self):
+        """Calcule si l'équipement associé a un modèle 3D"""
+        for record in self:
+            record.equipment_has_3d_model = bool(record.equipment_id and record.equipment_id.has_3d_model)
 
     @api.depends('assignment_ids.person_id')
     def _compute_assigned_person_ids(self):
@@ -265,9 +279,42 @@ class MaintenanceRequestExtended(models.Model):
 
         return True
 
+    # Relation avec les pièces
+    part_ids = fields.One2many(
+        'maintenance.request.part',
+        'request_id',
+        string='Pièces concernées',
+        help="Sélectionner les pièces spécifiques à maintenir"
+    )
+
+    part_count = fields.Integer(
+        'Nombre de pièces',
+        compute='_compute_part_count'
+    )
+
+    @api.depends('part_ids')
+    def _compute_part_count(self):
+        for record in self:
+            record.part_count = len(record.part_ids)
+
     def set_all_as_primary(self):
         """Définit toutes les assignations comme principales"""
         for request in self:
             if request.assignment_ids:
                 request.assignment_ids.write({'is_primary': True})
         return True
+
+    def action_view_parts(self):
+        """Ouvrir la vue des pièces"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Pièces de {self.name}',
+            'res_model': 'maintenance.request.part',
+            'view_mode': 'tree,form',
+            'domain': [('request_id', '=', self.id)],
+            'context': {
+                'default_request_id': self.id,
+                'default_equipment_id': self.equipment_id.id if self.equipment_id else False,
+            }
+        }
