@@ -6,4 +6,5 @@ from . import submodel3d
 from . import maintenance_person
 from . import api_access_log
 from . import maintenance_request_extended
-from . import maintenance_request_assignment  # Ajout de la nouvelle importation
+from . import maintenance_request_assignment
+from . import maintenance_request_part  # Nouveau modèle pour les pièces

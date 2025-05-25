@@ -19,6 +19,8 @@ Features:
 * Define maintenance roles (Technician, Supervisor, Manager, etc.)
 * Assign specific users to maintenance requests
 * Team management with personnel integration
+* Select specific parts/sub-models for maintenance requests
+* Define intervention types for each part (Cleaning, Repair, Replacement, etc.)
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
@@ -37,8 +39,9 @@ Features:
         'views/submodel_views.xml',
         'views/maintenance_person_views.xml',
         'views/maintenance_request_views_extended.xml',
+        'views/maintenance_request_views_parts.xml',  # Nouvelle vue pour les pièces
         'views/maintenance_team_views_extended.xml',
-        'views/maintenance_equipment_views_3d.xml',  # Nouveau fichier pour les vues équipement 3D
+        'views/maintenance_equipment_views_3d.xml',
         'views/api_views.xml',
     ],
     'assets': {
