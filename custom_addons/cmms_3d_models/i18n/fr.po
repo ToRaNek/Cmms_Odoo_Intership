@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-26 19:13+0000\n"
-"PO-Revision-Date: 2025-05-26 19:13+0000\n"
+"POT-Creation-Date: 2025-05-26 18:46+0000\n"
+"PO-Revision-Date: 2025-05-26 18:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,50 +22,47 @@ msgid ""
 "192.168.1.100\n"
 "10.0.0.0/24"
 msgstr ""
-"127.0.0.1\n"
-"192.168.1.100\n"
-"10.0.0.0/24"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_cmms_model3d
 msgid "3D Model"
-msgstr "3D Model"
+msgstr "Modèle 3D"
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_model3d
 #: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_model3d
 msgid "3D Models"
-msgstr "3D Models"
+msgstr "Modèles 3D"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_cmms_submodel3d
 msgid "3D Sub-model"
-msgstr "3D Sub-model"
+msgstr "Sous-modèle 3D"
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_submodel3d
 #: model:ir.actions.act_window,name:cmms_3d_models.action_view_submodels_from_model
 msgid "3D Sub-models"
-msgstr "3D Sub-models"
+msgstr "Sous-modèles 3D"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "<small>L'utilisateur pourra se connecter avec ce login</small>"
-msgstr "<small>The user will be able to login with this username</small>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid ""
 "<small>Les pièces disponibles correspondent aux sous-modèles 3D de "
 "l'équipement sélectionné.</small>"
-msgstr "<small>Available parts correspond to the 3D sub-models of the selected equipment.</small>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid ""
 "<small>Note: Vous pouvez optionnellement sélectionner une catégorie "
 "d'équipement ci-dessous.</small>"
-msgstr "<small>Note: You can optionally select an equipment category below.</small>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
@@ -73,8 +70,6 @@ msgid ""
 "<span class=\"o_stat_text\">Modifier</span>\n"
 "                            <span class=\"o_stat_text\">Modèle 3D</span>"
 msgstr ""
-"<span class=\"o_stat_text\">Edit</span>\n"
-"                            <span class=\"o_stat_text\">3D Model</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -82,8 +77,6 @@ msgid ""
 "<span class=\"o_stat_text\">Télécharger</span>\n"
 "                                <span class=\"o_stat_text\">IFC BIM</span>"
 msgstr ""
-"<span class=\"o_stat_text\">Download</span>\n"
-"                                <span class=\"o_stat_text\">IFC BIM</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -91,8 +84,6 @@ msgid ""
 "<span class=\"o_stat_text\">Visualiser</span>\n"
 "                                <span class=\"o_stat_text\">Modèle 3D</span>"
 msgstr ""
-"<span class=\"o_stat_text\">View</span>\n"
-"                                <span class=\"o_stat_text\">3D Model</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
@@ -100,8 +91,6 @@ msgid ""
 "<span class=\"o_stat_text\">Visualiser</span>\n"
 "                                <span class=\"o_stat_text\">Sous-modèle 3D</span>"
 msgstr ""
-"<span class=\"o_stat_text\">View</span>\n"
-"                                <span class=\"o_stat_text\">3D Sub-model</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
@@ -109,8 +98,6 @@ msgid ""
 "<span class=\"o_stat_text\">Visualiser</span>\n"
 "                            <span class=\"o_stat_text\">Modèle 3D</span>"
 msgstr ""
-"<span class=\"o_stat_text\">View</span>\n"
-"                            <span class=\"o_stat_text\">3D Model</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -118,8 +105,6 @@ msgid ""
 "<span class=\"o_stat_text\">Voir avec</span>\n"
 "                                <span class=\"o_stat_text\">sous-modèles</span>"
 msgstr ""
-"<span class=\"o_stat_text\">View with</span>\n"
-"                                <span class=\"o_stat_text\">sub-models</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
@@ -127,8 +112,6 @@ msgid ""
 "<span class=\"o_stat_text\">Voir avec</span>\n"
 "                            <span class=\"o_stat_text\">sous-modèles</span>"
 msgstr ""
-"<span class=\"o_stat_text\">View with</span>\n"
-"                            <span class=\"o_stat_text\">sub-models</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -136,8 +119,6 @@ msgid ""
 "<span class=\"o_stat_text\">Équipement</span>\n"
 "                                <span class=\"o_stat_text\">créé auto.</span>"
 msgstr ""
-"<span class=\"o_stat_text\">Equipment</span>\n"
-"                                <span class=\"o_stat_text\">auto-created</span>"
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
@@ -145,48 +126,49 @@ msgid ""
 "<strong>Automatic creation:</strong> Select an equipment category to "
 "automatically create maintenance equipment linked to your 3D model."
 msgstr ""
-"<strong>Automatic creation:</strong> Select an equipment category to "
-"automatically create maintenance equipment linked to your 3D model."
+"<strong>Création automatique:</strong> Sélectionnez une catégorie "
+"d'équipement pour créer automatiquement un équipement de maintenance lié à "
+"votre modèle 3D."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Création automatique d'équipement</strong>"
-msgstr "<strong>Automatic Equipment Creation</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "<strong>Création d'utilisateur Odoo</strong>"
-msgstr "<strong>Odoo User Creation</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Extraction de sous-modèles</strong>"
-msgstr "<strong>Sub-model Extraction</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Fichier IFC BIM disponible:</strong>"
-msgstr "<strong>IFC BIM file available:</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Informations sur le fichier IFC</strong>"
-msgstr "<strong>IFC File Information</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Instructions pour l'importation de modèles 3D:</strong>"
-msgstr "<strong>Instructions for importing 3D models:</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "<strong>Login généré:</strong> basé sur prénom.nom"
-msgstr "<strong>Generated login:</strong> based on firstname.lastname"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
 msgid "<strong>Modèle 3D associé:</strong>"
-msgstr "<strong>Associated 3D Model:</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
@@ -194,15 +176,14 @@ msgid ""
 "<strong>New:</strong> Add IFC files to enrich your 3D models with technical "
 "and maintenance BIM data."
 msgstr ""
-"<strong>New:</strong> Add IFC files to enrich your 3D models with technical "
-"and maintenance BIM data."
+"<strong>Nouveau:</strong> Ajoutez des fichiers IFC pour enrichir vos modèles"
+" 3D avec des données BIM techniques et de maintenance."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid ""
 "<strong>Note :</strong> Sans email, un login sera généré automatiquement."
 msgstr ""
-"<strong>Note:</strong> Without email, a login will be generated automatically."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
@@ -210,7 +191,6 @@ msgid ""
 "<strong>Note:</strong> Aucun email n'est configuré. L'utilisateur devra se "
 "connecter avec son login généré."
 msgstr ""
-"<strong>Note:</strong> No email is configured. The user will need to login with their generated username."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -218,7 +198,6 @@ msgid ""
 "<strong>Note:</strong> Ces fichiers sont utilisés pour la visualisation 3D "
 "des équipements de maintenance."
 msgstr ""
-"<strong>Note:</strong> These files are used for 3D visualization of maintenance equipment."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -226,73 +205,72 @@ msgid ""
 "<strong>Nouveau:</strong> Pour les données BIM techniques, ajoutez un "
 "fichier IFC qui sera stocké à côté du modèle 3D de visualisation."
 msgstr ""
-"<strong>New:</strong> For technical BIM data, add an IFC file that will be stored alongside the 3D visualization model."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "<strong>Sélection de pièces spécifiques</strong>"
-msgstr "<strong>Specific Parts Selection</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "<strong>Sélectionnez d'abord un équipement</strong>"
-msgstr "<strong>First select an equipment</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "<strong>Utilisateur Odoo créé avec succès</strong>"
-msgstr "<strong>Odoo User created successfully</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Équipement auto-créé:</strong>"
-msgstr "<strong>Auto-created equipment:</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "<strong>Équipement créé automatiquement:</strong>"
-msgstr "<strong>Automatically created equipment:</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "<strong>Équipement sans modèle 3D</strong>"
-msgstr "<strong>Equipment without 3D model</strong>"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_cmms_api_access_log
 msgid "API Access Log"
-msgstr "API Access Log"
+msgstr "Journal d'accès API"
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_api_access_log
 msgid "API Access Logs"
-msgstr "API Access Logs"
+msgstr "Journals d'accès API"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__api_key
 msgid "API Key"
-msgstr "API Key"
+msgstr "Clé API"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_cmms_api_key
 msgid "API Key Management"
-msgstr "API Key Management"
+msgstr "Gestion de Clé API"
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_api_key
 #: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_keys
 msgid "API Keys"
-msgstr "API Keys"
+msgstr "Clés API"
 
 #. module: cmms_3d_models
 #: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_management
 msgid "API Management"
-msgstr "API Management"
+msgstr "Gestion d'API"
 
 #. module: cmms_3d_models
 #: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_logs
 msgid "Access Logs"
-msgstr "Access Logs"
+msgstr "Journals d'accès"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__active
@@ -300,63 +278,63 @@ msgstr "Access Logs"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__active
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__active
 msgid "Actif"
-msgstr "Active"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_search
 msgid "Actifs"
-msgstr "Active"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_needaction
 msgid "Action Needed"
-msgstr "Action Needed"
+msgstr "Action nécessaire"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__active
 msgid "Active"
-msgstr "Active"
+msgstr "Actif"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 msgid "Actives"
-msgstr "Active"
+msgstr "Actifs"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_ids
 msgid "Activities"
-msgstr "Activities"
+msgstr "Activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activity Exception Decoration"
+msgstr "Activité Exception Décoration"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_state
 msgid "Activity State"
-msgstr "Activity State"
+msgstr "État d'activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Activity Type Icon"
+msgstr "Icône de type d'activité"
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_maintenance_person
 msgid "Ajouter votre première personne de maintenance"
-msgstr "Add your first maintenance person"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__all_assigned_request_ids
 msgid "All Assigned Requests"
-msgstr "All Assigned Requests"
+msgstr "Toutes les demandes assignées"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__allowed_ips
 msgid "Allowed IPs"
-msgstr "Allowed IPs"
+msgstr "IP autorisées"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
@@ -364,88 +342,88 @@ msgstr "Allowed IPs"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_search
 msgid "Archivés"
-msgstr "Archived"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_inherit_required_fields
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Assignations"
-msgstr "Assignments"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__assigned_by_id
 msgid "Assigned By"
-msgstr "Assigned By"
+msgstr "Assigné par"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__assigned_person_id
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__person_id
 msgid "Assigned Person"
-msgstr "Assigned Person"
+msgstr "Personne assigné"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__assigned_person_ids
 msgid "Assigned Persons"
-msgstr "Assigned Persons"
+msgstr "Personnes assignées"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__assigned_user_id
 msgid "Assigned To"
-msgstr "Assigned To"
+msgstr "Assigné à"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__assigned_date
 msgid "Assignment Date"
-msgstr "Assignment Date"
+msgstr "Date d'affectation"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__assignment_ids
 msgid "Assignments"
-msgstr "Assignments"
+msgstr "Affectations"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_assign
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Assignées à plusieurs personnes"
-msgstr "Assigned to multiple persons"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_assign
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Assignées à une personne"
-msgstr "Assigned to one person"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__partner_id
 msgid "Associated Contact"
-msgstr "Associated Contact"
+msgstr "Contact associés"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__files_list
 msgid "Associated Files"
-msgstr "Associated Files"
+msgstr "Fichiers associés"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__user_id
 msgid "Associated User"
-msgstr "Associated User"
+msgstr "Utilisateur associés"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_attachment_count
 msgid "Attachment Count"
-msgstr "Attachment Count"
+msgstr "Nombre de pièces"
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/model3d.py:0
 #, python-format
 msgid "Aucun fichier IFC"
-msgstr "No IFC file"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_access_log
 msgid "Aucun log d'accès API"
-msgstr "No API access logs"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -454,145 +432,145 @@ msgstr "No API access logs"
 #: code:addons/cmms_3d_models/models/maintenance_equipment.py:0
 #, python-format
 msgid "Aucun modèle 3D"
-msgstr "No 3D model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_submodel3d
 msgid "Aucun sous-modèle trouvé"
-msgstr "No sub-models found"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/model3d.py:0
 #, python-format
 msgid "Aucun équipement auto-créé"
-msgstr "No auto-created equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Aujourd'hui"
-msgstr "Today"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__auto_created_equipment_id
 msgid "Automatically Created Equipment"
-msgstr "Automatically Created Equipment"
+msgstr "Créer automatiquement l'Equipement"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__auto_create_equipment
 msgid "Automatically create the equipments"
-msgstr "Automatically create the equipments"
+msgstr "Créer automatiquement les équipements"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__auto_equipment_id
 msgid "Automatically created equipment"
-msgstr "Automatically created equipment"
+msgstr "Équipement auto-créé"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__other
 msgid "Autre"
-msgstr "Other"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__intervention_other
 msgid "Autre intervention"
-msgstr "Other intervention"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__available
 msgid "Available"
-msgstr "Available"
+msgstr "Disponible"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Avec email"
-msgstr "With email"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Avec fichier IFC"
-msgstr "With IFC file"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Avec fichiers externes"
-msgstr "With external files"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_search_inherit_3d
 msgid "Avec modèle 3D"
-msgstr "With 3D model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Avec pièces spécifiques"
-msgstr "With specific parts"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Avec utilisateur"
-msgstr "With user"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Avec équipement auto-créé"
-msgstr "With auto-created equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_bin_filename
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__bin_filename
 msgid "Binary File Name"
-msgstr "Binary File Name"
+msgstr "Nom du fichier binaire"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__bin_path
 msgid "Binary File Path"
-msgstr "Binary File Path"
+msgstr "Chemin du fichier Binaire"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__bin_url
 msgid "Binary File URL"
-msgstr "Binary File URL"
+msgstr "URL du fichier Binaire"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__cmms_model3d__model_format__blend
 msgid "Blender"
-msgstr "Blender"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__can_assign_request
 msgid "Can Assign Requests"
-msgstr "Can Assign Requests"
+msgstr "Peut assigner des demandes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__can_create_request
 msgid "Can Create Requests"
-msgstr "Can Create Requests"
+msgstr "Peut créer des demandes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__can_manage_all_requests
 msgid "Can Manage All Requests"
-msgstr "Can Manage All Requests"
+msgstr "Peut gérer toutes les demandes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__can_validate_requests
 msgid "Can Validate Requests"
-msgstr "Can Validate Requests"
+msgstr "Peut valider des demandes"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Catégorie d'équipement"
-msgstr "Equipment category"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Catégorie d'équipement (optionnel)"
-msgstr "Equipment category (optional)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Ce modèle 3D possède des données BIM techniques au format IFC."
-msgstr "This 3D model has technical BIM data in IFC format."
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -602,25 +580,23 @@ msgid ""
 "Ce modèle n'a pas d'équipement créé automatiquement. Sélectionnez une "
 "catégorie d'équipement pour en créer un."
 msgstr ""
-"This model has no automatically created equipment. Select an equipment "
-"category to create one."
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/model3d.py:0
 #, python-format
 msgid "Ce modèle n'a pas de fichier IFC associé."
-msgstr "This model has no associated IFC file."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__certifications
 msgid "Certifications"
-msgstr "Certifications"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Certifications professionnelles..."
-msgstr "Professional certifications..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -628,8 +604,6 @@ msgid ""
 "Cet équipement a été créé automatiquement lors de la sélection de la "
 "catégorie d'équipement."
 msgstr ""
-"This equipment was created automatically when selecting the equipment "
-"category."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
@@ -637,7 +611,6 @@ msgid ""
 "Cet équipement dispose d'un modèle 3D pour la visualisation et la "
 "maintenance."
 msgstr ""
-"This equipment has a 3D model for visualization and maintenance."
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -646,24 +619,24 @@ msgstr ""
 #: code:addons/cmms_3d_models/models/maintenance_equipment.py:0
 #, python-format
 msgid "Cet équipement n'a pas de modèle 3D associé."
-msgstr "This equipment has no associated 3D model."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Cette personne dispose maintenant d'un compte utilisateur Odoo."
-msgstr "This person now has an Odoo user account."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Cette semaine"
-msgstr "This week"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
 #: code:addons/cmms_3d_models/static/src/xml/model_viewer_template.xml:0
 #, python-format
 msgid "Chargement du modèle 3D..."
-msgstr "Loading 3D model..."
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -671,83 +644,83 @@ msgstr "Loading 3D model..."
 #: code:addons/cmms_3d_models/static/src/xml/submodel_viewer_template.xml:0
 #, python-format
 msgid "Chargement du sous-modèle 3D..."
-msgstr "Loading 3D sub-model..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Cliquez sur \"Créer utilisateur\""
-msgstr "Click on \"Create User\""
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "Clé API"
-msgstr "API Key"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_tree
 msgid "Clés API"
-msgstr "API Keys"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Code de statut"
-msgstr "Status code"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__color
 msgid "Color"
-msgstr "Color"
+msgstr "Couleur"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_zip
 msgid "Complete Model (ZIP)"
-msgstr "Complete Model (ZIP)"
+msgstr "Modèle complet (ZIP)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__complete_name
 msgid "Complete Name"
-msgstr "Complete Name"
+msgstr "Nom Complet"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Compte utilisateur"
-msgstr "User account"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Compétences"
-msgstr "Skills"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Contact"
-msgstr "Contact"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__is_converted_from_blend
 msgid "Converted from Blender"
-msgstr "Converted from Blender"
+msgstr "Converti depuis Blender"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Convertis depuis Blender"
-msgstr "Converted from Blender"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__cost_center
 msgid "Cost Center"
-msgstr "Cost Center"
+msgstr "Centre de coûts"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_equipment__cost_center
 msgid "Cost center for this equipment"
-msgstr "Cost center for this equipment"
+msgstr "Centre de coûts pour cet équipement"
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
 msgid "Create your first 3D model"
-msgstr "Create your first 3D model"
+msgstr "Créer votre premier modèle 3D"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__create_uid
@@ -759,7 +732,7 @@ msgstr "Create your first 3D model"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__create_uid
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__create_uid
 msgid "Created by"
-msgstr "Created by"
+msgstr "Créé par"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__create_date
@@ -771,53 +744,55 @@ msgstr "Created by"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__create_date
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__create_date
 msgid "Created on"
-msgstr "Created on"
+msgstr "Créé le"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_tree
 msgid "Créer utilisateur"
-msgstr "Create user"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_maintenance_role
 msgid "Créer votre premier rôle de maintenance"
-msgstr "Create your first maintenance role"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_key
 msgid "Créer votre première clé API"
-msgstr "Create your first API key"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__schedule_date
 msgid "Date prévue"
-msgstr "Scheduled Date"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__schedule_date
 msgid "Date prévue pour effectuer la maintenance"
-msgstr "Scheduled date to perform maintenance"
+msgstr ""
+"Date prévue par l'équipe de maintenance pour effectuer la maintenance. "
+"Celle-ci ne doit pas être trop éloignée de la date de demande. "
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__request_id
 msgid "Demande"
-msgstr "Request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__request_id
 msgid "Demande de maintenance"
-msgstr "Maintenance Request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Demandes"
-msgstr "Requests"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__description
@@ -826,28 +801,28 @@ msgstr "Requests"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Description"
-msgstr "Description"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Description du modèle..."
-msgstr "Model description..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__description
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Description du problème"
-msgstr "Problem description"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Description du rôle..."
-msgstr "Role description..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__assigned_request_ids
 msgid "Directly Assigned Requests"
-msgstr "Directly Assigned Requests"
+msgstr "Demandes directement assignées"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__display_name
@@ -858,74 +833,74 @@ msgstr "Directly Assigned Requests"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__display_name
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__display_name
 msgid "Display Name"
-msgstr "Display Name"
+msgstr "Nom d’affichage"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Disponibilité"
-msgstr "Availability"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Disponibles"
-msgstr "Available"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Données BIM / IFC"
-msgstr "BIM / IFC Data"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_part__description
 msgid "Décrire le problème spécifique sur cette pièce (optionnel)"
-msgstr "Describe the specific problem on this part (optional)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Décrire le problème sur cette pièce..."
-msgstr "Describe the problem on this part..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__email
 msgid "Email"
-msgstr "Email"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__email
 msgid "Email optionnel pour créer un utilisateur Odoo"
-msgstr "Optional email to create an Odoo user"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__employee_number
 msgid "Employee Number"
-msgstr "Employee Number"
+msgstr "Numero d'employé"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__endpoint
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Endpoint"
-msgstr "Endpoint"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__equipment_ids
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__equipment_id
 msgid "Equipment"
-msgstr "Equipment"
+msgstr "Équipement"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__equipment_category_id
 msgid "Equipment Category"
-msgstr "Equipment Category"
+msgstr "Catégorie d’équipement"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__equipment_has_3d_model
 msgid "Equipment has 3D Model"
-msgstr "Equipment has 3D Model"
+msgstr "L'Équipement a un modèle 3D"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Erreur client"
-msgstr "Client error"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -933,7 +908,7 @@ msgstr "Client error"
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur lors de l'initialisation des contrôles: "
-msgstr "Error initializing controls: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -941,7 +916,7 @@ msgstr "Error initializing controls: "
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur lors de l'initialisation du renderer WebGL: "
-msgstr "Error initializing WebGL renderer: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -949,14 +924,14 @@ msgstr "Error initializing WebGL renderer: "
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur lors du chargement des dépendances 3D: "
-msgstr "Error loading 3D dependencies: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
 #: code:addons/cmms_3d_models/static/src/xml/model_viewer_template.xml:0
 #, python-format
 msgid "Erreur lors du chargement du modèle 3D"
-msgstr "Error loading 3D model"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -964,7 +939,7 @@ msgstr "Error loading 3D model"
 #: code:addons/cmms_3d_models/static/src/js/model_viewer.js:0
 #, python-format
 msgid "Erreur lors du chargement du modèle 3D: "
-msgstr "Error loading 3D model: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -972,7 +947,7 @@ msgstr "Error loading 3D model: "
 #: code:addons/cmms_3d_models/static/src/xml/submodel_viewer_template.xml:0
 #, python-format
 msgid "Erreur lors du chargement du sous-modèle 3D"
-msgstr "Error loading 3D sub-model"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -980,26 +955,26 @@ msgstr "Error loading 3D sub-model"
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur lors du chargement du sous-modèle 3D: "
-msgstr "Error loading 3D sub-model: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
 #: code:addons/cmms_3d_models/static/src/js/model_viewer.js:0
 #, python-format
 msgid "Erreur lors du traitement du modèle 3D: "
-msgstr "Error processing 3D model: "
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur lors du traitement du sous-modèle 3D: "
-msgstr "Error processing 3D sub-model: "
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Erreur serveur"
-msgstr "Server error"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -1007,7 +982,7 @@ msgstr "Server error"
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur: GLTFLoader n'est pas disponible"
-msgstr "Error: GLTFLoader is not available"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -1015,22 +990,22 @@ msgstr "Error: GLTFLoader is not available"
 #: code:addons/cmms_3d_models/static/src/js/submodel_viewer.js:0
 #, python-format
 msgid "Erreur: THREE.js n'est pas chargé correctement"
-msgstr "Error: THREE.js is not loaded correctly"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__error_message
 msgid "Error Message"
-msgstr "Error Message"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__expires_at
 msgid "Expires On"
-msgstr "Expires On"
+msgstr "Expire le"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 msgid "Expirées"
-msgstr "Expired"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -1039,12 +1014,12 @@ msgstr "Expired"
 #: code:addons/cmms_3d_models/static/src/xml/submodel_viewer_template.xml:0
 #, python-format
 msgid "Fermer"
-msgstr "Close"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Fichier Blender d'origine"
-msgstr "Original Blender file"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1052,77 +1027,76 @@ msgid ""
 "Fichier IFC (Industry Foundation Classes) contenant les données BIM "
 "techniques et de maintenance"
 msgstr ""
-"IFC file (Industry Foundation Classes) containing technical and maintenance BIM data"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Fichier IFC BIM (Données techniques)"
-msgstr "IFC BIM File (Technical Data)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Fichier principal (Visualisation 3D)"
-msgstr "Main File (3D Visualization)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Fichiers"
-msgstr "Files"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Fichiers du modèle 3D"
-msgstr "3D Model Files"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Fichiers supplémentaires"
-msgstr "Additional files"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_filename
 msgid "File Name"
-msgstr "File Name"
+msgstr "Nom du fichier"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__first_name
 msgid "First Name"
-msgstr "First Name"
+msgstr "Prénom"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_follower_ids
 msgid "Followers"
-msgstr "Followers"
+msgstr "Abonnés"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "Followers (Partners)"
+msgstr "Abonnés (Partenaire)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome icon e.g. fa-tasks"
+msgstr "Police de caractère icône e.g. fa-tasks"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Format"
-msgstr "Format"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "Formats supportés: 192.168.1.100, 10.0.0.0/24"
-msgstr "Supported formats: 192.168.1.100, 10.0.0.0/24"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__display_name
 msgid "Full Name"
-msgstr "Full Name"
+msgstr "Nom Complet"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__cmms_model3d__model_format__glb
 msgid "GLB"
-msgstr "GLB"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
@@ -1132,14 +1106,13 @@ msgstr "GLB"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_search
 msgid "Grouper par"
-msgstr "Group by"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_key
 msgid ""
 "Gérez les clés API pour l'accès à votre système de maintenance via API REST."
 msgstr ""
-"Manage API keys for access to your maintenance system via REST API."
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_maintenance_person
@@ -1147,48 +1120,46 @@ msgid ""
 "Gérez vos équipes de maintenance. Un utilisateur Odoo peut être créé avec juste le nom, prénom et rôle.\n"
 "                L'email est optionnel - si non fourni, un login sera généré automatiquement."
 msgstr ""
-"Manage your maintenance teams. An Odoo user can be created with just name, first name and role.\n"
-"                Email is optional - if not provided, a login will be generated automatically."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__method
 msgid "HTTP Method"
-msgstr "HTTP Method"
+msgstr "Méthode HTTP"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__has_3d_model
 msgid "Has 3D Model"
-msgstr "Has 3D Model"
+msgstr "A un modèle 3D"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__has_auto_equipment
 msgid "Has Auto-created Equipment"
-msgstr "Has Auto-created Equipment"
+msgstr "Contient un équipement auto-créé"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__has_external_files
 msgid "Has External Files"
-msgstr "Has External Files"
+msgstr "Contient des fichiers externes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__has_ifc_file
 msgid "Has IFC File"
-msgstr "Has IFC File"
+msgstr "Contient un fichier IFC"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__has_message
 msgid "Has Message"
-msgstr "Has Message"
+msgstr "A un messahe"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__submodels_json
 msgid "Hierarchical structure of sub-models in JSON format"
-msgstr "Hierarchical structure of sub-models in JSON format"
+msgstr "Structure hiérarchique des sous-modèles au format JSON"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__hire_date
 msgid "Hire Date"
-msgstr "Hire Date"
+msgstr "Date d'embauche"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__id
@@ -1200,42 +1171,42 @@ msgstr "Hire Date"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__id
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__submodel_relative_id
 msgid "ID relatif"
-msgstr "Relative ID"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
 msgid "IFC"
-msgstr "IFC"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_file
 msgid "IFC File (BIM)"
-msgstr "IFC File (BIM)"
+msgstr "Fichier IFC (BIM)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_filename
 msgid "IFC File Name"
-msgstr "IFC File Name"
+msgstr "Nom du fichier IFC"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_file_size
 msgid "IFC File Size (bytes)"
-msgstr "IFC File Size (bytes)"
+msgstr "Taille du fichier IFC (octets)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_url
 msgid "IFC File URL"
-msgstr "IFC File URL"
+msgstr "URL du fichier IFC"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_version
 msgid "IFC Version"
-msgstr "IFC Version"
+msgstr "Version IFC"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__ifc_file
@@ -1243,43 +1214,43 @@ msgid ""
 "IFC file (Industry Foundation Classes) containing technical and maintenance "
 "BIM data"
 msgstr ""
-"IFC file (Industry Foundation Classes) containing technical and maintenance "
-"BIM data"
+"Fichier IFC (Industry Foundation Classes) contenant les données BIM "
+"techniques et de maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__ifc_version
 msgid "IFC format version detected automatically"
-msgstr "IFC format version detected automatically"
+msgstr "Version de format IFC détectée automatiquement"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__ip_address
 msgid "IP Address"
-msgstr "IP Address"
+msgstr "Adresse IP"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "IPs autorisées"
-msgstr "Authorized IPs"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_exception_icon
 msgid "Icon"
-msgstr "Icon"
+msgstr "Icône"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Icon to indicate an exception activity."
+msgstr "Icône pour indiquée une activité d'exception"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr "If checked, new messages require your attention."
+msgstr "Si cette cas est cochée, de nouveaux messages requièrent votre attention"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__message_has_error
 msgid "If checked, some messages have a delivery error."
-msgstr "If checked, some messages have a delivery error."
+msgstr "Si cette case est cochée, certains messages ont un délai de livraison"
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
@@ -1287,8 +1258,8 @@ msgid ""
 "Import 3D models in Blender (.blend), glTF (.gltf), or GLB (.glb) format to "
 "use them with your maintenance equipment."
 msgstr ""
-"Import 3D models in Blender (.blend), glTF (.gltf), or GLB (.glb) format to "
-"use them with your maintenance equipment."
+"Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB "
+"(.glb) pour les utiliser avec vos équipements de maintenance."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__has_external_files
@@ -1296,87 +1267,87 @@ msgid ""
 "Indicates if this 3D model references external files like textures or "
 "binaries"
 msgstr ""
-"Indicates if this 3D model references external files like textures or "
-"binaries"
+"Indique si ce modèles 3D fait références à des fichier externes comme "
+"les textures ou les fichiers binaires"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__equipment_has_3d_model
 msgid "Indique si l'équipement sélectionné dispose d'un modèle 3D"
-msgstr "Indicates if the selected equipment has a 3D model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_kanban
 msgid "Indisponible"
-msgstr "Unavailable"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Informations"
-msgstr "Information"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Informations IFC"
-msgstr "IFC Information"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "Informations générales"
-msgstr "General information"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Informations professionnelles"
-msgstr "Professional information"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__inspection
 msgid "Inspection"
-msgstr "Inspection"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Instructions pour créer un utilisateur Odoo :"
-msgstr "Instructions to create an Odoo user:"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__intervention_type
 msgid "Intervention Type"
-msgstr "Intervention Type"
+msgstr "Type d'intervention"
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/maintenance_person.py:0
 #, python-format
 msgid "Invitation envoyée"
-msgstr "Invitation sent"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_is_follower
 msgid "Is Follower"
-msgstr "Is Follower"
+msgstr "Est un abonné "
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__is_submodel
 msgid "Is a Sub-model"
-msgstr "Is a Sub-model"
+msgstr "Est un sous-modèle"
 
 #. module: cmms_3d_models
 #: model:ir.model.constraint,message:cmms_3d_models.constraint_cmms_submodel3d_unique_relative_id_per_parent
 msgid "L'ID relatif doit être unique pour chaque modèle parent!"
-msgstr "The relative ID must be unique for each parent model!"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "L'email est optionnel"
-msgstr "Email is optional"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
 #, python-format
 msgid "L'équipement est obligatoire pour toute demande de maintenance."
-msgstr "Equipment is required for any maintenance request."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
@@ -1384,14 +1355,13 @@ msgid ""
 "L'équipement sélectionné n'a pas de modèle 3D associé, donc aucune pièce "
 "spécifique n'est disponible."
 msgstr ""
-"The selected equipment has no associated 3D model, so no specific parts are available."
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
 #, python-format
 msgid "La date prévue est obligatoire pour toute demande de maintenance."
-msgstr "The scheduled date is required for any maintenance request."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log____last_update
@@ -1403,7 +1373,7 @@ msgstr "The scheduled date is required for any maintenance request."
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part____last_update
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role____last_update
 msgid "Last Modified on"
-msgstr "Last Modified on"
+msgstr "Dernière modification le"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__write_uid
@@ -1415,7 +1385,7 @@ msgstr "Last Modified on"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__write_uid
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__write_uid
 msgid "Last Updated by"
-msgstr "Last Updated by"
+msgstr "Dernière mise à jour par"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__write_date
@@ -1427,12 +1397,12 @@ msgstr "Last Updated by"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__write_date
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__write_date
 msgid "Last Updated on"
-msgstr "Last Updated on"
+msgstr "Dernière mise à jour le"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__last_used
 msgid "Last Used"
-msgstr "Last Used"
+msgstr "Dernière Utilisation"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1440,14 +1410,13 @@ msgid ""
 "Le fichier IFC contient les données techniques et de maintenance au format "
 "BIM standardisé."
 msgstr ""
-"The IFC file contains technical and maintenance data in standardized BIM format."
 
 #. module: cmms_3d_models
 #. odoo-python
 #: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
 #, python-format
 msgid "Le responsable est obligatoire pour toute demande de maintenance."
-msgstr "The responsible person is required for any maintenance request."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_access_log
@@ -1455,7 +1424,6 @@ msgid ""
 "Les logs d'accès API apparaitront ici une fois que des requêtes auront été "
 "effectuées."
 msgstr ""
-"API access logs will appear here once requests have been made."
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_maintenance_role
@@ -1463,7 +1431,6 @@ msgid ""
 "Les rôles permettent de classifier les personnes selon leur niveau "
 "d'expertise et leurs responsabilités."
 msgstr ""
-"Roles allow classifying people according to their level of expertise and responsibilities."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1471,7 +1438,6 @@ msgid ""
 "Les sous-modèles sont extraits automatiquement lors de l'importation d'un "
 "modèle 3D au format glTF/GLB."
 msgstr ""
-"Sub-models are automatically extracted when importing a 3D model in glTF/GLB format."
 
 #. module: cmms_3d_models
 #: model_terms:ir.actions.act_window,help:cmms_3d_models.action_cmms_submodel3d
@@ -1479,114 +1445,113 @@ msgid ""
 "Les sous-modèles sont extraits automatiquement lors de l'importation d'un "
 "modèle 3D principal."
 msgstr ""
-"Sub-models are automatically extracted when importing a main 3D model."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__files_list
 msgid "List of files associated with this 3D model"
-msgstr "List of files associated with this 3D model"
+msgstr "Liste des fichiers associés à ce modèle 3D"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_tree
 msgid "Logs d'accès API"
-msgstr "API access logs"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__lubrification
 msgid "Lubrification"
-msgstr "Lubrication"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_main_attachment_id
 msgid "Main Attachment"
-msgstr "Main Attachment"
+msgstr "Attachement principal"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_equipment
 msgid "Maintenance Equipment"
-msgstr "Maintenance Equipment"
+msgstr "Equipement de maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_maintenance_person
 msgid "Maintenance Personnel"
-msgstr "Maintenance Personnel"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_request
 msgid "Maintenance Request"
-msgstr "Maintenance Request"
+msgstr "Demande de maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_request_assignment
 msgid "Maintenance Request Assignment"
-msgstr "Maintenance Request Assignment"
+msgstr "Assignation à une demande de maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_request_part
 msgid "Maintenance Request Part"
-msgstr "Maintenance Request Part"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.actions.act_window,name:cmms_3d_models.action_maintenance_role
 msgid "Maintenance Roles"
-msgstr "Maintenance Roles"
+msgstr "Rôles de Maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_team
 msgid "Maintenance Teams"
-msgstr "Maintenance Teams"
+msgstr "Equipes de maintenance"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__auto_created_equipment_id
 msgid "Maintenance equipment automatically created from this 3D model"
-msgstr "Maintenance equipment automatically created from this 3D model"
+msgstr "quipement de maintenance automatiquement créé à partir de ce modèle 3D"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_inherit_required_fields
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Marquer tous comme assignés principaux"
-msgstr "Mark all as primary assignees"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_has_error
 msgid "Message Delivery error"
-msgstr "Message Delivery error"
+msgstr "Erreur de distribution du message"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_ids
 msgid "Messages"
-msgstr "Messages"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__mobile
 msgid "Mobile"
-msgstr "Mobile"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_bin
 msgid "Model Binary (.bin)"
-msgstr "Model Binary (.bin)"
+msgstr "Modèle binaire (.bin)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_file
 msgid "Model File (glTF/GLB/Blend)"
-msgstr "Model File (glTF/GLB/Blend)"
+msgstr "Fichier du modèle (glTF/GLB/Blend)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_format
 msgid "Model Format"
-msgstr "Model Format"
+msgstr "Format du modèle"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_scale
 msgid "Model Scale"
-msgstr "Model Scale"
+msgstr "Echèlle du modèle"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_url
 msgid "Model URL"
-msgstr "Model URL"
+msgstr "URL du modèle"
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -1597,54 +1562,54 @@ msgstr "Model URL"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_search_inherit_3d
 #, python-format
 msgid "Modèle 3D"
-msgstr "3D Model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__parent_model3d_id
 msgid "Modèle 3D parent"
-msgstr "Parent 3D Model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__parent_id
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_search
 msgid "Modèle parent"
-msgstr "Parent Model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
 msgid "Modèles 3D"
-msgstr "3D Models"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "My Activity Deadline"
+msgstr "Date limite de mon activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__name
 msgid "Name"
-msgstr "Name"
+msgstr "Nom"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__nettoyage
 msgid "Nettoyage"
-msgstr "Cleaning"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "Next Activity Deadline"
+msgstr "Date limite de la prochaine activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_summary
 msgid "Next Activity Summary"
-msgstr "Next Activity Summary"
+msgstr "Résumé de la prochaine activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_type_id
 msgid "Next Activity Type"
-msgstr "Next Activity Type"
+msgstr "Type de la prochaine activité"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__name
@@ -1652,95 +1617,95 @@ msgstr "Next Activity Type"
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__name
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Nom"
-msgstr "Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "Nom de la clé API"
-msgstr "API Key Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__part_name
 msgid "Nom de la pièce"
-msgstr "Part Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Nom du modèle"
-msgstr "Model Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__name
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Nom du rôle"
-msgstr "Role Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Nom du sous-modèle"
-msgstr "Sub-model Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_assign
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Non assignées"
-msgstr "Not assigned"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Non disponibles"
-msgstr "Not available"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__notes
 msgid "Notes"
-msgstr "Notes"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_needaction_counter
 msgid "Number of Actions"
-msgstr "Number of Actions"
+msgstr "Nombre d'Actions"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__part_count
 msgid "Number of Parts"
-msgstr "Number of Parts"
+msgstr "Nombre de pièces"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__person_count
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_team__person_count
 msgid "Number of People"
-msgstr "Number of People"
+msgstr "Nombre de personnes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__request_count
 msgid "Number of Requests"
-msgstr "Number of Requests"
+msgstr "Nombre de demandes"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__message_has_error_counter
 msgid "Number of errors"
-msgstr "Number of errors"
+msgstr "Nombre d'erreurs"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr "Number of messages with delivery error"
+msgstr "Nombre de messages avec une erreur de distribution"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__child_count
 msgid "Number of sub-models"
-msgstr "Number of sub-models"
+msgstr "Nombre de sous-modeles"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__submodel_count
 msgid "Number of sub-models (new system)"
-msgstr "Number of sub-models (new system)"
+msgstr "Nombre de sous-modèles"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1748,7 +1713,6 @@ msgid ""
 "Option 1: Téléchargez le fichier principal glTF et son fichier binaire "
 "(.bin) séparément"
 msgstr ""
-"Option 1: Upload the main glTF file and its binary file (.bin) separately"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1756,72 +1720,71 @@ msgid ""
 "Option 2 (recommandée): Créez une archive ZIP contenant tous les fichiers du"
 " modèle et téléchargez-la"
 msgstr ""
-"Option 2 (recommended): Create a ZIP archive containing all model files and upload it"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__source_blend_file
 msgid "Original Blender file before conversion"
-msgstr "Original Blender file before conversion"
+msgstr "Fichier Blender original avant conversion"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Paramètres d'affichage"
-msgstr "Display Settings"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__parent_id
 msgid "Parent Equipment"
-msgstr "Parent Equipment"
+msgstr "Équipement parent"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__parent_id
 msgid "Parent model"
-msgstr "Parent model"
+msgstr "Modèle parent"
 
 #. module: cmms_3d_models
 #: model:ir.ui.menu,name:cmms_3d_models.menu_maintenance_persons
 msgid "People"
-msgstr "People"
+msgstr "Personnes"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Permissions"
-msgstr "Permissions"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Permissions de base"
-msgstr "Basic Permissions"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__assigned_person_role
 msgid "Person's Role"
-msgstr "Person's Role"
+msgstr "Rôle de la Personne"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_assign
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Personne assignée"
-msgstr "Assigned Person"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_person
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Personne de maintenance"
-msgstr "Maintenance Person"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__assigned_person_id
 msgid "Personne de maintenance assignée à cette demande"
-msgstr "Maintenance person assigned to this request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__person_ids
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_team_tree_inherit_persons
 msgid "Personnes"
-msgstr "People"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_kanban
@@ -1829,76 +1792,76 @@ msgstr "People"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_tree
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_team_form_inherit_persons
 msgid "Personnes de maintenance"
-msgstr "Maintenance Personnel"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_team__person_ids
 msgid "Personnes de maintenance membres de cette équipe"
-msgstr "Maintenance personnel members of this team"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_kanban
 msgid "Peut créer utilisateur"
-msgstr "Can create user"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Pièce"
-msgstr "Part"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__submodel_id
 msgid "Pièce/Sous-modèle"
-msgstr "Part/Sub-model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_tree_inherit_parts
 msgid "Pièces"
-msgstr "Parts"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__part_ids
 msgid "Pièces concernées"
-msgstr "Related Parts"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Pièces spécifiques à maintenir"
-msgstr "Specific parts to maintain"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Position"
-msgstr "Position"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
 msgid "Position 3D"
-msgstr "3D Position"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__position_x
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__position_x
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_position_x
 msgid "Position X"
-msgstr "Position X"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__position_y
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__position_y
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_position_y
 msgid "Position Y"
-msgstr "Position Y"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__position_z
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__position_z
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_position_z
 msgid "Position Z"
-msgstr "Position Z"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1906,7 +1869,6 @@ msgid ""
 "Pour extraire des sous-modèles, importez un fichier glTF/GLB contenant une "
 "hiérarchie de nœuds, ou un fichier Blender qui sera converti."
 msgstr ""
-"To extract sub-models, import a glTF/GLB file containing a node hierarchy, or a Blender file that will be converted."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -1914,26 +1876,23 @@ msgid ""
 "Pour les modèles Blender: téléchargez directement le fichier .blend, il sera"
 " automatiquement converti en GLB."
 msgstr ""
-"For Blender models: upload the .blend file directly, it will be automatically converted to GLB."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Pour les modèles avec textures/ressources externes (glTF):"
-msgstr "For models with external textures/resources (glTF):"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid ""
 "Pour les modèles glTF, téléchargez le fichier binaire (.bin) correspondant"
 msgstr ""
-"For glTF models, upload the corresponding binary file (.bin)"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid ""
 "Pour les modèles simples (GLB): téléchargez directement le fichier GLB."
 msgstr ""
-"For simple models (GLB): upload the GLB file directly."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
@@ -1941,153 +1900,152 @@ msgid ""
 "Pour pouvoir choisir des pièces spécifiques, vous devez d'abord sélectionner"
 " un équipement."
 msgstr ""
-"To be able to choose specific parts, you must first select an equipment."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__is_primary
 msgid "Primary Assignee"
-msgstr "Primary Assignee"
+msgstr "Assigné Principal"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__primary_assignment_id
 msgid "Primary Assignment"
-msgstr "Primary Assignment"
+msgstr "Assignement Principal"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__primary_assignment_ids
 msgid "Primary Assignments"
-msgstr "Primary Assignments"
+msgstr "Assignements Principal"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Préciser"
-msgstr "Specify"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_part__intervention_other
 msgid "Préciser le type d'intervention si 'Autre' est sélectionné"
-msgstr "Specify the type of intervention if 'Other' is selected"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Préciser le type d'intervention..."
-msgstr "Specify the type of intervention..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Prénom"
-msgstr "First Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__rate_limit
 msgid "Rate Limit (req/minute)"
-msgstr "Rate Limit (req/minute)"
+msgstr "Limite de débit (requêtes/minute)"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Rechercher une pièce..."
-msgstr "Search for a part..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__relative_id
 msgid "Relative ID"
-msgstr "Relative ID"
+msgstr "ID relatif"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__remplacement
 msgid "Remplacement"
-msgstr "Replacement"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Remplissez le nom, prénom et rôle (obligatoires)"
-msgstr "Fill in name, first name and role (required)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Renvoyer invitation"
-msgstr "Resend invitation"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__request_data
 msgid "Request Data"
-msgstr "Request Data"
+msgstr "Données de la requête"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request__user_id
 msgid "Responsable"
-msgstr "Responsible"
+msgstr "Technicien"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__response_time
 msgid "Response Time (ms)"
-msgstr "Response Time (ms)"
+msgstr "Temps de réponse (ms)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__activity_user_id
 msgid "Responsible User"
-msgstr "Responsible User"
+msgstr "Utilisateur responsable"
 
 #. module: cmms_3d_models
 #: model:ir.ui.menu,name:cmms_3d_models.menu_maintenance_roles
 msgid "Roles"
-msgstr "Roles"
+msgstr "Rôles"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Rotation"
-msgstr "Rotation"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_form_inherit_3d
 msgid "Rotation 3D"
-msgstr "3D Rotation"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__rotation_x
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__rotation_x
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_rotation_x
 msgid "Rotation X"
-msgstr "Rotation X"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__rotation_y
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__rotation_y
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_rotation_y
 msgid "Rotation Y"
-msgstr "Rotation Y"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__rotation_z
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__rotation_z
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__model3d_rotation_z
 msgid "Rotation Z"
-msgstr "Rotation Z"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__maintenance_request_part__intervention_type__reparation
 msgid "Réparation"
-msgstr "Repair"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__role_id
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__role_id
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Rôle"
-msgstr "Role"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model,name:cmms_3d_models.model_maintenance_role
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_form
 msgid "Rôle de maintenance"
-msgstr "Maintenance Role"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_tree
 msgid "Rôles de maintenance"
-msgstr "Maintenance Roles"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
@@ -2095,42 +2053,41 @@ msgid ""
 "Saisissez une adresse IP par ligne. Laissez vide pour autoriser toutes les "
 "IPs."
 msgstr ""
-"Enter one IP address per line. Leave empty to allow all IPs."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Sans email"
-msgstr "Without email"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Sans fichier IFC"
-msgstr "Without IFC file"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_equipment_search_inherit_3d
 msgid "Sans modèle 3D"
-msgstr "Without 3D model"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
 msgid "Sans pièces spécifiques"
-msgstr "Without specific parts"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Sans utilisateur"
-msgstr "Without user"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Sans équipement auto-créé"
-msgstr "Without auto-created equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__scale
 msgid "Scale"
-msgstr "Scale"
+msgstr "Échelle"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__equipment_category_id
@@ -2138,13 +2095,14 @@ msgid ""
 "Select a category to automatically create maintenance equipment linked to "
 "this 3D model. Works only for parent models (not sub-models)."
 msgstr ""
-"Select a category to automatically create maintenance equipment linked to "
-"this 3D model. Works only for parent models (not sub-models)."
+"Sélectionnez une catégorie pour créer automatiquement un équipement de "
+"maintenance lié à ce modèle 3D. Ne fonctionne que pour les modèles parents "
+"(non sous-modèles)."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_role__sequence
 msgid "Sequence"
-msgstr "Sequence"
+msgstr "Séquence"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
@@ -2152,27 +2110,26 @@ msgid ""
 "Si aucun email n'est fourni, un login sera généré automatiquement basé sur "
 "le nom/prénom."
 msgstr ""
-"If no email is provided, a login will be automatically generated based on name/first name."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_assignment__is_primary
 msgid "Si coché, cette personne est un assigné principal pour cette demande"
-msgstr "If checked, this person is a primary assignee for this request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__source_blend_file
 msgid "Source Blend File"
-msgstr "Source Blend File"
+msgstr "Fichier Blend source"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__source_blend_filename
 msgid "Source Blend Filename"
-msgstr "Source Blend Filename"
+msgstr "Nom du fichier Blend source"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
 msgid "Sous-modèle 3D"
-msgstr "3D Sub-model"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -2181,28 +2138,28 @@ msgstr "3D Sub-model"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #, python-format
 msgid "Sous-modèles"
-msgstr "Sub-models"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_tree
 msgid "Sous-modèles 3D"
-msgstr "3D Sub-models"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__specialties
 msgid "Specialties"
-msgstr "Specialties"
+msgstr "Spécialités"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Spécialités techniques..."
-msgstr "Technical specialties..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__status_code
-msgid "Status Code"
-msgstr "Status Code"
+msgid "Code d’état"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__activity_state
@@ -2212,106 +2169,106 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"Status based on activities\n"
-"Overdue: Due date is already passed\n"
-"Today: Activity date is today\n"
-"Planned: Future activities."
+"Statut basé sur les activités\n"
+"En retard : La date d’échéance est déjà dépassée\n"
+"Aujourd’hui : La date de l’activité est aujourd’hui\n"
+"Planifié : Activités futures"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_role_search
 msgid "Statut"
-msgstr "Status"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Statut utilisateur"
-msgstr "User status"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_equipment__child_ids
-msgid "Sub Equipments"
-msgstr "Sub Equipments"
+msgid "Sous-équipements"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__submodel_ids
 msgid "Submodels"
-msgstr "Submodels"
+msgstr "Sous-modèles"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__submodels_json
 msgid "Submodels (JSON)"
-msgstr "Submodels (JSON)"
+msgstr "Sous-modèles (JSON)"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 msgid "Succès"
-msgstr "Success"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
 msgid "Sécurité"
-msgstr "Security"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_part__submodel_id
 msgid "Sélectionner la pièce spécifique de l'équipement"
-msgstr "Select the specific part of the equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_part__intervention_type
 msgid "Sélectionner le type d'intervention à effectuer sur cette pièce"
-msgstr "Select the type of intervention to perform on this part"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__part_ids
 msgid "Sélectionner les pièces spécifiques à maintenir"
-msgstr "Select the specific parts to maintain"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Sélectionner un rôle..."
-msgstr "Select a role..."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__sequence
 msgid "Séquence"
-msgstr "Sequence"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Taille du fichier IFC en octets"
-msgstr "IFC file size in bytes"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_team__person_ids
 msgid "Team Members"
-msgstr "Team Members"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__thumbnail
 msgid "Thumbnail"
-msgstr "Thumbnail"
+msgstr "Vignette"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Type d'intervention"
-msgstr "Intervention Type"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_person__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Type of the exception activity on record."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
 msgid "Télécharger IFC"
-msgstr "Download IFC"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Télécharger le fichier IFC"
-msgstr "Download IFC file"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -2319,12 +2276,11 @@ msgid ""
 "Téléchargez une archive ZIP contenant le fichier principal (glTF/GLB/Blend) "
 "et tous les fichiers associés (textures .png/.jpg, binaires .bin)"
 msgstr ""
-"Upload a ZIP archive containing the main file (glTF/GLB/Blend) and all associated files (textures .png/.jpg, binaries .bin)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__phone
 msgid "Téléphone"
-msgstr "Phone"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
@@ -2332,19 +2288,17 @@ msgid ""
 "Un équipement de maintenance a été créé automatiquement et lié à ce modèle "
 "3D."
 msgstr ""
-"A maintenance equipment has been created automatically and linked to this 3D model."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid ""
 "Un équipement de maintenance sera créé automatiquement pour ce modèle 3D."
 msgstr ""
-"A maintenance equipment will be created automatically for this 3D model."
 
 #. module: cmms_3d_models
 #: model:ir.model.constraint,message:cmms_3d_models.constraint_maintenance_request_assignment_unique_request_person
 msgid "Une personne ne peut être assignée qu'une seule fois à une demande!"
-msgstr "A person can only be assigned once to a request!"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__model_zip
@@ -2352,8 +2306,8 @@ msgid ""
 "Upload a ZIP file containing the main glTF/GLB/Blend file and all associated"
 " files (textures, binaries, etc.)"
 msgstr ""
-"Upload a ZIP file containing the main glTF/GLB/Blend file and all associated"
-" files (textures, binaries, etc.)"
+"Téléchargez un fichier ZIP contenant le fichier principal glTF/GLB/Blend "
+"ainsi que tous les fichiers associés (textures, fichiers binaires, etc.)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__model_bin
@@ -2361,23 +2315,24 @@ msgid ""
 "Upload the binary file associated with the glTF model (if using separate "
 "files)"
 msgstr ""
-"Upload the binary file associated with the glTF model (if using separate "
-"files)"
+"Téléchargez le fichier binaire associé au modèle glTF (si vous utilisez des "
+"fichiers séparés)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__model_file
 msgid "Upload the main 3D model file (glTF, GLB, or Blend format)"
-msgstr "Upload the main 3D model file (glTF, GLB, or Blend format)"
+msgstr ""
+"Téléversez le fichier principal du modèle 3D (format glTF, GLB ou Blend)"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_key__usage_count
 msgid "Usage Count"
-msgstr "Usage Count"
+msgstr "Nombre d’utilisations"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__user_agent
 msgid "User Agent"
-msgstr "User Agent"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_api_access_log__user_id
@@ -2385,12 +2340,12 @@ msgstr "User Agent"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_access_log_search
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 msgid "Utilisateur"
-msgstr "User"
+msgstr "Agent utilisateur"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__user_id
 msgid "Utilisateur Odoo"
-msgstr "Odoo User"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -2398,40 +2353,40 @@ msgstr "Odoo User"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_kanban
 #, python-format
 msgid "Utilisateur créé"
-msgstr "User created"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__user_id
 msgid "Utilisateur responsable de cette demande"
-msgstr "User responsible for this request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__assigned_user_id
 msgid "Utilisateur spécifiquement assigné à cette demande de maintenance"
-msgstr "User specifically assigned to this maintenance request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_search
 msgid "Utilisées récemment"
-msgstr "Recently used"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 msgid "Version IFC"
-msgstr "IFC Version"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__viewer_url
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__viewer_url
 msgid "Viewer URL"
-msgstr "Viewer URL"
+msgstr "URL du visualiseur"
 
 #. module: cmms_3d_models
 #. odoo-javascript
 #: code:addons/cmms_3d_models/static/src/xml/model_viewer_template.xml:0
 #, python-format
 msgid "Visualiseur 3D"
-msgstr "3D Viewer"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-javascript
@@ -2439,29 +2394,29 @@ msgstr "3D Viewer"
 #: code:addons/cmms_3d_models/static/src/xml/submodel_viewer_template.xml:0
 #, python-format
 msgid "Visualiseur Sous-modèle 3D"
-msgstr "3D Sub-model Viewer"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_tree
 msgid "Voir demandes"
-msgstr "View requests"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_tree
 msgid "Voir en 3D"
-msgstr "View in 3D"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Voir l'équipement"
-msgstr "View equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
 msgid "Voir équipement"
-msgstr "View equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -2470,12 +2425,11 @@ msgstr "View equipment"
 msgid ""
 "Vous devez préciser le type d'intervention si vous sélectionnez 'Autre'."
 msgstr ""
-"You must specify the type of intervention if you select 'Other'."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
 msgid "Vous pouvez continuer sans sélectionner de pièces spécifiques."
-msgstr "You can continue without selecting specific parts."
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
@@ -2483,7 +2437,6 @@ msgid ""
 "Vous pouvez créer un utilisateur avec juste le nom, prénom et rôle. L'email "
 "est optionnel."
 msgstr ""
-"You can create a user with just name, first name and role. Email is optional."
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
@@ -2491,7 +2444,6 @@ msgid ""
 "Vous pouvez sélectionner les pièces précises de l'équipement qui nécessitent"
 " une intervention."
 msgstr ""
-"You can select the specific parts of the equipment that require intervention."
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_cmms_model3d__auto_create_equipment
@@ -2499,59 +2451,59 @@ msgid ""
 "Will automatically create maintenance equipment linked to each imported sub-"
 "model"
 msgstr ""
-"Will automatically create maintenance equipment linked to each imported sub-"
-"model"
+"Créera automatiquement des équipements de maintenance liés à chaque sous-"
+"modèle importé"
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__model_zip_filename
 msgid "ZIP File Name"
-msgstr "ZIP File Name"
+msgstr "Nom du fichier ZIP"
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_kanban
 msgid "demandes"
-msgstr "requests"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "exemple@domaine.com (optionnel)"
-msgstr "example@domain.com (optional)"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields.selection,name:cmms_3d_models.selection__cmms_model3d__model_format__gltf
 msgid "glTF"
-msgstr "glTF"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__gltf_filename
 msgid "glTF File Name"
-msgstr "glTF File Name"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__gltf_path
 msgid "glTF File Path"
-msgstr "glTF File Path"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__gltf_url
 msgid "glTF File URL"
-msgstr "glTF File URL"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_submodel3d__scale
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__submodel_scale
 msgid "Échelle"
-msgstr "Scale"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_search
 msgid "Équipe"
-msgstr "Team"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__equipment_id
 msgid "Équipement"
-msgstr "Equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #. odoo-python
@@ -2559,30 +2511,30 @@ msgstr "Equipment"
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
 #, python-format
 msgid "Équipement auto-créé"
-msgstr "Auto-created equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request__equipment_id
 #: model:ir.model.fields,help:cmms_3d_models.field_maintenance_request_part__equipment_id
 msgid "Équipement concerné par cette demande de maintenance"
-msgstr "Equipment concerned by this maintenance request"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Équipement de maintenance"
-msgstr "Maintenance Equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
 msgid "Équipements liés"
-msgstr "Linked Equipment"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model_terms:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
 msgid "Équipes"
-msgstr "Teams"
+msgstr ""
 
 #. module: cmms_3d_models
 #: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_person__team_ids
 msgid "Équipes de maintenance"
-msgstr "Maintenance Teams"
+msgstr ""
