@@ -968,3 +968,300 @@ msgstr "Este modelo não tem equipamento criado automaticamente. Selecione uma c
 #: code:addons/cmms_3d_models/models/model3d.py:0
 msgid "Équipement auto-créé"
 msgstr "Equipamento Criado Automaticamente"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichier IFC BIM (Données techniques)"
+msgstr "Arquivo IFC BIM (Dados técnicos)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance"
+msgstr "Arquivo IFC (Industry Foundation Classes) contendo dados técnicos e de manutenção BIM"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Données BIM / IFC"
+msgstr "Dados BIM / IFC"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Informations sur le fichier IFC"
+msgstr "Informações do arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Le fichier IFC contient les données techniques et de maintenance au format BIM standardisé."
+msgstr "O arquivo IFC contém dados técnicos e de manutenção no formato BIM padronizado."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Télécharger le fichier IFC"
+msgstr "Baixar arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichier IFC BIM disponible:"
+msgstr "Arquivo IFC BIM disponível:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Ce modèle 3D possède des données BIM techniques au format IFC."
+msgstr "Este modelo 3D possui dados técnicos BIM no formato IFC."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Nouveau: Ajoutez des fichiers IFC pour enrichir vos modèles 3D avec des données BIM techniques et de maintenance."
+msgstr "Novo: Adicione arquivos IFC para enriquecer seus modelos 3D com dados técnicos e de manutenção BIM."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour les données BIM techniques, ajoutez un fichier IFC qui sera stocké à côté du modèle 3D de visualisation."
+msgstr "Para dados técnicos BIM, adicione um arquivo IFC que será armazenado junto ao modelo 3D de visualização."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Télécharger IFC BIM"
+msgstr "Baixar IFC BIM"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Taille du fichier IFC en octets"
+msgstr "Tamanho do arquivo IFC em bytes"
+
+# Messages API REST
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Authentication required"
+msgstr "Autenticação necessária"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Invalid credentials"
+msgstr "Credenciais inválidas"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Authentication failed"
+msgstr "Falha na autenticação"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Invalid authentication format"
+msgstr "Formato de autenticação inválido"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Request not found"
+msgstr "Solicitação não encontrada"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Equipment not found"
+msgstr "Equipamento não encontrado"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Requests retrieved successfully"
+msgstr "Solicitações recuperadas com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Equipment retrieved successfully"
+msgstr "Equipamento recuperado com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Request created successfully"
+msgstr "Solicitação criada com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Request updated successfully"
+msgstr "Solicitação atualizada com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Request archived successfully"
+msgstr "Solicitação arquivada com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "User profile retrieved successfully"
+msgstr "Perfil de usuário recuperado com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Profile updated successfully"
+msgstr "Perfil atualizado com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Dashboard data retrieved successfully"
+msgstr "Dados do painel recuperados com sucesso"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Invalid JSON data"
+msgstr "Dados JSON inválidos"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Email availability checked"
+msgstr "Disponibilidade de e-mail verificada"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Available"
+msgstr "Disponível"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/controllers/api_rest.py:0
+msgid "Email already in use"
+msgstr "E-mail já em uso"
+
+# Champs de modèles
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_file
+msgid "Fichier IFC (BIM)"
+msgstr "Arquivo IFC (BIM)"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_filename
+msgid "Nom du fichier IFC"
+msgstr "Nome do arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_url
+msgid "URL du fichier IFC"
+msgstr "URL do arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__has_ifc_file
+msgid "Possède un fichier IFC"
+msgstr "Possui um arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_version
+msgid "Version IFC"
+msgstr "Versão IFC"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__ifc_file_size
+msgid "Taille fichier IFC (octets)"
+msgstr "Tamanho do arquivo IFC (bytes)"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__equipment_category_id
+msgid "Catégorie d'équipement"
+msgstr "Categoria de equipamento"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__auto_created_equipment_id
+msgid "Équipement créé automatiquement"
+msgstr "Equipamento criado automaticamente"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_cmms_model3d__has_auto_equipment
+msgid "A un équipement auto-créé"
+msgstr "Possui equipamento criado automaticamente"
+
+# Assignations multiples
+#. module: cmms_3d_models
+#: model:ir.model,name:cmms_3d_models.model_maintenance_request_assignment
+msgid "Assignation de demande de maintenance"
+msgstr "Atribuição de solicitação de manutenção"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__person_id
+msgid "Personne assignée"
+msgstr "Pessoa atribuída"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__user_id
+msgid "Utilisateur associé"
+msgstr "Usuário associado"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__assigned_date
+msgid "Date d'assignation"
+msgstr "Data de atribuição"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__assigned_by_id
+msgid "Assigné par"
+msgstr "Atribuído por"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__is_primary
+msgid "Assigné principal"
+msgstr "Responsável principal"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_assignment__notes
+msgid "Notes"
+msgstr "Notas"
+
+# Messages d'erreur spécifiques
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_request_assignment.py:0
+msgid "Une personne ne peut être assignée qu'une seule fois à une demande!"
+msgstr "Uma pessoa só pode ser atribuída uma vez por solicitação!"
+
+# Sous-modèles
+#. module: cmms_3d_models
+#: model:ir.model,name:cmms_3d_models.model_cmms_submodel3d
+msgid "Sous-modèle 3D"
+msgstr "Submodelo 3D"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
+msgid "Sous-modèle 3D"
+msgstr "Submodelo 3D"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_submodel3d_form
+msgid "Visualiser Sous-modèle 3D"
+msgstr "Visualizar submodelo 3D"
+
+# Messages de validation personnalisés
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Erreur lors de la sauvegarde du modèle 3D:"
+msgstr "Erro ao salvar o modelo 3D:"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Erreur lors de la conversion du fichier Blender:"
+msgstr "Erro ao converter arquivo Blender:"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Erreur lors de l'extraction de l'archive ZIP:"
+msgstr "Erro ao extrair o arquivo ZIP:"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Erreur lors de la sauvegarde du fichier IFC:"
+msgstr "Erro ao salvar o arquivo IFC:"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Version inconnue"
+msgstr "Versão desconhecida"
+
+# Statuts et filtres
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Avec fichier IFC"
+msgstr "Com arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Sans fichier IFC"
+msgstr "Sem arquivo IFC"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Version IFC"
+msgstr "Versão IFC"
