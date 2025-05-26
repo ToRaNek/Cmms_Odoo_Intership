@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- custom_addons/cmms_3d_models/views/model3d_views.xml - Version avec support IFC -->
 <odoo>
     <!-- Form View -->
     <record id="view_cmms_model3d_form" model="ir.ui.view">
@@ -30,6 +31,15 @@
                                 class="oe_stat_button" icon="fa-sitemap">
                             <field name="submodel_count" string="Sous-modèles" widget="statinfo"/>
                         </button>
+                        <!-- NOUVEAU BOUTON POUR TÉLÉCHARGER LE FICHIER IFC -->
+                        <button name="action_download_ifc" type="object"
+                                class="oe_stat_button" icon="fa-building"
+                                attrs="{'invisible': [('has_ifc_file', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Télécharger</span>
+                                <span class="o_stat_text">IFC BIM</span>
+                            </div>
+                        </button>
                         <!-- NOUVEAU BOUTON POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ -->
                         <button name="action_view_auto_equipment" type="object"
                                 class="oe_stat_button" icon="fa-wrench"
@@ -41,11 +51,22 @@
                         </button>
                     </div>
 
+                    <!-- NOUVELLE ALERTE POUR INFORMER SUR LE FICHIER IFC -->
+                    <div class="alert alert-info" role="alert"
+                         attrs="{'invisible': [('has_ifc_file', '=', False)]}">
+                        <p>
+                            <strong>Fichier IFC BIM disponible:</strong>
+                            <field name="ifc_filename" readonly="1" class="oe_inline"/>
+                            (<field name="ifc_version" readonly="1" class="oe_inline"/>)
+                        </p>
+                        <p>Ce modèle 3D possède des données BIM techniques au format IFC.</p>
+                    </div>
+
                     <!-- NOUVELLE ALERTE POUR INFORMER SUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT -->
                     <div class="alert alert-success" role="alert"
                          attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
                         <p>
-                            <strong>Équipement auto-créé:</strong> 
+                            <strong>Équipement auto-créé:</strong>
                             <field name="auto_created_equipment_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
                         </p>
                         <p>Un équipement de maintenance a été créé automatiquement et lié à ce modèle 3D.</p>
@@ -67,10 +88,10 @@
                     <!-- NOUVEAU GROUPE POUR LA CATÉGORIE D'ÉQUIPEMENT -->
                     <group>
                         <group string="Équipement de maintenance">
-                            <field name="equipment_category_id" 
+                            <field name="equipment_category_id"
                                    options="{'no_create': True, 'no_open': True}"
                                    help="Catégorie d'équipement (optionnel)"/>
-                            <field name="auto_created_equipment_id" readonly="1" 
+                            <field name="auto_created_equipment_id" readonly="1"
                                    attrs="{'invisible': [('auto_created_equipment_id', '=', False)]}"
                                    options="{'no_open': True}"/>
                             <field name="has_auto_equipment" invisible="1"/>
@@ -90,12 +111,13 @@
                                             <li>Option 2 (recommandée): Créez une archive ZIP contenant tous les fichiers du modèle et téléchargez-la</li>
                                         </ul>
                                     </li>
+                                    <li><strong>Nouveau:</strong> Pour les données BIM techniques, ajoutez un fichier IFC qui sera stocké à côté du modèle 3D de visualisation.</li>
                                 </ul>
                                 <p><strong>Note:</strong> Ces fichiers sont utilisés pour la visualisation 3D des équipements de maintenance.</p>
                             </div>
 
                             <group>
-                                <group string="Fichier principal">
+                                <group string="Fichier principal (Visualisation 3D)">
                                     <field name="model_file" filename="model_filename"/>
                                     <field name="model_filename" invisible="1"/>
                                     <field name="model_format"/>
@@ -110,6 +132,21 @@
                                            help="Téléchargez une archive ZIP contenant le fichier principal (glTF/GLB/Blend) et tous les fichiers associés (textures .png/.jpg, binaires .bin)"/>
                                     <field name="model_zip_filename" invisible="1"/>
                                 </group>
+                            </group>
+
+                            <!-- NOUVEAU GROUPE POUR LES FICHIERS IFC -->
+                            <group string="Fichier IFC BIM (Données techniques)">
+                                <field name="ifc_file" filename="ifc_filename"
+                                       help="Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance"/>
+                                <field name="ifc_filename" invisible="1"/>
+                                <field name="ifc_url" widget="url" readonly="1"
+                                       attrs="{'invisible': [('ifc_url', '=', False)]}"/>
+                                <field name="has_ifc_file" invisible="1"/>
+                                <field name="ifc_version" readonly="1"
+                                       attrs="{'invisible': [('ifc_version', '=', False)]}"/>
+                                <field name="ifc_file_size" readonly="1"
+                                       attrs="{'invisible': [('ifc_file_size', '=', 0)]}"
+                                       help="Taille du fichier IFC en octets"/>
                             </group>
 
                             <group>
@@ -140,6 +177,25 @@
 
                         <page string="Description">
                             <field name="description" placeholder="Description du modèle..."/>
+                        </page>
+
+                        <page string="Données BIM / IFC" attrs="{'invisible': [('has_ifc_file', '=', False)]}">
+                            <div class="alert alert-info" role="alert">
+                                <p><strong>Informations sur le fichier IFC</strong></p>
+                                <p>Le fichier IFC contient les données techniques et de maintenance au format BIM standardisé.</p>
+                            </div>
+                            <group>
+                                <group string="Informations IFC">
+                                    <field name="ifc_filename" readonly="1"/>
+                                    <field name="ifc_version" readonly="1"/>
+                                    <field name="ifc_file_size" readonly="1"/>
+                                    <field name="ifc_url" widget="url" readonly="1"/>
+                                </group>
+                            </group>
+                            <div class="mt16">
+                                <button name="action_download_ifc" type="object"
+                                        string="Télécharger le fichier IFC" class="btn btn-primary"/>
+                            </div>
                         </page>
 
                         <page string="Sous-modèles" name="submodels_page">
@@ -173,7 +229,7 @@
                                     <field name="location"/>
                                 </tree>
                             </field>
-                            
+
                             <!-- NOUVELLE SECTION POUR L'ÉQUIPEMENT AUTO-CRÉÉ -->
                             <div class="alert alert-success" role="alert"
                                  attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
@@ -182,7 +238,7 @@
                                     <field name="auto_created_equipment_id" readonly="1" class="oe_inline" options="{'no_open': True}"/>
                                 </p>
                                 <p>Cet équipement a été créé automatiquement lors de la sélection de la catégorie d'équipement.</p>
-                                <button name="action_view_auto_equipment" type="object" 
+                                <button name="action_view_auto_equipment" type="object"
                                         string="Voir l'équipement" class="btn btn-primary"/>
                             </div>
                         </page>
@@ -200,12 +256,17 @@
             <tree string="Modèles 3D">
                 <field name="name"/>
                 <field name="model_format"/>
+                <field name="has_ifc_file" widget="boolean_icon" string="IFC"/>
+                <field name="ifc_version" attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
                 <field name="equipment_category_id"/>
                 <field name="has_auto_equipment" widget="boolean_icon"/>
                 <field name="has_external_files"/>
                 <field name="active"/>
                 <button name="action_view_3d" type="object"
                         string="Voir en 3D" class="btn-sm btn-primary"/>
+                <button name="action_download_ifc" type="object"
+                        string="Télécharger IFC" class="btn-sm btn-info"
+                        attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
                 <button name="action_view_auto_equipment" type="object"
                         string="Voir équipement" class="btn-sm btn-success"
                         attrs="{'invisible': [('has_auto_equipment', '=', False)]}"/>
@@ -222,18 +283,24 @@
                 <field name="name"/>
                 <field name="model_format"/>
                 <field name="equipment_category_id"/>
-                <filter string="Avec équipement auto-créé" name="has_auto_equipment" 
+                <field name="ifc_version"/>
+                <filter string="Avec fichier IFC" name="has_ifc"
+                        domain="[('has_ifc_file', '=', True)]"/>
+                <filter string="Sans fichier IFC" name="no_ifc"
+                        domain="[('has_ifc_file', '=', False)]"/>
+                <filter string="Avec équipement auto-créé" name="has_auto_equipment"
                         domain="[('auto_created_equipment_id', '!=', False)]"/>
-                <filter string="Sans équipement auto-créé" name="no_auto_equipment" 
+                <filter string="Sans équipement auto-créé" name="no_auto_equipment"
                         domain="[('auto_created_equipment_id', '=', False)]"/>
                 <filter string="Avec fichiers externes" name="has_external" domain="[('has_external_files', '=', True)]"/>
                 <filter string="Convertis depuis Blender" name="from_blend" domain="[('is_converted_from_blend', '=', True)]"/>
                 <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
-                    <filter string="Catégorie d'équipement" name="group_by_equipment_category" 
+                    <filter string="Version IFC" name="group_by_ifc_version" context="{'group_by': 'ifc_version'}"/>
+                    <filter string="Catégorie d'équipement" name="group_by_equipment_category"
                             context="{'group_by': 'equipment_category_id'}"/>
-                    <filter string="Équipement auto-créé" name="group_by_auto_equipment" 
+                    <filter string="Équipement auto-créé" name="group_by_auto_equipment"
                             context="{'group_by': 'auto_created_equipment_id'}"/>
                 </group>
             </search>
@@ -254,7 +321,10 @@
                 Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
             </p>
             <p>
-                <strong>Nouveau:</strong> Sélectionnez une catégorie d'équipement pour créer automatiquement un équipement de maintenance lié à votre modèle 3D.
+                <strong>Nouveau:</strong> Ajoutez des fichiers IFC pour enrichir vos modèles 3D avec des données BIM techniques et de maintenance.
+            </p>
+            <p>
+                <strong>Création automatique:</strong> Sélectionnez une catégorie d'équipement pour créer automatiquement un équipement de maintenance lié à votre modèle 3D.
             </p>
         </field>
     </record>

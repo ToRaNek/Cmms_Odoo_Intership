@@ -1,0 +1,970 @@
+# custom_addons/cmms_3d_models/i18n/en.po
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * cmms_3d_models
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-27 10:00+0000\n"
+"PO-Revision-Date: 2025-01-27 10:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_model3d
+msgid "Modèles 3D"
+msgstr "3D Models"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_model3d
+msgid "Modèles 3D"
+msgstr "3D Models"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Modèle 3D"
+msgstr "3D Model"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Visualiser"
+msgstr "View"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Voir avec"
+msgstr "View with"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "sous-modèles"
+msgstr "sub-models"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Sous-modèles"
+msgstr "Sub-models"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Équipement"
+msgstr "Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "créé auto."
+msgstr "auto-created"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Équipement auto-créé:"
+msgstr "Auto-created equipment:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Un équipement de maintenance a été créé automatiquement et lié à ce modèle 3D."
+msgstr "A maintenance equipment has been automatically created and linked to this 3D model."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Création automatique d'équipement"
+msgstr "Automatic equipment creation"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Un équipement de maintenance sera créé automatiquement pour ce modèle 3D."
+msgstr "A maintenance equipment will be automatically created for this 3D model."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Note: Vous pouvez optionnellement sélectionner une catégorie d'équipement ci-dessous."
+msgstr "Note: You can optionally select an equipment category below."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Équipement de maintenance"
+msgstr "Maintenance Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Catégorie d'équipement (optionnel)"
+msgstr "Equipment category (optional)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichiers du modèle 3D"
+msgstr "3D Model Files"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Instructions pour l'importation de modèles 3D:"
+msgstr "Instructions for importing 3D models:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour les modèles Blender: téléchargez directement le fichier .blend, il sera automatiquement converti en GLB."
+msgstr "For Blender models: upload the .blend file directly, it will be automatically converted to GLB."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour les modèles simples (GLB): téléchargez directement le fichier GLB."
+msgstr "For simple models (GLB): upload the GLB file directly."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour les modèles avec textures/ressources externes (glTF):"
+msgstr "For models with textures/external resources (glTF):"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Option 1: Téléchargez le fichier principal glTF et son fichier binaire (.bin) séparément"
+msgstr "Option 1: Upload the main glTF file and its binary file (.bin) separately"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Option 2 (recommandée): Créez une archive ZIP contenant tous les fichiers du modèle et téléchargez-la"
+msgstr "Option 2 (recommended): Create a ZIP archive containing all model files and upload it"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Note:"
+msgstr "Note:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Ces fichiers sont utilisés pour la visualisation 3D des équipements de maintenance."
+msgstr "These files are used for 3D visualization of maintenance equipment."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichier principal"
+msgstr "Main File"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichiers supplémentaires"
+msgstr "Additional Files"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour les modèles glTF, téléchargez le fichier binaire (.bin) correspondant"
+msgstr "For glTF models, upload the corresponding binary file (.bin)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Téléchargez une archive ZIP contenant le fichier principal (glTF/GLB/Blend) et tous les fichiers associés (textures .png/.jpg, binaires .bin)"
+msgstr "Upload a ZIP archive containing the main file (glTF/GLB/Blend) and all associated files (textures .png/.jpg, binaries .bin)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Fichier Blender d'origine"
+msgstr "Original Blender File"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Paramètres d'affichage"
+msgstr "Display Parameters"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Position"
+msgstr "Position"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Rotation"
+msgstr "Rotation"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Description"
+msgstr "Description"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Description du modèle..."
+msgstr "Model description..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Extraction de sous-modèles"
+msgstr "Sub-model Extraction"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Les sous-modèles sont extraits automatiquement lors de l'importation d'un modèle 3D au format glTF/GLB."
+msgstr "Sub-models are automatically extracted when importing a 3D model in glTF/GLB format."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Pour extraire des sous-modèles, importez un fichier glTF/GLB contenant une hiérarchie de nœuds, ou un fichier Blender qui sera converti."
+msgstr "To extract sub-models, import a glTF/GLB file containing a node hierarchy, or a Blender file that will be converted."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Équipements liés"
+msgstr "Linked Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Équipement créé automatiquement:"
+msgstr "Automatically created equipment:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Cet équipement a été créé automatiquement lors de la sélection de la catégorie d'équipement."
+msgstr "This equipment has been automatically created when selecting the equipment category."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_form
+msgid "Voir l'équipement"
+msgstr "View Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
+msgid "Voir en 3D"
+msgstr "View in 3D"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_tree
+msgid "Voir équipement"
+msgstr "View Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Avec équipement auto-créé"
+msgstr "With auto-created equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Sans équipement auto-créé"
+msgstr "Without auto-created equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Avec fichiers externes"
+msgstr "With external files"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Convertis depuis Blender"
+msgstr "Converted from Blender"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Archivés"
+msgstr "Archived"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Grouper par"
+msgstr "Group by"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Format"
+msgstr "Format"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Catégorie d'équipement"
+msgstr "Equipment Category"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_model3d_search
+msgid "Équipement auto-créé"
+msgstr "Auto-created Equipment"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
+msgid "Créer votre premier modèle 3D"
+msgstr "Create your first 3D model"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
+msgid "Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance."
+msgstr "Import 3D models in Blender (.blend), glTF (.gltf) or GLB (.glb) format to use them with your maintenance equipment."
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
+msgid "Nouveau:"
+msgstr "New:"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_model3d
+msgid "Sélectionnez une catégorie d'équipement pour créer automatiquement un équipement de maintenance lié à votre modèle 3D."
+msgstr "Select an equipment category to automatically create a maintenance equipment linked to your 3D model."
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_maintenance_persons
+msgid "Personnes"
+msgstr "People"
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_maintenance_roles
+msgid "Rôles"
+msgstr "Roles"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,name:cmms_3d_models.action_maintenance_person
+msgid "Personnes de maintenance"
+msgstr "Maintenance Personnel"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,name:cmms_3d_models.action_maintenance_role
+msgid "Rôles de maintenance"
+msgstr "Maintenance Roles"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Personne de maintenance"
+msgstr "Maintenance Person"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Créer utilisateur"
+msgstr "Create User"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Renvoyer invitation"
+msgstr "Resend Invitation"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Demandes"
+msgstr "Requests"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Sélectionner un rôle..."
+msgstr "Select a role..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Création d'utilisateur Odoo"
+msgstr "Odoo User Creation"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Vous pouvez créer un utilisateur avec juste le nom, prénom et rôle. L'email est optionnel."
+msgstr "You can create a user with just name, first name and role. Email is optional."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Si aucun email n'est fourni, un login sera généré automatiquement basé sur le nom/prénom."
+msgstr "If no email is provided, a login will be automatically generated based on name/first name."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Utilisateur Odoo créé avec succès"
+msgstr "Odoo User Created Successfully"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Cette personne dispose maintenant d'un compte utilisateur Odoo."
+msgstr "This person now has an Odoo user account."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Aucun email n'est configuré. L'utilisateur devra se connecter avec son login généré."
+msgstr "No email is configured. The user will need to login with their generated login."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Contact"
+msgstr "Contact"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "exemple@domaine.com (optionnel)"
+msgstr "example@domain.com (optional)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Informations professionnelles"
+msgstr "Professional Information"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Numéro d'employé"
+msgstr "Employee Number"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Date d'embauche"
+msgstr "Hire Date"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Compte utilisateur"
+msgstr "User Account"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Utilisateur Odoo"
+msgstr "Odoo User"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Contact associé"
+msgstr "Associated Contact"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Login généré:"
+msgstr "Generated Login:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "basé sur prénom.nom"
+msgstr "based on firstname.lastname"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "L'utilisateur pourra se connecter avec ce login"
+msgstr "The user will be able to login with this login"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Instructions pour créer un utilisateur Odoo :"
+msgstr "Instructions to create an Odoo user:"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Remplissez le nom, prénom et rôle (obligatoires)"
+msgstr "Fill in name, first name and role (required)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "L'email est optionnel"
+msgstr "Email is optional"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Cliquez sur \"Créer utilisateur\""
+msgstr "Click on \"Create User\""
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Sans email, un login sera généré automatiquement."
+msgstr "Without email, a login will be generated automatically."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Compétences"
+msgstr "Skills"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Spécialités"
+msgstr "Specialties"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Spécialités techniques..."
+msgstr "Technical specialties..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Certifications"
+msgstr "Certifications"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Certifications professionnelles..."
+msgstr "Professional certifications..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_person_form
+msgid "Équipes"
+msgstr "Teams"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Assignations"
+msgstr "Assignments"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Marquer tous comme assignés principaux"
+msgstr "Mark all as primary assignees"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Personne assignée"
+msgstr "Assigned Person"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Rôle"
+msgstr "Role"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Utilisateur associé"
+msgstr "Associated User"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Date d'assignation"
+msgstr "Assignment Date"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Assigné par"
+msgstr "Assigned By"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Assigné principal"
+msgstr "Primary Assignee"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Notes"
+msgstr "Notes"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Pièces spécifiques à maintenir"
+msgstr "Specific Parts to Maintain"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Sélection de pièces spécifiques"
+msgstr "Specific Parts Selection"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Vous pouvez sélectionner les pièces précises de l'équipement qui nécessitent une intervention."
+msgstr "You can select the specific parts of the equipment that require intervention."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Les pièces disponibles correspondent aux sous-modèles 3D de l'équipement sélectionné."
+msgstr "Available parts correspond to the 3D sub-models of the selected equipment."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Sélectionnez d'abord un équipement"
+msgstr "First select an equipment"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Pour pouvoir choisir des pièces spécifiques, vous devez d'abord sélectionner un équipement."
+msgstr "To be able to choose specific parts, you must first select equipment."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Pièce"
+msgstr "Part"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Rechercher une pièce..."
+msgstr "Search for a part..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Type d'intervention"
+msgstr "Intervention Type"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Préciser"
+msgstr "Specify"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Préciser le type d'intervention..."
+msgstr "Specify the intervention type..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Description du problème"
+msgstr "Problem Description"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Décrire le problème sur cette pièce..."
+msgstr "Describe the problem on this part..."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Équipement sans modèle 3D"
+msgstr "Equipment without 3D Model"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "L'équipement sélectionné n'a pas de modèle 3D associé, donc aucune pièce spécifique n'est disponible."
+msgstr "The selected equipment has no associated 3D model, so no specific parts are available."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_form_with_parts
+msgid "Vous pouvez continuer sans sélectionner de pièces spécifiques."
+msgstr "You can continue without selecting specific parts."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_tree_inherit_parts
+msgid "Pièces"
+msgstr "Parts"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
+msgid "Avec pièces spécifiques"
+msgstr "With specific parts"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
+msgid "Sans pièces spécifiques"
+msgstr "Without specific parts"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
+msgid "Assignées à une personne"
+msgstr "Assigned to a person"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
+msgid "Assignées à plusieurs personnes"
+msgstr "Assigned to multiple people"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_maintenance_request_search_inherit_parts
+msgid "Non assignées"
+msgstr "Not assigned"
+
+#. module: cmms_3d_models
+#: model:ir.model,name:cmms_3d_models.model_maintenance_request_part
+msgid "Pièce de demande de maintenance"
+msgstr "Maintenance Request Part"
+
+#. module: cmms_3d_models
+#: model:ir.model.fields,field_description:cmms_3d_models.field_maintenance_request_part__intervention_type
+msgid "Type d'intervention"
+msgstr "Intervention Type"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Nettoyage"
+msgstr "Cleaning"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Réparation"
+msgstr "Repair"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Remplacement"
+msgstr "Replacement"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Inspection"
+msgstr "Inspection"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Lubrification"
+msgstr "Lubrication"
+
+#. module: cmms_3d_models
+#: selection:maintenance.request.part,intervention_type:0
+msgid "Autre"
+msgstr "Other"
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_management
+msgid "Gestion API"
+msgstr "API Management"
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_keys
+msgid "Clés API"
+msgstr "API Keys"
+
+#. module: cmms_3d_models
+#: model:ir.ui.menu,name:cmms_3d_models.menu_cmms_api_logs
+msgid "Logs d'accès"
+msgstr "Access Logs"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_api_key
+msgid "Clés API"
+msgstr "API Keys"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,name:cmms_3d_models.action_cmms_api_access_log
+msgid "Logs d'accès API"
+msgstr "API Access Logs"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Clé API"
+msgstr "API Key"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Nom de la clé API"
+msgstr "API Key Name"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Informations générales"
+msgstr "General Information"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Utilisateur"
+msgstr "User"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Dernière utilisation"
+msgstr "Last Used"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Nombre d'utilisations"
+msgstr "Usage Count"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Sécurité"
+msgstr "Security"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Limite de taux (req/minute)"
+msgstr "Rate Limit (req/minute)"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Expire le"
+msgstr "Expires on"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "IPs autorisées"
+msgstr "Allowed IPs"
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Saisissez une adresse IP par ligne. Laissez vide pour autoriser toutes les IPs."
+msgstr "Enter one IP address per line. Leave empty to allow all IPs."
+
+#. module: cmms_3d_models
+#: model:ir.ui.view,arch_db:cmms_3d_models.view_cmms_api_key_form
+msgid "Formats supportés: 192.168.1.100, 10.0.0.0/24"
+msgstr "Supported formats: 192.168.1.100, 10.0.0.0/24"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_key
+msgid "Créer votre première clé API"
+msgstr "Create your first API key"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_cmms_api_key
+msgid "Gérez les clés API pour l'accès à votre système de maintenance via API REST."
+msgstr "Manage API keys for access to your maintenance system via REST API."
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_maintenance_person
+msgid "Ajouter votre première personne de maintenance"
+msgstr "Add your first maintenance person"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_maintenance_person
+msgid "Gérez vos équipes de maintenance. Un utilisateur Odoo peut être créé avec juste le nom, prénom et rôle. L'email est optionnel - si non fourni, un login sera généré automatiquement."
+msgstr "Manage your maintenance teams. An Odoo user can be created with just name, first name and role. Email is optional - if not provided, a login will be generated automatically."
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_maintenance_role
+msgid "Créer votre premier rôle de maintenance"
+msgstr "Create your first maintenance role"
+
+#. module: cmms_3d_models
+#: model:ir.actions.act_window,help:cmms_3d_models.action_maintenance_role
+msgid "Les rôles permettent de classifier les personnes selon leur niveau d'expertise et leurs responsabilités."
+msgstr "Roles allow classifying people according to their level of expertise and responsibilities."
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_technician_level_1
+msgid "Technicien Niveau 1"
+msgstr "Technician Level 1"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_technician_level_1
+msgid "Technicien de maintenance de base - Interventions simples et préventives"
+msgstr "Basic maintenance technician - Simple and preventive interventions"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_technician_level_2
+msgid "Technicien Niveau 2"
+msgstr "Technician Level 2"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_technician_level_2
+msgid "Technicien de maintenance expérimenté - Réparations complexes"
+msgstr "Experienced maintenance technician - Complex repairs"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_technician_level_3
+msgid "Technicien Niveau 3"
+msgstr "Technician Level 3"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_technician_level_3
+msgid "Technicien de maintenance expert - Diagnostics avancés et formation"
+msgstr "Expert maintenance technician - Advanced diagnostics and training"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_team_leader
+msgid "Chef d'équipe"
+msgstr "Team Leader"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_team_leader
+msgid "Responsable d'équipe de maintenance - Coordination et supervision"
+msgstr "Maintenance team leader - Coordination and supervision"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_supervisor
+msgid "Superviseur"
+msgstr "Supervisor"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_supervisor
+msgid "Superviseur de maintenance - Gestion des ressources et planification"
+msgstr "Maintenance supervisor - Resource management and planning"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_manager
+msgid "Manager"
+msgstr "Manager"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_manager
+msgid "Manager de maintenance - Direction et stratégie de maintenance"
+msgstr "Maintenance manager - Maintenance direction and strategy"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_operator
+msgid "Opérateur"
+msgstr "Operator"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_operator
+msgid "Opérateur d'équipement - Utilisation et maintenance de premier niveau"
+msgstr "Equipment operator - Usage and first-level maintenance"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,name:cmms_3d_models.role_quality_manager
+msgid "Responsable Qualité"
+msgstr "Quality Manager"
+
+#. module: cmms_3d_models
+#: model:maintenance.role,description:cmms_3d_models.role_quality_manager
+msgid "Responsable qualité maintenance - Audit et amélioration continue"
+msgstr "Maintenance quality manager - Audit and continuous improvement"
+
+# Messages d'erreur et de validation
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "L'email %s est déjà utilisé par %s"
+msgstr "Email %s is already used by %s"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Impossible de créer le contact: %s"
+msgstr "Unable to create contact: %s"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Impossible de créer l'utilisateur: %s"
+msgstr "Unable to create user: %s"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Un utilisateur existe déjà pour cette personne"
+msgstr "A user already exists for this person"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Le nom et le prénom sont requis pour créer un utilisateur"
+msgstr "Name and first name are required to create a user"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Aucun utilisateur associé à cette personne"
+msgstr "No user associated with this person"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Un email est requis pour envoyer une invitation"
+msgstr "An email is required to send an invitation"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
+msgid "L'équipement est obligatoire pour toute demande de maintenance."
+msgstr "Equipment is mandatory for any maintenance request."
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
+msgid "Le responsable est obligatoire pour toute demande de maintenance."
+msgstr "The person in charge is mandatory for any maintenance request."
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_request_extended.py:0
+msgid "La date prévue est obligatoire pour toute demande de maintenance."
+msgstr "The scheduled date is mandatory for any maintenance request."
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_request_part.py:0
+msgid "Vous devez préciser le type d'intervention si vous sélectionnez 'Autre'."
+msgstr "You must specify the intervention type if you select 'Other'."
+
+# Notifications
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Utilisateur créé"
+msgstr "User Created"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_person.py:0
+msgid "Invitation envoyée"
+msgstr "Invitation Sent"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_equipment.py:0
+msgid "Aucun modèle 3D"
+msgstr "No 3D Model"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/maintenance_equipment.py:0
+msgid "Cet équipement n'a pas de modèle 3D associé."
+msgstr "This equipment has no associated 3D model."
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Aucun équipement auto-créé"
+msgstr "No Auto-created Equipment"
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Ce modèle n'a pas d'équipement créé automatiquement. Sélectionnez une catégorie d'équipement pour en créer un."
+msgstr "This model has no automatically created equipment. Select an equipment category to create one."
+
+#. module: cmms_3d_models
+#: code:addons/cmms_3d_models/models/model3d.py:0
+msgid "Équipement auto-créé"
+msgstr "Auto-created Equipment"

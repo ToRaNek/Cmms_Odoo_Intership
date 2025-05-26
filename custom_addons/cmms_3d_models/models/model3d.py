@@ -1,4 +1,4 @@
-# custom_addons/cmms_3d_models/models/model3d.py - Ajout de la création automatique d'équipement
+# custom_addons/cmms_3d_models/models/model3d.py - Version complète avec support IFC
 
 import os
 import base64
@@ -34,6 +34,16 @@ class Model3D(models.Model):
     viewer_url = fields.Char('Viewer URL', compute='_compute_viewer_url')
     thumbnail = fields.Binary('Thumbnail', attachment=True)
     active = fields.Boolean('Active', default=True)
+
+    # NOUVEAUX CHAMPS POUR LE FICHIER IFC
+    ifc_file = fields.Binary('Fichier IFC (BIM)', attachment=True,
+                            help="Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance")
+    ifc_filename = fields.Char('Nom du fichier IFC')
+    ifc_url = fields.Char('URL du fichier IFC', compute='_compute_ifc_url', store=True)
+    has_ifc_file = fields.Boolean('Possède un fichier IFC', compute='_compute_has_ifc_file', store=True)
+    ifc_version = fields.Char('Version IFC', readonly=True,
+                             help="Version du format IFC détectée automatiquement")
+    ifc_file_size = fields.Integer('Taille fichier IFC (octets)', readonly=True)
 
     # New field for uploading all model files as a ZIP
     model_zip = fields.Binary('Complete Model (ZIP)',
@@ -111,6 +121,20 @@ class Model3D(models.Model):
         store=True,
         string='A un équipement auto-créé'
     )
+
+    @api.depends('ifc_file', 'ifc_filename')
+    def _compute_has_ifc_file(self):
+        for record in self:
+            record.has_ifc_file = bool(record.ifc_file and record.ifc_filename)
+
+    @api.depends('ifc_file', 'ifc_filename')
+    def _compute_ifc_url(self):
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for record in self:
+            if record.ifc_file and record.id and record.ifc_filename:
+                record.ifc_url = f"{base_url}/models3d/{record.id}/{record.ifc_filename}"
+            else:
+                record.ifc_url = False
 
     @api.depends('auto_created_equipment_id')
     def _compute_has_auto_equipment(self):
@@ -194,18 +218,138 @@ class Model3D(models.Model):
             else:
                 record.viewer_url = False
 
+    # NOUVELLE MÉTHODE POUR ANALYSER LE FICHIER IFC
+    def _analyze_ifc_file(self, record):
+        """Analyse le fichier IFC pour extraire les métadonnées"""
+        try:
+            if not record.ifc_file or not record.ifc_filename:
+                return
+
+            # Créer le dossier de modèle
+            models_dir = os.path.normpath(os.path.join(MODELS_DIR, str(record.id)))
+            os.makedirs(models_dir, exist_ok=True)
+
+            # Sauvegarder temporairement le fichier IFC pour l'analyser
+            ifc_path = os.path.normpath(os.path.join(models_dir, record.ifc_filename))
+            with open(ifc_path, 'wb') as f:
+                f.write(base64.b64decode(record.ifc_file))
+
+            # Calculer la taille du fichier
+            file_size = os.path.getsize(ifc_path)
+            record.ifc_file_size = file_size
+
+            # Lire les premières lignes pour détecter la version IFC
+            ifc_version = "Non détectée"
+            try:
+                with open(ifc_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    for line in f:
+                        if 'FILE_SCHEMA' in line and 'IFC' in line:
+                            # Extraire la version IFC du header
+                            if 'IFC2X3' in line:
+                                ifc_version = "IFC 2x3"
+                            elif 'IFC4' in line:
+                                ifc_version = "IFC 4"
+                            elif 'IFC4X1' in line:
+                                ifc_version = "IFC 4.1"
+                            elif 'IFC4X3' in line:
+                                ifc_version = "IFC 4.3"
+                            else:
+                                # Essayer d'extraire la version avec une regex
+                                import re
+                                match = re.search(r'IFC(\w+)', line)
+                                if match:
+                                    ifc_version = f"IFC {match.group(1)}"
+                            break
+                        # Limiter la lecture aux 100 premières lignes pour la performance
+                        if f.tell() > 10000:  # ~10KB
+                            break
+            except Exception as e:
+                _logger.warning(f"Erreur lors de la lecture du fichier IFC pour détection de version: {str(e)}")
+
+            record.ifc_version = ifc_version
+
+            _logger.info(f"Fichier IFC analysé: {record.ifc_filename}, version: {ifc_version}, taille: {file_size} octets")
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de l'analyse du fichier IFC: {str(e)}")
+
+    # NOUVELLE MÉTHODE POUR SAUVEGARDER LE FICHIER IFC
+    def _save_ifc_file(self, record):
+        """Sauvegarde le fichier IFC sur le disque"""
+        try:
+            if not record.ifc_file or not record.ifc_filename:
+                return
+
+            # Vérifier que ifc_filename est bien une chaîne
+            if not isinstance(record.ifc_filename, str):
+                _logger.warning(f"ifc_filename n'est pas une chaîne: {record.ifc_filename}, type: {type(record.ifc_filename)}")
+                record.ifc_filename = str(record.ifc_filename)
+
+            # Créer le dossier si nécessaire
+            models_dir = os.path.normpath(os.path.join(MODELS_DIR, str(record.id)))
+            os.makedirs(models_dir, exist_ok=True)
+
+            # Sauvegarder le fichier IFC
+            file_path = os.path.normpath(os.path.join(models_dir, record.ifc_filename))
+            with open(file_path, 'wb') as f:
+                f.write(base64.b64decode(record.ifc_file))
+
+            _logger.info(f"Fichier IFC sauvegardé: {file_path}")
+
+            # Analyser le fichier IFC pour extraire les métadonnées
+            self._analyze_ifc_file(record)
+
+            # Ajouter le fichier IFC à la liste des fichiers associés
+            file_list = []
+            if record.files_list:
+                try:
+                    file_list = json.loads(record.files_list)
+                except:
+                    file_list = []
+
+            if record.ifc_filename not in file_list:
+                file_list.append(record.ifc_filename)
+                record.files_list = json.dumps(file_list)
+                record.has_external_files = True
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de la sauvegarde du fichier IFC: {str(e)}")
+            raise ValidationError(f"Erreur lors de la sauvegarde du fichier IFC: {str(e)}")
+
+    # ACTION POUR TÉLÉCHARGER LE FICHIER IFC
+    def action_download_ifc(self):
+        """Action pour télécharger le fichier IFC"""
+        self.ensure_one()
+        if not self.ifc_file or not self.ifc_filename:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Aucun fichier IFC'),
+                    'message': _('Ce modèle n\'a pas de fichier IFC associé.'),
+                    'sticky': False,
+                    'type': 'warning',
+                }
+            }
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.ifc_url,
+            'target': 'new',
+        }
+
     # MÉTHODE POUR CRÉER/METTRE À JOUR L'ÉQUIPEMENT AUTOMATIQUEMENT
     def _create_or_update_auto_equipment(self):
         """Crée ou met à jour l'équipement automatiquement pour les modèles parents"""
         self.ensure_one()
-        
+
         # Ne pas créer d'équipement pour les sous-modèles
         if self.parent_id:
             return False
-        
+
         # Nom de l'équipement avec préfixe
         equipment_name = f"Équipement - {self.name}"
-        
+
         # Valeurs de base pour l'équipement
         equipment_vals = {
             'name': equipment_name,
@@ -218,17 +362,17 @@ class Model3D(models.Model):
             'model3d_rotation_y': self.rotation_y,
             'model3d_rotation_z': self.rotation_z,
         }
-        
+
         # Ajouter la catégorie seulement si elle est sélectionnée
         if self.equipment_category_id:
             equipment_vals['category_id'] = self.equipment_category_id.id
-        
+
         # Si un équipement existe déjà, le mettre à jour
         if self.auto_created_equipment_id:
             self.auto_created_equipment_id.write(equipment_vals)
             _logger.info(f"Équipement auto-créé mis à jour : {equipment_name} (ID: {self.auto_created_equipment_id.id})")
             return self.auto_created_equipment_id
-        
+
         # Sinon, créer un nouvel équipement
         else:
             equipment = self.env['maintenance.equipment'].create(equipment_vals)
@@ -265,6 +409,15 @@ class Model3D(models.Model):
                 _logger.error(f"Erreur lors du traitement du fichier modèle: {str(e)}")
                 raise ValidationError(f"Erreur lors du traitement du fichier modèle: {str(e)}")
 
+        # NOUVEAU: Handle IFC file
+        if res.ifc_file:
+            try:
+                _logger.info(f"Traitement du fichier IFC: {res.ifc_filename or 'sans nom'}")
+                self._save_ifc_file(res)
+            except Exception as e:
+                _logger.error(f"Erreur lors du traitement du fichier IFC: {str(e)}")
+                raise ValidationError(f"Erreur lors du traitement du fichier IFC: {str(e)}")
+
         # Handle binary file separately if needed
         if res.model_bin and not is_blend:  # Skip for Blend files as they're handled in conversion
             try:
@@ -294,11 +447,11 @@ class Model3D(models.Model):
 
     def write(self, vals):
         # Sauvegarder les anciennes catégories pour comparer
-        old_categories = {record.id: record.equipment_category_id.id if record.equipment_category_id else False 
+        old_categories = {record.id: record.equipment_category_id.id if record.equipment_category_id else False
                          for record in self}
-        
+
         res = super(Model3D, self).write(vals)
-        
+
         try:
             for record in self:
                 if 'model_file' in vals and vals['model_file']:
@@ -306,18 +459,23 @@ class Model3D(models.Model):
                         self._convert_and_save_blend_file(record)
                     else:
                         self._save_model_file(record)
+
+                # NOUVEAU: Handle IFC file update
+                if 'ifc_file' in vals and vals['ifc_file']:
+                    self._save_ifc_file(record)
+
                 if 'model_bin' in vals and vals['model_bin']:
                     self._save_bin_file(record)
                 if 'model_zip' in vals and vals['model_zip'] and bool(vals['model_zip'].strip()):
                     self._extract_zip_model(record)
-                
+
                 # NOUVEAU : Vérifier si des paramètres ont changé
-                if ('equipment_category_id' in vals or 'name' in vals or 
-                    any(field in vals for field in ['scale', 'position_x', 'position_y', 'position_z', 
+                if ('equipment_category_id' in vals or 'name' in vals or
+                    any(field in vals for field in ['scale', 'position_x', 'position_y', 'position_z',
                                                    'rotation_x', 'rotation_y', 'rotation_z'])):
                     # Créer ou mettre à jour l'équipement automatiquement
                     record._create_or_update_auto_equipment()
-                        
+
         except Exception as e:
             _logger.error(f"Erreur lors de la mise à jour du modèle 3D: {str(e)}")
             raise ValidationError(f"Erreur lors de la mise à jour du modèle 3D: {str(e)}")
@@ -330,15 +488,15 @@ class Model3D(models.Model):
             if record.auto_created_equipment_id:
                 equipments_to_delete |= record.auto_created_equipment_id
                 _logger.info(f"Marquage de l'équipement auto-créé pour suppression: {record.auto_created_equipment_id.name}")
-        
+
         # Supprimer les modèles
         res = super(Model3D, self).unlink()
-        
+
         # Supprimer les équipements auto-créés
         if equipments_to_delete:
             equipments_to_delete.unlink()
             _logger.info(f"Suppression de {len(equipments_to_delete)} équipements auto-créés")
-        
+
         return res
 
     # ACTION POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ
@@ -357,7 +515,7 @@ class Model3D(models.Model):
                     'type': 'warning',
                 }
             }
-        
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Équipement auto-créé'),
@@ -367,7 +525,6 @@ class Model3D(models.Model):
             'target': 'current',
         }
 
-    # Toutes les autres méthodes restent inchangées
     def _save_model_file(self, record):
         try:
             # Vérifier que model_filename est bien une chaîne
