@@ -239,34 +239,49 @@ class Model3D(models.Model):
             record.ifc_file_size = file_size
 
             # Lire les premières lignes pour détecter la version IFC
-            ifc_version = "Non détectée"
+            ifc_version = "Not detected"
+            if hasattr(record, 'ifc_filename'):
+                ifc_path = os.path.normpath(os.path.join(MODELS_DIR, str(record.id), record.ifc_filename))
+            else:
+                return
+
+            max_bytes = 10000  # 10 ko
+            total_bytes = 0
+            max_lines = 100
+
             try:
                 with open(ifc_path, 'r', encoding='utf-8', errors='ignore') as f:
                     for line in f:
+                        total_bytes += len(line.encode('utf-8', errors='ignore'))
+                        line_count += 1
                         if 'FILE_SCHEMA' in line and 'IFC' in line:
-                            # Extraire la version IFC du header
+                            # Détection version
                             if 'IFC2X3' in line:
                                 ifc_version = "IFC 2x3"
-                            elif 'IFC4' in line:
-                                ifc_version = "IFC 4"
-                            elif 'IFC4X1' in line:
-                                ifc_version = "IFC 4.1"
                             elif 'IFC4X3' in line:
                                 ifc_version = "IFC 4.3"
+                            elif 'IFC4X1' in line:
+                                ifc_version = "IFC 4.1"
+                            elif 'IFC4' in line:
+                                ifc_version = "IFC 4"
                             else:
-                                # Essayer d'extraire la version avec une regex
                                 import re
                                 match = re.search(r'IFC(\w+)', line)
                                 if match:
                                     ifc_version = f"IFC {match.group(1)}"
                             break
-                        # Limiter la lecture aux 100 premières lignes pour la performance
-                        if f.tell() > 10000:  # ~10KB
+                        if total_bytes > max_bytes or line_count > max_lines:
                             break
             except Exception as e:
                 _logger.warning(f"Erreur lors de la lecture du fichier IFC pour détection de version: {str(e)}")
 
             record.ifc_version = ifc_version
+
+            # Info pour suivi/debug
+            try:
+                file_size = os.path.getsize(ifc_path)
+            except Exception:
+                file_size = -1
 
             _logger.info(f"Fichier IFC analysé: {record.ifc_filename}, version: {ifc_version}, taille: {file_size} octets")
 
@@ -388,6 +403,11 @@ class Model3D(models.Model):
         if 'model_filename' in vals:
             _logger.info(f"Nom du fichier: {vals['model_filename']}")
 
+        if vals.get('ifc_file') and not vals.get('ifc_filename'):
+                # On utilise le nom du modèle prévu dans vals (cas création)
+                model_name = vals.get('name', 'modele3d')
+                vals['ifc_filename'] = f"{model_name}.ifc"
+
         # Create the record first
         res = super(Model3D, self).create(vals)
 
@@ -449,6 +469,13 @@ class Model3D(models.Model):
         # Sauvegarder les anciennes catégories pour comparer
         old_categories = {record.id: record.equipment_category_id.id if record.equipment_category_id else False
                          for record in self}
+
+        if vals.get('ifc_file') and not vals.get('ifc_filename'):
+                # On récupère le nom déjà existant du modèle sur le(s) record(s)
+                for rec in self:
+                    model_name = vals.get('name', rec.name or 'modele3d')
+                    vals['ifc_filename'] = f"{model_name}.ifc"
+                    break  #
 
         res = super(Model3D, self).write(vals)
 

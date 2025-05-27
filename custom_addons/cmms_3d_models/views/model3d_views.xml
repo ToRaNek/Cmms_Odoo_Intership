@@ -138,7 +138,7 @@
                             <group string="Fichier IFC BIM (Données techniques)">
                                 <field name="ifc_file" filename="ifc_filename"
                                        help="Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance"/>
-                                <field name="ifc_filename" invisible="1"/>
+                                <field name="ifc_filename" readonly="1"/>`
                                 <field name="ifc_url" widget="url" readonly="1"
                                        attrs="{'invisible': [('ifc_url', '=', False)]}"/>
                                 <field name="has_ifc_file" invisible="1"/>

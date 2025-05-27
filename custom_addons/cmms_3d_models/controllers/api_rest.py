@@ -174,104 +174,262 @@ class CMSAPIController(http.Controller):
 
         return domain
 
+    def _serialize_part(self, part_record):
+        """Sérialiser une pièce de maintenance request avec toutes ses informations"""
+        try:
+            # Récupérer le sous-modèle 3D associé
+            submodel = part_record.submodel_id
+
+            # Déterminer le type d'intervention (avec gestion du champ 'other')
+            intervention_display = dict(part_record._fields['intervention_type'].selection)[part_record.intervention_type]
+            if part_record.intervention_type == 'other' and part_record.intervention_other:
+                intervention_display = part_record.intervention_other
+
+            part_data = {
+                'id': part_record.id,
+                'part_name': part_record.part_name or '',
+                'description': part_record.description or '',
+                'intervention_type': part_record.intervention_type,
+                'intervention_type_display': intervention_display,
+                'intervention_other': part_record.intervention_other or '',
+                'sequence': part_record.sequence,
+
+                # Informations du sous-modèle 3D
+                'submodel': {
+                    'id': submodel.id if submodel else None,
+                    'name': submodel.name if submodel else '',
+                    'relative_id': submodel.relative_id if submodel else None,
+                    'gltf_filename': submodel.gltf_filename if submodel else '',
+                    'viewer_url': submodel.viewer_url if submodel else None,
+                    'gltf_url': submodel.gltf_url if submodel else None,
+                    'bin_url': submodel.bin_url if submodel else None,
+                    'scale': submodel.scale if submodel else 1.0,
+                    'position': {
+                        'x': submodel.position_x if submodel else 0.0,
+                        'y': submodel.position_y if submodel else 0.0,
+                        'z': submodel.position_z if submodel else 0.0,
+                    } if submodel else None,
+                    'rotation': {
+                        'x': submodel.rotation_x if submodel else 0.0,
+                        'y': submodel.rotation_y if submodel else 0.0,
+                        'z': submodel.rotation_z if submodel else 0.0,
+                    } if submodel else None,
+                } if submodel else None,
+
+                # Informations du modèle 3D parent
+                'parent_model3d': {
+                    'id': part_record.parent_model3d_id.id if part_record.parent_model3d_id else None,
+                    'name': part_record.parent_model3d_id.name if part_record.parent_model3d_id else '',
+                    'viewer_url': part_record.parent_model3d_id.viewer_url if part_record.parent_model3d_id else None,
+                } if part_record.parent_model3d_id else None,
+            }
+
+            return part_data
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de la sérialisation de la pièce {part_record.id}: {str(e)}")
+            return {
+                'id': part_record.id,
+                'part_name': part_record.part_name or '',
+                'description': part_record.description or '',
+                'intervention_type': part_record.intervention_type,
+                'intervention_type_display': part_record.intervention_type,
+                'error': 'Erreur lors du chargement des données 3D'
+            }
+
+    def _serialize_assignment(self, assignment_record):
+        """Sérialiser une assignation de maintenance"""
+        try:
+            return {
+                'id': assignment_record.id,
+                'person': {
+                    'id': assignment_record.person_id.id,
+                    'name': assignment_record.person_id.display_name,
+                    'first_name': assignment_record.person_id.first_name or '',
+                    'last_name': assignment_record.person_id.name or '',
+                    'email': assignment_record.person_id.email or '',
+                    'phone': assignment_record.person_id.phone or '',
+                    'mobile': assignment_record.person_id.mobile or '',
+                    'available': assignment_record.person_id.available,
+                    'role': {
+                        'id': assignment_record.person_id.role_id.id if assignment_record.person_id.role_id else None,
+                        'name': assignment_record.person_id.role_id.name if assignment_record.person_id.role_id else '',
+                        'description': assignment_record.person_id.role_id.description if assignment_record.person_id.role_id else '',
+                    } if assignment_record.person_id.role_id else None,
+                    'specialties': assignment_record.person_id.specialties or '',
+                    'certifications': assignment_record.person_id.certifications or '',
+                },
+                'user': {
+                    'id': assignment_record.user_id.id if assignment_record.user_id else None,
+                    'name': assignment_record.user_id.name if assignment_record.user_id else '',
+                    'login': assignment_record.user_id.login if assignment_record.user_id else '',
+                } if assignment_record.user_id else None,
+                'assigned_date': assignment_record.assigned_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if assignment_record.assigned_date else None,
+                'assigned_by': {
+                    'id': assignment_record.assigned_by_id.id if assignment_record.assigned_by_id else None,
+                    'name': assignment_record.assigned_by_id.name if assignment_record.assigned_by_id else '',
+                } if assignment_record.assigned_by_id else None,
+                'is_primary': assignment_record.is_primary,
+                'notes': assignment_record.notes or '',
+            }
+        except Exception as e:
+            _logger.error(f"Erreur lors de la sérialisation de l'assignation {assignment_record.id}: {str(e)}")
+            return {
+                'id': assignment_record.id,
+                'person': {
+                    'id': assignment_record.person_id.id,
+                    'name': assignment_record.person_id.display_name,
+                },
+                'error': 'Erreur lors du chargement des données d\'assignation'
+            }
+
     def _serialize_request(self, request_record):
-        """Sérialiser une demande de maintenance"""
-        # URL du viewer 3D si disponible
-        viewer_url = None
-        if request_record.equipment_id and request_record.equipment_id.model3d_id:
-            viewer_url = request_record.equipment_id.model3d_id.viewer_url
+        """Sérialiser une demande de maintenance avec toutes les informations enrichies"""
+        try:
+            # URL du viewer 3D si disponible
+            viewer_url = None
+            if request_record.equipment_id and request_record.equipment_id.model3d_id:
+                viewer_url = request_record.equipment_id.model3d_id.viewer_url
 
-        # Gérer l'utilisateur assigné (plusieurs champs possibles)
-        assigned_user = None
-        if hasattr(request_record, 'assigned_user_id') and request_record.assigned_user_id:
-            assigned_user = request_record.assigned_user_id
-        elif hasattr(request_record, 'technician_user_id') and request_record.technician_user_id:
-            assigned_user = request_record.technician_user_id
-        elif hasattr(request_record, 'owner_user_id') and request_record.owner_user_id:
-            assigned_user = request_record.owner_user_id
+            # Gérer l'utilisateur assigné (plusieurs champs possibles)
+            assigned_user = None
+            if hasattr(request_record, 'assigned_user_id') and request_record.assigned_user_id:
+                assigned_user = request_record.assigned_user_id
+            elif hasattr(request_record, 'technician_user_id') and request_record.technician_user_id:
+                assigned_user = request_record.technician_user_id
+            elif hasattr(request_record, 'owner_user_id') and request_record.owner_user_id:
+                assigned_user = request_record.owner_user_id
 
-        # Préparer la liste de toutes les assignations
-        assignments = []
-        if hasattr(request_record, 'assignment_ids') and request_record.assignment_ids:
-            for assignment in request_record.assignment_ids:
-                assignments.append({
-                    'id': assignment.id,
-                    'person_id': {
-                        'id': assignment.person_id.id,
-                        'name': assignment.person_id.display_name,
-                        'role': assignment.person_id.role_id.name if assignment.person_id.role_id else None
-                    },
-                    'user_id': {
-                        'id': assignment.user_id.id,
-                        'name': assignment.user_id.name
-                    } if assignment.user_id else None,
-                    'assigned_date': assignment.assigned_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if assignment.assigned_date else None,
-                    'is_primary': assignment.is_primary,
-                    'notes': assignment.notes or ''
-                })
+            # Sérialiser toutes les assignations
+            assignments = []
+            if hasattr(request_record, 'assignment_ids') and request_record.assignment_ids:
+                for assignment in request_record.assignment_ids:
+                    assignments.append(self._serialize_assignment(assignment))
 
-        # Préparer la liste de toutes les personnes assignées
-        assigned_persons = []
-        if hasattr(request_record, 'assigned_person_ids') and request_record.assigned_person_ids:
-            for person in request_record.assigned_person_ids:
-                assigned_persons.append({
-                    'id': person.id,
-                    'name': person.display_name,
-                    'role': person.role_id.name if person.role_id else None
-                })
+            # Préparer la liste de toutes les personnes assignées
+            assigned_persons = []
+            if hasattr(request_record, 'assigned_person_ids') and request_record.assigned_person_ids:
+                for person in request_record.assigned_person_ids:
+                    assigned_persons.append({
+                        'id': person.id,
+                        'name': person.display_name,
+                        'first_name': person.first_name or '',
+                        'last_name': person.name or '',
+                        'email': person.email or '',
+                        'phone': person.phone or '',
+                        'role': {
+                            'id': person.role_id.id if person.role_id else None,
+                            'name': person.role_id.name if person.role_id else None,
+                        } if person.role_id else None,
+                        'available': person.available,
+                    })
 
-        return {
-            'id': request_record.id,
-            'name': request_record.name,
-            'description': request_record.description or '',
-            'request_date': request_record.request_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.request_date else None,
-            'schedule_date': request_record.schedule_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.schedule_date else None,
-            'stage_id': {
-                'id': request_record.stage_id.id,
-                'name': request_record.stage_id.name
-            } if request_record.stage_id else None,
-            'equipment_id': {
-                'id': request_record.equipment_id.id,
-                'name': request_record.equipment_id.name,
-                'category': request_record.equipment_id.category_id.name if request_record.equipment_id.category_id else None,
-                'location': request_record.equipment_id.location or '',
-                'model_3d_viewer_url': viewer_url
-            } if request_record.equipment_id else None,
-            'assigned_user_id': {
-                'id': assigned_user.id,
-                'name': assigned_user.name
-            } if assigned_user else None,
-            'assigned_person_id': {
-                'id': request_record.assigned_person_id.id,
-                'name': request_record.assigned_person_id.display_name,
-                'role': request_record.assigned_person_id.role_id.name if request_record.assigned_person_id.role_id else None
-            } if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id else None,
-            'maintenance_team_id': {
-                'id': request_record.maintenance_team_id.id,
-                'name': request_record.maintenance_team_id.name
-            } if request_record.maintenance_team_id else None,
-            'maintenance_type': request_record.maintenance_type,
-            'priority': request_record.priority,
-            'kanban_state': request_record.kanban_state,
-            'color': request_record.color,
-            'duration': request_record.duration,
-            'close_date': request_record.close_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.close_date else None,
-            'user_id': {
-                'id': request_record.user_id.id,
-                'name': request_record.user_id.name
-            } if request_record.user_id else None,
-            'owner_user_id': {
-                'id': request_record.owner_user_id.id,
-                'name': request_record.owner_user_id.name
-            } if hasattr(request_record, 'owner_user_id') and request_record.owner_user_id else None,
-            'technician_user_id': {
-                'id': request_record.technician_user_id.id,
-                'name': request_record.technician_user_id.name
-            } if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else None,
-            # Nouvelles clés pour toutes les assignations
-            'assignments': assignments,
-            'assigned_person_ids': assigned_persons,
-        }
+            # NOUVEAU: Sérialiser toutes les pièces/sous-modèles
+            parts = []
+            if hasattr(request_record, 'part_ids') and request_record.part_ids:
+                for part in request_record.part_ids:
+                    parts.append(self._serialize_part(part))
+
+            # Informations sur l'équipement enrichies
+            equipment_info = None
+            if request_record.equipment_id:
+                equipment = request_record.equipment_id
+                equipment_info = {
+                    'id': equipment.id,
+                    'name': equipment.name,
+                    'serial_no': equipment.serial_no or '',
+                    'location': equipment.location or '',
+                    'category': {
+                        'id': equipment.category_id.id if equipment.category_id else None,
+                        'name': equipment.category_id.name if equipment.category_id else '',
+                    } if equipment.category_id else None,
+                    'model_3d': {
+                        'id': equipment.model3d_id.id if equipment.model3d_id else None,
+                        'name': equipment.model3d_id.name if equipment.model3d_id else '',
+                        'viewer_url': viewer_url,
+                        'has_ifc': equipment.model3d_id.has_ifc_file if equipment.model3d_id else False,
+                        'ifc_version': equipment.model3d_id.ifc_version if equipment.model3d_id else None,
+                        'ifc_url': equipment.model3d_id.ifc_url if equipment.model3d_id else None,
+                    } if equipment.model3d_id else None,
+                    'has_3d_model': bool(equipment.model3d_id),
+                }
+
+            # Construire la réponse complète
+            request_data = {
+                'id': request_record.id,
+                'name': request_record.name,
+                'description': request_record.description or '',
+                'request_date': request_record.request_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.request_date else None,
+                'schedule_date': request_record.schedule_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.schedule_date else None,
+                'close_date': request_record.close_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if request_record.close_date else None,
+
+                # Statut et étape
+                'stage': {
+                    'id': request_record.stage_id.id if request_record.stage_id else None,
+                    'name': request_record.stage_id.name if request_record.stage_id else '',
+                    'done': request_record.stage_id.done if request_record.stage_id else False,
+                } if request_record.stage_id else None,
+                'maintenance_type': request_record.maintenance_type,
+                'priority': request_record.priority,
+                'kanban_state': request_record.kanban_state,
+                'color': request_record.color,
+                'duration': request_record.duration,
+
+                # Équipement enrichi
+                'equipment': equipment_info,
+
+                # Équipe
+                'maintenance_team': {
+                    'id': request_record.maintenance_team_id.id if request_record.maintenance_team_id else None,
+                    'name': request_record.maintenance_team_id.name if request_record.maintenance_team_id else '',
+                } if request_record.maintenance_team_id else None,
+
+                # Utilisateurs (compatibilité)
+                'user': {
+                    'id': request_record.user_id.id if request_record.user_id else None,
+                    'name': request_record.user_id.name if request_record.user_id else '',
+                } if request_record.user_id else None,
+                'assigned_user': {
+                    'id': assigned_user.id if assigned_user else None,
+                    'name': assigned_user.name if assigned_user else '',
+                } if assigned_user else None,
+                'owner_user': {
+                    'id': request_record.owner_user_id.id if hasattr(request_record, 'owner_user_id') and request_record.owner_user_id else None,
+                    'name': request_record.owner_user_id.name if hasattr(request_record, 'owner_user_id') and request_record.owner_user_id else '',
+                } if hasattr(request_record, 'owner_user_id') and request_record.owner_user_id else None,
+                'technician_user': {
+                    'id': request_record.technician_user_id.id if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else None,
+                    'name': request_record.technician_user_id.name if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else '',
+                } if hasattr(request_record, 'technician_user_id') and request_record.technician_user_id else None,
+
+                # Assignations enrichies
+                'assigned_person': {
+                    'id': request_record.assigned_person_id.id if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id else None,
+                    'name': request_record.assigned_person_id.display_name if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id else '',
+                    'role': request_record.assigned_person_id.role_id.name if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id and request_record.assigned_person_id.role_id else None,
+                } if hasattr(request_record, 'assigned_person_id') and request_record.assigned_person_id else None,
+                'assigned_persons': assigned_persons,
+                'assignments': assignments,
+
+                # NOUVEAU: Pièces/sous-modèles avec visualisation 3D
+                'parts': parts,
+                'parts_count': len(parts),
+
+                # Compteurs
+                'assignment_count': len(assignments),
+            }
+
+            return request_data
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de la sérialisation de la demande {request_record.id}: {str(e)}")
+            # Retourner une version minimale en cas d'erreur
+            return {
+                'id': request_record.id,
+                'name': request_record.name,
+                'description': request_record.description or '',
+                'error': 'Erreur lors du chargement des données complètes'
+            }
 
     def _serialize_equipment(self, equipment_record):
         """Sérialiser un équipement"""
@@ -368,7 +526,7 @@ class CMSAPIController(http.Controller):
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_requests(self, limit=10000, offset=0, stage_id=None, status=None, equipment_id=None, **kwargs):
-        """Récupérer les demandes de maintenance de l'utilisateur - Version Flutter Web optimisée"""
+        """Récupérer les demandes de maintenance avec pièces et assignations complètes"""
         try:
             limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
@@ -402,7 +560,7 @@ class CMSAPIController(http.Controller):
                 except (ValueError, TypeError):
                     _logger.warning(f"Ignoring invalid equipment_id: {equipment_id}")
 
-            # Récupérer les demandes
+            # Récupérer les demandes avec toutes les relations
             requests = request.env['maintenance.request'].search(
                 domain,
                 limit=limit,
@@ -410,7 +568,10 @@ class CMSAPIController(http.Controller):
                 order='request_date desc, id desc'
             )
 
-            # Sérialiser les données
+            # Précharger toutes les relations pour optimiser les performances
+            requests.read(['assignment_ids', 'part_ids', 'equipment_id', 'assigned_person_ids'])
+
+            # Sérialiser les données avec toutes les informations enrichies
             data = {
                 'requests': [self._serialize_request(req) for req in requests],
                 'total_count': request.env['maintenance.request'].search_count(domain),
@@ -423,10 +584,19 @@ class CMSAPIController(http.Controller):
                 }
             }
 
+            # Ajouter des statistiques utiles
+            if requests:
+                data['statistics'] = {
+                    'total_parts': sum(len(req.part_ids) for req in requests),
+                    'total_assignments': sum(len(req.assignment_ids) for req in requests),
+                    'requests_with_3d': len([req for req in requests if req.equipment_id and req.equipment_id.model3d_id]),
+                    'requests_with_parts': len([req for req in requests if req.part_ids]),
+                }
+
             # Réponse spéciale sans cookie pour Flutter Web
             response_data = {
                 'success': True,
-                'message': "Requests retrieved successfully",
+                'message': "Requests with parts and assignments retrieved successfully",
                 'data': data,
                 'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
             }
@@ -441,6 +611,54 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting requests: {str(e)}")
             return self._error_response(f"Error retrieving requests: {str(e)}", 500)
+
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_request(self, request_id, **kwargs):
+        """Récupérer une demande spécifique avec toutes ses pièces et assignations"""
+        try:
+            domain = self._get_allowed_requests_domain()
+            domain.append(('id', '=', request_id))
+
+            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
+
+            if not maintenance_request:
+                return self._error_response("Request not found", 404)
+
+            # Précharger toutes les relations
+            maintenance_request.read(['assignment_ids', 'part_ids', 'equipment_id', 'assigned_person_ids'])
+
+            # Sérialiser avec toutes les données enrichies
+            data = self._serialize_request(maintenance_request)
+
+            # Ajouter des informations supplémentaires pour la vue détaillée
+            data['detailed_info'] = {
+                'can_edit': True,  # Logique à adapter selon vos besoins
+                'has_parts': len(maintenance_request.part_ids) > 0,
+                'has_assignments': len(maintenance_request.assignment_ids) > 0,
+                'has_3d_model': bool(maintenance_request.equipment_id and maintenance_request.equipment_id.model3d_id),
+                'created_date': maintenance_request.create_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if maintenance_request.create_date else None,
+                'last_update': maintenance_request.write_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if maintenance_request.write_date else None,
+            }
+
+            # Réponse spéciale sans cookie pour Flutter Web
+            response_data = {
+                'success': True,
+                'message': "Request with complete details retrieved successfully",
+                'data': data,
+                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+            }
+
+            response = request.make_response(
+                json.dumps(response_data, default=str),
+                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            )
+            response.status_code = 200
+            return response
+
+        except Exception as e:
+            _logger.error(f"Error getting request {request_id}: {str(e)}")
+            return self._error_response(f"Error retrieving request: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
@@ -475,40 +693,6 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting equipment {equipment_id}: {str(e)}")
             return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
-
-    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_request(self, request_id, **kwargs):
-        """Récupérer une demande spécifique - Version Flutter Web optimisée"""
-        try:
-            domain = self._get_allowed_requests_domain()
-            domain.append(('id', '=', request_id))
-
-            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
-
-            if not maintenance_request:
-                return self._error_response("Request not found", 404)
-
-            data = self._serialize_request(maintenance_request)
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Request retrieved successfully",
-                'data': data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except Exception as e:
-            _logger.error(f"Error getting request {request_id}: {str(e)}")
-            return self._error_response(f"Error retrieving request: {str(e)}", 500)
 
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['POST'], csrf=False)
     @basic_auth_required
@@ -755,6 +939,10 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting equipment: {str(e)}")
             return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
+
+    @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_user_profile(self, **kwargs):
         """Récupérer le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
         try:
             user = request.env.user
@@ -824,51 +1012,6 @@ class CMSAPIController(http.Controller):
                     'can_manage_all_requests': person.role_id.can_manage_all_requests if person and person.role_id else False,
                     'can_validate_requests': person.role_id.can_validate_requests if person and person.role_id else False,
                 }
-            }
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "User profile retrieved successfully",
-                'data': profile_data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except Exception as e:
-            _logger.error(f"Error getting user profile: {str(e)}")
-            return self._error_response(f"Error retrieving user profile: {str(e)}", 500)
-
-    @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_user_profile(self, **kwargs):
-        """Récupérer le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
-        try:
-            user = request.env.user
-
-            # Récupérer la personne de maintenance associée si elle existe
-            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-
-            # Récupérer les équipes de l'utilisateur
-            team_ids = self._get_user_teams()
-            teams = request.env['maintenance.team'].browse(team_ids)
-
-            # Construire les données du profil
-            profile_data = {
-                'user': {
-                    'id': user.id,
-                    'name': user.name,
-                    'login': user.login,
-                    'email': user.email or '',
-                    # Ajoutez d'autres champs selon vos besoins
-                },
-                # Ajoutez d'autres sections selon vos besoins
             }
 
             return self._success_response(profile_data, "User profile retrieved successfully")
