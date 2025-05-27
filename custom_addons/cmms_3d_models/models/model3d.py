@@ -23,7 +23,7 @@ BLENDER_EXE = r"C:\Program Files\Blender Foundation\Blender 4.4\blender.exe"
 
 # Import du parser IFC
 try:
-    from .ifc_parser import SimpleIfcParser
+    from .ifc_parser import TargetedIfcParser
 except ImportError:
     _logger.warning("Parser IFC non disponible")
     SimpleIfcParser = None
@@ -241,7 +241,7 @@ class Model3D(models.Model):
 
     # NOUVELLE MÉTHODE POUR ANALYSER LE FICHIER IFC ET EXTRAIRE LES DONNÉES JSON
     def _analyze_ifc_file(self, record):
-        """Analyse le fichier IFC pour extraire les métadonnées et données JSON"""
+        """Analyse le fichier IFC pour extraire les métadonnées et données JSON ciblées"""
         try:
             if not record.ifc_file or not record.ifc_filename:
                 return
@@ -264,33 +264,45 @@ class Model3D(models.Model):
             # Calculer la taille du fichier
             file_size = os.path.getsize(ifc_path)
 
-            # Utiliser le parser IFC pour extraire les données
-            if SimpleIfcParser:
-                parser = SimpleIfcParser()
+            # Utiliser le parser IFC ciblé pour extraire uniquement ce qui nous intéresse
+            if TargetedIfcParser:
+                parser = TargetedIfcParser()
                 ifc_data = parser.parse_file(ifc_path)
 
                 # Extraire les informations de base
                 file_info = ifc_data.get('file_info', {})
                 ifc_version = file_info.get('version', 'Non détectée')
-                entities_count = ifc_data.get('summary', {}).get('total_entities', 0)
-                entity_types = list(ifc_data.get('summary', {}).get('entity_types', {}).keys())
 
-                # Stocker les données JSON
+                # Compter les PropertySets et objets référencés
+                property_sets_count = ifc_data.get('summary', {}).get('property_sets_count', 0)
+                referenced_objects_count = ifc_data.get('summary', {}).get('referenced_objects_count', 0)
+                total_entities = property_sets_count + referenced_objects_count
+
+                # Créer une liste des types d'entités trouvées
+                entity_types = ['IFCPROPERTYSET']
+                if referenced_objects_count > 0:
+                    # Ajouter les types d'objets référencés
+                    ref_objects = ifc_data.get('referenced_objects', {})
+                    ref_types = list(set([obj.get('Type', 'UNKNOWN') for obj in ref_objects.values()]))
+                    entity_types.extend(ref_types)
+
+                # Stocker les données JSON ciblées
                 record.write({
                     'ifc_version': ifc_version,
                     'ifc_file_size': file_size,
                     'ifc_data_json': json.dumps(ifc_data, indent=2, ensure_ascii=False),
-                    'ifc_entities_count': entities_count,
+                    'ifc_entities_count': total_entities,
                     'ifc_entity_types': ', '.join(entity_types),
                     'ifc_parsing_status': 'parsed',
                     'ifc_parsing_error': False
                 })
 
-                _logger.info(f"IFC analysé avec succès: {record.ifc_filename}, version: {ifc_version}, "
-                           f"entités: {entities_count}, taille: {file_size} octets")
+                _logger.info(f"IFC analysé avec succès (mode ciblé): {record.ifc_filename}, "
+                           f"version: {ifc_version}, PropertySets: {property_sets_count}, "
+                           f"objets référencés: {referenced_objects_count}, taille: {file_size} octets")
 
             else:
-                # Parser simple sans bibliothèque externe
+                # Fallback sur l'analyse simple si le parser ciblé n'est pas disponible
                 ifc_data = self._simple_ifc_analysis(ifc_path)
 
                 record.write({
@@ -314,7 +326,7 @@ class Model3D(models.Model):
             })
 
     def _simple_ifc_analysis(self, ifc_path):
-        """Analyse IFC simple sans bibliothèque externe"""
+        """Analyse IFC simple sans bibliothèque externe - version ciblée pour PropertySets"""
         try:
             with open(ifc_path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
@@ -331,13 +343,21 @@ class Model3D(models.Model):
             if name_match:
                 file_name = name_match.group(1)
 
-            # Compter les entités
-            entities = re.findall(r'#\d+=(\w+)\(', content)
-            entity_types = list(set(entities))
-            entities_count = len(entities)
+            # Compter UNIQUEMENT les IFCPROPERTYSET et quelques objets de référence
+            target_types = ['IFCPROPERTYSET', 'IFCMATERIAL', 'IFCUNIT', 'IFCSIUNIT']
+            entities_count = 0
+            found_types = []
 
-            # Créer la structure JSON de base
+            for target_type in target_types:
+                pattern = rf'#{{\d+}}={target_type}\('
+                matches = re.findall(pattern, content)
+                if matches:
+                    entities_count += len(matches)
+                    found_types.append(f"{target_type}({len(matches)})")
+
+            # Créer la structure JSON de base ciblée
             result = {
+                'parsing_mode': 'simple_targeted',
                 'file_info': {
                     'name': file_name,
                     'version': ifc_version,
@@ -345,10 +365,11 @@ class Model3D(models.Model):
                 },
                 'summary': {
                     'total_entities': entities_count,
-                    'entity_types': {etype: entities.count(etype) for etype in entity_types}
+                    'entity_types_found': found_types
                 },
-                'entities': {},
-                'parsing_method': 'simple_regex'
+                'property_sets': {},
+                'referenced_objects': {},
+                'note': 'Analyse simple ciblée - PropertySets et objets de référence uniquement'
             }
 
             return result
@@ -358,9 +379,11 @@ class Model3D(models.Model):
             return {
                 'error': True,
                 'message': str(e),
+                'parsing_mode': 'simple_targeted_error',
                 'file_info': {'name': 'unknown.ifc', 'version': 'Erreur', 'schema': 'Erreur'},
-                'summary': {'total_entities': 0, 'entity_types': {}},
-                'entities': {}
+                'summary': {'total_entities': 0, 'entity_types_found': []},
+                'property_sets': {},
+                'referenced_objects': {}
             }
 
     # NOUVELLE MÉTHODE POUR SAUVEGARDER LE FICHIER IFC
