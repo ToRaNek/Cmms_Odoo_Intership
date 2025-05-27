@@ -1,3 +1,4 @@
+# custom_addons/cmms_3d_models/controllers/main.py
 import os
 import json
 import base64
@@ -288,7 +289,7 @@ class CMMS3DController(http.Controller):
 
     @http.route('/web/cmms/viewer/<int:model3d_id>', type='http', auth="public")
     def simple_viewer(self, model3d_id, **kw):
-        """Page simple de visualisation 3D"""
+        """Page simple de visualisation 3D - Version corrigée"""
         model3d = request.env['cmms.model3d'].sudo().browse(model3d_id)
         if not model3d.exists():
             return request.not_found()
@@ -423,40 +424,40 @@ class CMMS3DController(http.Controller):
             """
 
         # Création d'une simple page HTML avec un visualiseur 3D utilisant les CDN officiels
-        html = """
+        html = f"""
         <!DOCTYPE html>
         <html>
         <head>
-            <title>CMMS 3D Viewer - %s</title>
+            <title>CMMS 3D Viewer - {model3d.name}</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-                #viewer { width: 100%%; height: 100vh; }
-                #loading {
+                body {{ margin: 0; overflow: hidden; font-family: Arial, sans-serif; }}
+                #viewer {{ width: 100%; height: 100vh; }}
+                #loading {{
                     position: absolute;
-                    top: 50%%;
-                    left: 50%%;
-                    transform: translate(-50%%, -50%%);
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     background: rgba(255,255,255,0.8);
                     padding: 20px;
                     border-radius: 10px;
                     text-align: center;
                     z-index: 100;
-                }
-                #spinner {
+                }}
+                #spinner {{
                     border: 5px solid #f3f3f3;
                     border-top: 5px solid #3498db;
-                    border-radius: 50%%;
+                    border-radius: 50%;
                     width: 50px;
                     height: 50px;
                     animation: spin 1s linear infinite;
                     margin: 0 auto 10px auto;
-                }
-                @keyframes spin {
-                    0%% { transform: rotate(0deg); }
-                    100%% { transform: rotate(360deg); }
-                }
-                #controls {
+                }}
+                @keyframes spin {{
+                    0% {{ transform: rotate(0deg); }}
+                    100% {{ transform: rotate(360deg); }}
+                }}
+                #controls {{
                     position: absolute;
                     bottom: 20px;
                     left: 20px;
@@ -465,8 +466,8 @@ class CMMS3DController(http.Controller):
                     padding: 10px;
                     border-radius: 5px;
                     font-size: 14px;
-                }
-                #modelInfo {
+                }}
+                #modelInfo {{
                     position: absolute;
                     top: 20px;
                     left: 20px;
@@ -476,25 +477,25 @@ class CMMS3DController(http.Controller):
                     border-radius: 5px;
                     font-size: 14px;
                     max-width: 300px;
-                }
-                #error {
+                }}
+                #error {{
                     display: none;
                     position: absolute;
-                    top: 50%%;
-                    left: 50%%;
-                    transform: translate(-50%%, -50%%);
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     background: rgba(220,53,69,0.8);
                     color: white;
                     padding: 20px;
                     border-radius: 10px;
                     text-align: center;
                     z-index: 100;
-                    max-width: 80%%;
-                }
-                #info {
+                    max-width: 80%;
+                }}
+                #info {{
                     position: absolute;
                     top: 0px;
-                    width: 100%%;
+                    width: 100%;
                     padding: 10px;
                     box-sizing: border-box;
                     text-align: center;
@@ -502,8 +503,8 @@ class CMMS3DController(http.Controller):
                     color: #fff;
                     background-color: rgba(0,0,0,0.5);
                     font-size: 14px;
-                }
-                #debug {
+                }}
+                #debug {{
                     position: absolute;
                     bottom: 10px;
                     right: 10px;
@@ -516,10 +517,10 @@ class CMMS3DController(http.Controller):
                     max-height: 150px;
                     overflow: auto;
                     z-index: 100;
-                }
+                }}
 
                 /* Nouveau style pour le sélecteur de sous-modèles */
-                #submodelSelector {
+                #submodelSelector {{
                     position: absolute;
                     top: 50px;
                     right: 20px;
@@ -531,49 +532,49 @@ class CMMS3DController(http.Controller):
                     max-width: 200px;
                     overflow-y: auto;
                     max-height: 80vh;
-                }
-                .submodel-item {
+                }}
+                .submodel-item {{
                     padding: 5px;
                     cursor: pointer;
                     border-bottom: 1px solid rgba(255,255,255,0.2);
-                }
-                .submodel-item:hover {
+                }}
+                .submodel-item:hover {{
                     background: rgba(255,255,255,0.1);
-                }
-                .submodel-item.active {
+                }}
+                .submodel-item.active {{
                     background: rgba(0,150,255,0.3);
                     font-weight: bold;
-                }
-                .child-model {
+                }}
+                .child-model {{
                     padding-left: 15px;
                     font-size: 0.9em;
-                }
+                }}
             </style>
         </head>
         <body>
             <div id="viewer"></div>
             <div id="info">
-                <b>CMMS 3D Viewer - <span id="currentModelName">%s</span></b><br>
+                <b>CMMS 3D Viewer - <span id="currentModelName">{model3d.name}</span></b><br>
                 Cliquer et glisser pour faire pivoter | Molette pour zoomer | Clic droit pour déplacer
             </div>
 
             <!-- Sélecteur de sous-modèles si on a des enfants -->
-            <div id="submodelSelector" style="%s">
+            <div id="submodelSelector" style="display: {'block' if include_children or model3d.child_ids else 'none'};">
                 <h4>Modèles</h4>
                 <div id="modelList"></div>
             </div>
 
             <!-- NOUVEAU: Informations IFC -->
-            %s
+            {ifc_info}
 
             <div id="loading">
                 <div id="spinner"></div>
-                <div id="progress">Chargement... 0%%</div>
+                <div id="progress">Chargement... 0%</div>
             </div>
             <div id="modelInfo">
-                <h3>%s</h3>
-                <p>%s</p>
-                %s
+                <h3>{model3d.name}</h3>
+                <p>{model3d.description or ""}</p>
+                {'<p><small>Convertit depuis fichier Blender: ' + model3d.source_blend_filename + '</small></p>' if model3d.is_converted_from_blend else ""}
             </div>
             <div id="error">
                 <h3>Erreur de chargement</h3>
@@ -590,7 +591,7 @@ class CMMS3DController(http.Controller):
 
             <script>
                 // Debug log helper
-                function debugLog(message) {
+                function debugLog(message) {{
                     const debugEl = document.getElementById('debug');
                     const entry = document.createElement('div');
                     entry.textContent = message;
@@ -600,161 +601,338 @@ class CMMS3DController(http.Controller):
                     debugEl.scrollTop = debugEl.scrollHeight;
 
                     // Limit entries
-                    while (debugEl.children.length > 20) {
+                    while (debugEl.children.length > 20) {{
                         debugEl.removeChild(debugEl.firstChild);
-                    }
+                    }}
 
                     console.log(message);
-                }
+                }}
 
                 // Données des modèles
-                const modelsData = %s;
-                debugLog(`Modèles chargés: ${modelsData.length}`);
+                const modelsData = {models_json};
+                debugLog(`Modèles chargés: ${{modelsData.length}}`);
 
                 // Log modèle principal
-                if (modelsData.length > 0) {
-                    debugLog(`Modèle principal: ${modelsData[0].name}, URL: ${modelsData[0].url}`);
-                    if (modelsData[0].has_ifc) {
-                        debugLog(`Fichier IFC disponible: ${modelsData[0].ifc_version || 'Version inconnue'}`);
-                    }
-                }
+                if (modelsData.length > 0) {{
+                    debugLog(`Modèle principal: ${{modelsData[0].name}}, URL: ${{modelsData[0].url}}`);
+                    if (modelsData[0].has_ifc) {{
+                        debugLog(`Fichier IFC disponible: ${{modelsData[0].ifc_version || 'Version inconnue'}}`);
+                    }}
+                }}
 
                 // Log sous-modèles
-                if (modelsData.length > 1) {
-                    debugLog(`Nombre de sous-modèles: ${modelsData.length - 1}`);
-                    for (let i = 1; i < Math.min(5, modelsData.length); i++) {
-                        debugLog(`Sous-modèle #${i}: ${modelsData[i].name}, URL: ${modelsData[i].url}`);
-                    }
-                    if (modelsData.length > 5) {
-                        debugLog(`... et ${modelsData.length - 5} autres sous-modèles`);
-                    }
-                }
+                if (modelsData.length > 1) {{
+                    debugLog(`Nombre de sous-modèles: ${{modelsData.length - 1}}`);
+                    for (let i = 1; i < Math.min(5, modelsData.length); i++) {{
+                        debugLog(`Sous-modèle #${{i}}: ${{modelsData[i].name}}, URL: ${{modelsData[i].url}}`);
+                    }}
+                    if (modelsData.length > 5) {{
+                        debugLog(`... et ${{modelsData.length - 5}} autres sous-modèles`);
+                    }}
+                }}
 
                 // Variables pour Three.js
                 let scene, camera, renderer, controls;
-                let loadedModels = {}; // Stocke les modèles chargés par ID
+                let loadedModels = {{}}; // Stocke les modèles chargés par ID
 
                 // Initialiser la scène
                 init();
 
-                // Le reste du code JavaScript Three.js reste identique...
-                // [Code JavaScript inchangé pour économiser l'espace]
+                function init() {{
+                    debugLog('Initialisation de Three.js...');
+                    
+                    // Créer la scène
+                    scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0xf0f0f0);
 
-                function init() {
-                    // [Code existant inchangé]
-                }
+                    // Setup caméra
+                    const container = document.getElementById('viewer');
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+                    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                    camera.position.set(5, 5, 5);
+                    camera.lookAt(0, 0, 0);
 
-                function loadModel(modelData, callback) {
-                    // [Code existant inchangé]
-                }
+                    // Setup renderer
+                    try {{
+                        renderer = new THREE.WebGLRenderer({{ antialias: true }});
+                        renderer.setSize(width, height);
+                        renderer.setPixelRatio(window.devicePixelRatio);
+                        renderer.shadowMap.enabled = true;
+                        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                        container.appendChild(renderer.domElement);
+                        debugLog('Renderer WebGL initialisé');
+                    }} catch (e) {{
+                        showError("Erreur d'initialisation WebGL: " + e.message);
+                        return;
+                    }}
 
-                function centerCameraOnModel(model) {
-                    // [Code existant inchangé]
-                }
+                    // Setup controls
+                    try {{
+                        controls = new THREE.OrbitControls(camera, renderer.domElement);
+                        controls.enableDamping = true;
+                        controls.dampingFactor = 0.05;
+                        controls.enableZoom = true;
+                        controls.enablePan = true;
+                        controls.enableRotate = true;
+                        debugLog('Contrôles OrbitControls initialisés');
+                    }} catch (e) {{
+                        showError("Erreur d'initialisation des contrôles: " + e.message);
+                        return;
+                    }}
 
-                function toggleModel(modelId, visible = true) {
-                    // [Code existant inchangé]
-                }
+                    // Ajouter des lumières
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                    scene.add(ambientLight);
 
-                function showOnlyModel(modelId) {
-                    // [Code existant inchangé]
-                }
+                    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+                    directionalLight1.position.set(10, 10, 5);
+                    directionalLight1.castShadow = true;
+                    directionalLight1.shadow.mapSize.width = 2048;
+                    directionalLight1.shadow.mapSize.height = 2048;
+                    scene.add(directionalLight1);
 
-                function showAllModels() {
-                    // [Code existant inchangé]
-                }
+                    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+                    directionalLight2.position.set(-10, -10, -5);
+                    scene.add(directionalLight2);
 
-                function populateModelSelector() {
-                    // [Code existant inchangé]
-                }
+                    debugLog('Lumières ajoutées');
 
-                function animate() {
-                    // [Code existant inchangé]
-                }
+                    // Charger le modèle principal
+                    if (modelsData.length > 0) {{
+                        loadModel(modelsData[0], function() {{
+                            debugLog('Modèle principal chargé');
+                            
+                            // Charger les sous-modèles si présents
+                            let childModelsLoaded = 0;
+                            const totalChildModels = modelsData.length - 1;
+                            
+                            if (totalChildModels > 0) {{
+                                for (let i = 1; i < modelsData.length; i++) {{
+                                    loadModel(modelsData[i], function() {{
+                                        childModelsLoaded++;
+                                        debugLog(`Sous-modèle ${{childModelsLoaded}}/${{totalChildModels}} chargé`);
+                                        
+                                        if (childModelsLoaded === totalChildModels) {{
+                                            debugLog('Tous les sous-modèles chargés');
+                                            populateModelSelector();
+                                            centerCameraOnAllModels();
+                                        }}
+                                    }});
+                                }}
+                            }} else {{
+                                populateModelSelector();
+                                centerCameraOnAllModels();
+                            }}
+                            
+                            document.getElementById('loading').style.display = 'none';
+                        }});
+                    }} else {{
+                        showError('Aucun modèle à charger');
+                    }}
 
-                function onWindowResize() {
-                    // [Code existant inchangé]
-                }
+                    // Animation
+                    animate();
 
-                function showError(message) {
-                    // [Code existant inchangé]
-                }
+                    // Gestion du redimensionnement
+                    window.addEventListener('resize', onWindowResize);
+                }}
 
-                // [Code JavaScript complet omis pour économiser l'espace]
+                function loadModel(modelData, callback) {{
+                    debugLog(`Chargement du modèle: ${{modelData.name}}`);
+                    
+                    const loader = new THREE.GLTFLoader();
+
+                    // Setup DRACO decoder for compressed models
+                    if (typeof THREE.DRACOLoader !== 'undefined') {{
+                        const dracoLoader = new THREE.DRACOLoader();
+                        dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+                        loader.setDRACOLoader(dracoLoader);
+                    }}
+
+                    // Définir le chemin de base pour les ressources
+                    const modelUrl = modelData.url;
+                    const basePath = modelUrl.substring(0, modelUrl.lastIndexOf('/') + 1);
+                    loader.setResourcePath(basePath);
+
+                    loader.load(
+                        modelUrl,
+                        function (gltf) {{
+                            try {{
+                                const model = gltf.scene;
+                                
+                                // Appliquer les transformations
+                                model.scale.set(modelData.scale, modelData.scale, modelData.scale);
+                                model.position.set(modelData.position.x, modelData.position.y, modelData.position.z);
+                                model.rotation.set(
+                                    THREE.MathUtils.degToRad(modelData.rotation.x),
+                                    THREE.MathUtils.degToRad(modelData.rotation.y),
+                                    THREE.MathUtils.degToRad(modelData.rotation.z)
+                                );
+
+                                // Configuration des ombres
+                                model.traverse(function (child) {{
+                                    if (child.isMesh) {{
+                                        child.castShadow = true;
+                                        child.receiveShadow = true;
+                                    }}
+                                }});
+
+                                // Ajouter à la scène
+                                scene.add(model);
+                                loadedModels[modelData.id] = model;
+                                
+                                debugLog(`Modèle ajouté à la scène: ${{modelData.name}}`);
+                                
+                                if (callback) callback();
+                            }} catch (e) {{
+                                debugLog(`Erreur lors du traitement du modèle: ${{e.message}}`);
+                                showError(`Erreur lors du traitement du modèle ${{modelData.name}}: ${{e.message}}`);
+                            }}
+                        }},
+                        function (xhr) {{
+                            if (xhr.lengthComputable) {{
+                                const percentComplete = xhr.loaded / xhr.total * 100;
+                                const progressText = `Chargement ${{modelData.name}}... ${{Math.round(percentComplete)}}%`;
+                                document.getElementById('progress').textContent = progressText;
+                                debugLog(progressText);
+                            }}
+                        }},
+                        function (error) {{
+                            debugLog(`Erreur de chargement pour ${{modelData.name}}: ${{error.message || error}}`);
+                            showError(`Erreur lors du chargement du modèle ${{modelData.name}}: ${{error.message || error}}`);
+                        }}
+                    );
+                }}
+
+                function centerCameraOnAllModels() {{
+                    if (Object.keys(loadedModels).length === 0) return;
+
+                    const box = new THREE.Box3();
+                    
+                    // Calculer la boîte englobante de tous les modèles
+                    Object.values(loadedModels).forEach(model => {{
+                        const modelBox = new THREE.Box3().setFromObject(model);
+                        box.union(modelBox);
+                    }});
+
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = camera.fov * (Math.PI / 180);
+                    const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+                    camera.position.set(
+                        center.x + cameraZ * 0.8,
+                        center.y + cameraZ * 0.6,
+                        center.z + cameraZ * 0.8
+                    );
+                    
+                    controls.target.copy(center);
+                    controls.update();
+                    
+                    debugLog(`Caméra centrée sur tous les modèles`);
+                }}
+
+                function toggleModel(modelId, visible = true) {{
+                    const model = loadedModels[modelId];
+                    if (model) {{
+                        model.visible = visible;
+                        debugLog(`Modèle ${{modelId}} ${{visible ? 'affiché' : 'masqué'}}`);
+                    }}
+                }}
+
+                function showOnlyModel(modelId) {{
+                    Object.keys(loadedModels).forEach(id => {{
+                        loadedModels[id].visible = (id == modelId);
+                    }});
+                    
+                    const modelData = modelsData.find(m => m.id == modelId);
+                    if (modelData) {{
+                        document.getElementById('currentModelName').textContent = modelData.name;
+                        debugLog(`Affichage du modèle uniquement: ${{modelData.name}}`);
+                    }}
+                }}
+
+                function showAllModels() {{
+                    Object.values(loadedModels).forEach(model => {{
+                        model.visible = true;
+                    }});
+                    document.getElementById('currentModelName').textContent = 'Tous les modèles';
+                    debugLog('Affichage de tous les modèles');
+                }}
+
+                function populateModelSelector() {{
+                    const modelList = document.getElementById('modelList');
+                    if (!modelList) return;
+
+                    modelList.innerHTML = '';
+
+                    // Afficher tous les modèles
+                    const allItem = document.createElement('div');
+                    allItem.className = 'submodel-item active';
+                    allItem.textContent = 'Tous les modèles';
+                    allItem.onclick = function() {{
+                        document.querySelectorAll('.submodel-item').forEach(item => item.classList.remove('active'));
+                        allItem.classList.add('active');
+                        showAllModels();
+                    }};
+                    modelList.appendChild(allItem);
+
+                    // Ajouter chaque modèle
+                    modelsData.forEach(function(modelData) {{
+                        const item = document.createElement('div');
+                        item.className = 'submodel-item' + (modelData.is_child ? ' child-model' : '');
+                        item.textContent = modelData.name;
+                        item.onclick = function() {{
+                            document.querySelectorAll('.submodel-item').forEach(item => item.classList.remove('active'));
+                            item.classList.add('active');
+                            showOnlyModel(modelData.id);
+                        }};
+                        modelList.appendChild(item);
+                    }});
+                }}
+
+                function animate() {{
+                    requestAnimationFrame(animate);
+                    
+                    if (controls) {{
+                        controls.update();
+                    }}
+                    
+                    if (renderer && scene && camera) {{
+                        renderer.render(scene, camera);
+                    }}
+                }}
+
+                function onWindowResize() {{
+                    const container = document.getElementById('viewer');
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+
+                    camera.aspect = width / height;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(width, height);
+                }}
+
+                function showError(message) {{
+                    document.getElementById('loading').style.display = 'none';
+                    const errorDiv = document.getElementById('error');
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorDiv.style.display = 'block';
+                    errorMessage.textContent = message;
+                    debugLog(`ERREUR: ${{message}}`);
+                }}
             </script>
         </body>
         </html>
-        """ % (
-            model3d.name,  # Title
-            model3d.name,  # Current model name display
-            "display: " + ("block" if include_children or model3d.child_ids else "none"),  # Afficher le sélecteur uniquement s'il y a des enfants
-            ifc_info,  # NOUVEAU: Informations IFC
-            model3d.name,  # Model info header
-            model3d.description or "",  # Model info description
-            # Ajouter une note si le modèle a été converti depuis Blender
-            '<p><small>Convertit depuis fichier Blender: ' + model3d.source_blend_filename + '</small></p>' if model3d.is_converted_from_blend else "",
-            models_json  # Données des modèles en JSON
-        )
+        """
 
         return request.make_response(
             html,
             headers=[('Content-Type', 'text/html')]
         )
-
-    # Toutes les autres méthodes existantes restent inchangées
-    # ... (autres méthodes omises pour économiser l'espace)
-
-    @http.route('/web/cmms/equipment/<int:equipment_id>', type='json', auth="user")
-    def get_equipment_3d_info(self, equipment_id, **kw):
-        """Récupère les informations 3D d'un équipement"""
-        equipment = request.env['maintenance.equipment'].sudo().browse(equipment_id)
-        if not equipment.exists() or not equipment.model3d_id:
-            return {'error': 'Équipement non trouvé ou sans modèle 3D'}
-
-        result = {
-            'equipment': {
-                'id': equipment.id,
-                'name': equipment.name,
-                'scale': equipment.model3d_scale,
-                'position': {
-                    'x': equipment.model3d_position_x,
-                    'y': equipment.model3d_position_y,
-                    'z': equipment.model3d_position_z
-                },
-                'rotation': {
-                    'x': equipment.model3d_rotation_x,
-                    'y': equipment.model3d_rotation_y,
-                    'z': equipment.model3d_rotation_z
-                }
-            },
-            'model3d': {
-                'id': equipment.model3d_id.id,
-                'name': equipment.model3d_id.name,
-                'url': equipment.model3d_id.model_url,
-                'format': equipment.model3d_id.model_format,
-                'has_external_files': equipment.model3d_id.has_external_files,
-                'scale': equipment.model3d_id.scale,
-                'position': {
-                    'x': equipment.model3d_id.position_x,
-                    'y': equipment.model3d_id.position_y,
-                    'z': equipment.model3d_id.position_z
-                },
-                'rotation': {
-                    'x': equipment.model3d_id.rotation_x,
-                    'y': equipment.model3d_id.rotation_y,
-                    'z': equipment.model3d_id.rotation_z
-                },
-                # NOUVEAU: Ajouter les informations IFC
-                'has_ifc': equipment.model3d_id.has_ifc_file,
-                'ifc_url': equipment.model3d_id.ifc_url if equipment.model3d_id.has_ifc_file else None,
-                'ifc_version': equipment.model3d_id.ifc_version if equipment.model3d_id.has_ifc_file else None,
-                'ifc_filename': equipment.model3d_id.ifc_filename if equipment.model3d_id.has_ifc_file else None,
-            }
-        }
-
-        return result
-
-    # Ajouter ces routes à la classe CMMS3DController
 
     @http.route('/web/cmms/submodel/<int:parent_id>/<int:submodel_id>', type='http', auth="public")
     def submodel_viewer(self, parent_id, submodel_id, **kw):
@@ -793,78 +971,57 @@ class CMMS3DController(http.Controller):
             }
 
             # Création d'une simple page HTML avec un visualiseur 3D
-            html = """
+            html = f"""
             <!DOCTYPE html>
             <html>
             <head>
-                <title>CMMS 3D Sous-modèle Viewer - %s</title>
+                <title>CMMS 3D Sous-modèle Viewer - {submodel.name}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-                    #viewer { width: 100%%; height: 100vh; }
-                    #loading {
+                    body {{ margin: 0; overflow: hidden; font-family: Arial, sans-serif; }}
+                    #viewer {{ width: 100%; height: 100vh; }}
+                    #loading {{
                         position: absolute;
-                        top: 50%%;
-                        left: 50%%;
-                        transform: translate(-50%%, -50%%);
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
                         background: rgba(255,255,255,0.8);
                         padding: 20px;
                         border-radius: 10px;
                         text-align: center;
                         z-index: 100;
-                    }
-                    #spinner {
+                    }}
+                    #spinner {{
                         border: 5px solid #f3f3f3;
                         border-top: 5px solid #3498db;
-                        border-radius: 50%%;
+                        border-radius: 50%;
                         width: 50px;
                         height: 50px;
                         animation: spin 1s linear infinite;
                         margin: 0 auto 10px auto;
-                    }
-                    @keyframes spin {
-                        0%% { transform: rotate(0deg); }
-                        100%% { transform: rotate(360deg); }
-                    }
-                    #controls {
-                        position: absolute;
-                        bottom: 20px;
-                        left: 20px;
-                        background: rgba(0,0,0,0.5);
-                        color: white;
-                        padding: 10px;
-                        border-radius: 5px;
-                        font-size: 14px;
-                    }
-                    #modelInfo {
-                        position: absolute;
-                        top: 20px;
-                        left: 20px;
-                        background: rgba(0,0,0,0.5);
-                        color: white;
-                        padding: 10px;
-                        border-radius: 5px;
-                        font-size: 14px;
-                        max-width: 300px;
-                    }
-                    #error {
+                    }}
+                    @keyframes spin {{
+                        0% {{ transform: rotate(0deg); }}
+                        100% {{ transform: rotate(360deg); }}
+                    }}
+                    #error {{
                         display: none;
                         position: absolute;
-                        top: 50%%;
-                        left: 50%%;
-                        transform: translate(-50%%, -50%%);
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
                         background: rgba(220,53,69,0.8);
                         color: white;
                         padding: 20px;
                         border-radius: 10px;
                         text-align: center;
                         z-index: 100;
-                        max-width: 80%%;
-                    }
-                    #info {
+                        max-width: 80%;
+                    }}
+                    #info {{
                         position: absolute;
                         top: 0px;
-                        width: 100%%;
+                        width: 100%;
                         padding: 10px;
                         box-sizing: border-box;
                         text-align: center;
@@ -872,8 +1029,8 @@ class CMMS3DController(http.Controller):
                         color: #fff;
                         background-color: rgba(0,0,0,0.5);
                         font-size: 14px;
-                    }
-                    .close-button {
+                    }}
+                    .close-button {{
                         position: absolute;
                         top: 10px;
                         right: 10px;
@@ -883,11 +1040,11 @@ class CMMS3DController(http.Controller):
                         border-radius: 5px;
                         padding: 5px 10px;
                         cursor: pointer;
-                    }
-                    .close-button:hover {
+                    }}
+                    .close-button:hover {{
                         background: rgba(0,0,0,0.8);
-                    }
-                    .return-button {
+                    }}
+                    .return-button {{
                         position: absolute;
                         top: 10px;
                         right: 100px;
@@ -897,29 +1054,24 @@ class CMMS3DController(http.Controller):
                         border-radius: 5px;
                         padding: 5px 10px;
                         cursor: pointer;
-                    }
-                    .return-button:hover {
+                    }}
+                    .return-button:hover {{
                         background: rgba(0,0,0,0.8);
-                    }
+                    }}
                 </style>
             </head>
             <body>
                 <div id="viewer"></div>
                 <div id="info">
-                    <b>CMMS 3D Viewer - Sous-modèle: <span id="currentModelName">%s</span></b><br>
+                    <b>CMMS 3D Viewer - Sous-modèle: <span id="currentModelName">{submodel.name}</span></b><br>
                     Cliquer et glisser pour faire pivoter | Molette pour zoomer | Clic droit pour déplacer
                 </div>
                 <button class="close-button" onclick="window.close()">Fermer</button>
-                <button class="return-button" onclick="window.location.href='/web/cmms/viewer/%s'">Retour au modèle principal</button>
+                <button class="return-button" onclick="window.location.href='/web/cmms/viewer/{parent_id}'">Retour au modèle principal</button>
 
                 <div id="loading">
                     <div id="spinner"></div>
-                    <div id="progress">Chargement... 0%%</div>
-                </div>
-                <div id="modelInfo">
-                    <h3>%s</h3>
-                    <p>%s</p>
-                    <p><small>ID relatif: %s</small></p>
+                    <div id="progress">Chargement... 0%</div>
                 </div>
                 <div id="error">
                     <h3>Erreur de chargement</h3>
@@ -935,7 +1087,7 @@ class CMMS3DController(http.Controller):
 
                 <script>
                     // Données du sous-modèle
-                    const submodelData = %s;
+                    const submodelData = {json.dumps(submodel_data)};
                     console.log("Données du sous-modèle:", submodelData);
 
                     // Variables pour Three.js
@@ -945,7 +1097,7 @@ class CMMS3DController(http.Controller):
                     init();
 
                     // Fonction d'initialisation principale
-                    function init() {
+                    function init() {{
                         // Créer la scène
                         scene = new THREE.Scene();
                         scene.background = new THREE.Color(0xf0f0f0);
@@ -958,26 +1110,26 @@ class CMMS3DController(http.Controller):
                         camera.position.z = 5;
 
                         // Setup renderer
-                        try {
-                            renderer = new THREE.WebGLRenderer({ antialias: true });
+                        try {{
+                            renderer = new THREE.WebGLRenderer({{ antialias: true }});
                             renderer.setSize(width, height);
                             renderer.setPixelRatio(window.devicePixelRatio);
-                            renderer.outputEncoding = THREE.sRGBEncoding;
+                            renderer.shadowMap.enabled = true;
                             container.appendChild(renderer.domElement);
-                        } catch (e) {
+                        }} catch (e) {{
                             showError("Erreur d'initialisation WebGL: " + e.message);
                             return;
-                        }
+                        }}
 
                         // Setup controls
-                        try {
+                        try {{
                             controls = new THREE.OrbitControls(camera, renderer.domElement);
                             controls.enableDamping = true;
                             controls.dampingFactor = 0.25;
-                        } catch (e) {
+                        }} catch (e) {{
                             showError("Erreur d'initialisation des contrôles: " + e.message);
                             return;
-                        }
+                        }}
 
                         // Ajouter des lumières
                         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -999,24 +1151,23 @@ class CMMS3DController(http.Controller):
 
                         // Gestion du redimensionnement
                         window.addEventListener('resize', onWindowResize);
-                    }
+                    }}
 
                     // Fonction pour charger le sous-modèle
-                    function loadModel() {
+                    function loadModel() {{
                         const loader = new THREE.GLTFLoader();
 
                         // Setup DRACO decoder for compressed models
-                        if (typeof THREE.DRACOLoader !== 'undefined') {
+                        if (typeof THREE.DRACOLoader !== 'undefined') {{
                             const dracoLoader = new THREE.DRACOLoader();
                             dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
                             loader.setDRACOLoader(dracoLoader);
-                        }
+                        }}
 
                         // Ajouter un indicateur de chargement
                         document.getElementById('loading').style.display = 'block';
 
                         // Pour GLTFLoader, le chemin est critique pour trouver les textures
-                        // Toutes les textures doivent être dans le même répertoire que le fichier GLTF principal
                         const modelUrl = submodelData.gltf_url;
                         const modelUrlDir = modelUrl.substring(0, modelUrl.lastIndexOf('/') + 1);
 
@@ -1025,8 +1176,8 @@ class CMMS3DController(http.Controller):
 
                         loader.load(
                             modelUrl,
-                            function (gltf) {
-                                try {
+                            function (gltf) {{
+                                try {{
                                     model = gltf.scene;
 
                                     // Appliquer les transformations
@@ -1043,9 +1194,9 @@ class CMMS3DController(http.Controller):
                                     );
 
                                     model.rotation.set(
-                                        THREE.Math.degToRad(submodelData.rotation_x),
-                                        THREE.Math.degToRad(submodelData.rotation_y),
-                                        THREE.Math.degToRad(submodelData.rotation_z)
+                                        THREE.MathUtils.degToRad(submodelData.rotation_x),
+                                        THREE.MathUtils.degToRad(submodelData.rotation_y),
+                                        THREE.MathUtils.degToRad(submodelData.rotation_z)
                                     );
 
                                     // Ajouter le modèle à la scène
@@ -1056,24 +1207,24 @@ class CMMS3DController(http.Controller):
 
                                     // Masque l'indicateur de chargement
                                     document.getElementById('loading').style.display = 'none';
-                                } catch (e) {
+                                }} catch (e) {{
                                     showError("Erreur lors du traitement du modèle 3D: " + e.message);
                                     console.error("Model processing error:", e);
-                                }
-                            },
-                            function (xhr) {
+                                }}
+                            }},
+                            function (xhr) {{
                                 const percent = xhr.loaded / xhr.total * 100;
-                                document.getElementById('progress').textContent = 'Chargement... ' + Math.round(percent) + '%%';
-                            },
-                            function (error) {
+                                document.getElementById('progress').textContent = 'Chargement... ' + Math.round(percent) + '%';
+                            }},
+                            function (error) {{
                                 console.error('Error loading 3D model:', error);
                                 showError("Erreur lors du chargement du modèle 3D: " + error.message);
-                            }
+                            }}
                         );
-                    }
+                    }}
 
                     // Centrer la caméra sur un modèle
-                    function centerCameraOnModel(model) {
+                    function centerCameraOnModel(model) {{
                         const box = new THREE.Box3().setFromObject(model);
                         const center = box.getCenter(new THREE.Vector3());
                         const size = box.getSize(new THREE.Vector3());
@@ -1085,18 +1236,18 @@ class CMMS3DController(http.Controller):
                         camera.position.z = center.z + cameraZ * 1.5;
                         controls.target.set(center.x, center.y, center.z);
                         controls.update();
-                    }
+                    }}
 
                     // Fonctions standard de Three.js
-                    function animate() {
+                    function animate() {{
                         requestAnimationFrame(animate);
                         if (controls) controls.update();
-                        if (renderer && scene && camera) {
+                        if (renderer && scene && camera) {{
                             renderer.render(scene, camera);
-                        }
-                    }
+                        }}
+                    }}
 
-                    function onWindowResize() {
+                    function onWindowResize() {{
                         const container = document.getElementById('viewer');
                         const width = container.clientWidth;
                         const height = container.clientHeight;
@@ -1104,27 +1255,19 @@ class CMMS3DController(http.Controller):
                         camera.aspect = width / height;
                         camera.updateProjectionMatrix();
                         renderer.setSize(width, height);
-                    }
+                    }}
 
-                    function showError(message) {
+                    function showError(message) {{
                         document.getElementById('loading').style.display = 'none';
                         const errorDiv = document.getElementById('error');
                         const errorMessage = document.getElementById('errorMessage');
                         errorDiv.style.display = 'block';
                         errorMessage.textContent = message;
-                    }
+                    }}
                 </script>
             </body>
             </html>
-            """ % (
-                submodel.name,  # Title
-                submodel.name,  # Current model name display
-                parent_id,      # Parent ID for the return button
-                submodel.name,  # Model info header
-                submodel.description or "",  # Model info description
-                submodel.relative_id,  # Relative ID
-                json.dumps(submodel_data)  # Données du sous-modèle en JSON
-            )
+            """
 
             return request.make_response(
                 html,
@@ -1192,3 +1335,53 @@ class CMMS3DController(http.Controller):
         except json.JSONDecodeError:
             _logger.error(f"Erreur de décodage JSON pour le modèle {model3d_id}")
             return []
+
+    @http.route('/web/cmms/equipment/<int:equipment_id>', type='json', auth="user")
+    def get_equipment_3d_info(self, equipment_id, **kw):
+        """Récupère les informations 3D d'un équipement"""
+        equipment = request.env['maintenance.equipment'].sudo().browse(equipment_id)
+        if not equipment.exists() or not equipment.model3d_id:
+            return {'error': 'Équipement non trouvé ou sans modèle 3D'}
+
+        result = {
+            'equipment': {
+                'id': equipment.id,
+                'name': equipment.name,
+                'scale': equipment.model3d_scale,
+                'position': {
+                    'x': equipment.model3d_position_x,
+                    'y': equipment.model3d_position_y,
+                    'z': equipment.model3d_position_z
+                },
+                'rotation': {
+                    'x': equipment.model3d_rotation_x,
+                    'y': equipment.model3d_rotation_y,
+                    'z': equipment.model3d_rotation_z
+                }
+            },
+            'model3d': {
+                'id': equipment.model3d_id.id,
+                'name': equipment.model3d_id.name,
+                'url': equipment.model3d_id.model_url,
+                'format': equipment.model3d_id.model_format,
+                'has_external_files': equipment.model3d_id.has_external_files,
+                'scale': equipment.model3d_id.scale,
+                'position': {
+                    'x': equipment.model3d_id.position_x,
+                    'y': equipment.model3d_id.position_y,
+                    'z': equipment.model3d_id.position_z
+                },
+                'rotation': {
+                    'x': equipment.model3d_id.rotation_x,
+                    'y': equipment.model3d_id.rotation_y,
+                    'z': equipment.model3d_id.rotation_z
+                },
+                # NOUVEAU: Ajouter les informations IFC
+                'has_ifc': equipment.model3d_id.has_ifc_file,
+                'ifc_url': equipment.model3d_id.ifc_url if equipment.model3d_id.has_ifc_file else None,
+                'ifc_version': equipment.model3d_id.ifc_version if equipment.model3d_id.has_ifc_file else None,
+                'ifc_filename': equipment.model3d_id.ifc_filename if equipment.model3d_id.has_ifc_file else None,
+            }
+        }
+
+        return result
