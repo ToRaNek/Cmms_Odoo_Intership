@@ -1,4 +1,4 @@
-# custom_addons/cmms_3d_models/models/model3d.py - Version complète avec support IFC
+# custom_addons/cmms_3d_models/models/model3d.py - Version avec extraction IFC JSON
 
 import os
 import base64
@@ -21,6 +21,13 @@ DEBUG_LOG_PATH = os.path.normpath(r"C:\Users\admin\Desktop\odoo\models\blender_d
 # Chemin vers l'exécutable Blender - à adapter selon votre installation
 BLENDER_EXE = r"C:\Program Files\Blender Foundation\Blender 4.4\blender.exe"
 
+# Import du parser IFC
+try:
+    from .ifc_parser import SimpleIfcParser
+except ImportError:
+    _logger.warning("Parser IFC non disponible")
+    SimpleIfcParser = None
+
 class Model3D(models.Model):
     _name = 'cmms.model3d'
     _description = '3D Model'
@@ -35,7 +42,7 @@ class Model3D(models.Model):
     thumbnail = fields.Binary('Thumbnail', attachment=True)
     active = fields.Boolean('Active', default=True)
 
-    # NOUVEAUX CHAMPS POUR LE FICHIER IFC
+    # CHAMPS POUR LE FICHIER IFC
     ifc_file = fields.Binary('Fichier IFC (BIM)', attachment=True,
                             help="Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance")
     ifc_filename = fields.Char('Nom du fichier IFC')
@@ -44,6 +51,20 @@ class Model3D(models.Model):
     ifc_version = fields.Char('Version IFC', readonly=True,
                              help="Version du format IFC détectée automatiquement")
     ifc_file_size = fields.Integer('Taille fichier IFC (octets)', readonly=True)
+
+    # NOUVEAU: Champs pour les données IFC extraites au format JSON
+    ifc_data_json = fields.Text('Données IFC (JSON)', readonly=True,
+                               help="Données BIM extraites du fichier IFC au format JSON structuré")
+    ifc_parsing_status = fields.Selection([
+        ('not_parsed', 'Non analysé'),
+        ('parsing', 'Analyse en cours'),
+        ('parsed', 'Analysé avec succès'),
+        ('error', 'Erreur d\'analyse')
+    ], string='Statut d\'analyse IFC', default='not_parsed', readonly=True)
+    ifc_parsing_error = fields.Text('Erreur d\'analyse IFC', readonly=True)
+    ifc_entities_count = fields.Integer('Nombre d\'entités IFC', readonly=True)
+    ifc_entity_types = fields.Text('Types d\'entités IFC', readonly=True,
+                                  help="Liste des types d'entités IFC trouvées dans le fichier")
 
     # New field for uploading all model files as a ZIP
     model_zip = fields.Binary('Complete Model (ZIP)',
@@ -103,7 +124,7 @@ class Model3D(models.Model):
     submodel_ids = fields.One2many('cmms.submodel3d', 'parent_id', string='Sous-modèles')
     submodel_count = fields.Integer('Nombre de sous-modèles (nouveau système)', compute='_compute_submodel_count')
 
-    # NOUVEAUX CHAMPS POUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT
+    # CHAMPS POUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT
     equipment_category_id = fields.Many2one(
         'maintenance.equipment.category',
         string='Catégorie d\'équipement',
@@ -218,12 +239,18 @@ class Model3D(models.Model):
             else:
                 record.viewer_url = False
 
-    # NOUVELLE MÉTHODE POUR ANALYSER LE FICHIER IFC
+    # NOUVELLE MÉTHODE POUR ANALYSER LE FICHIER IFC ET EXTRAIRE LES DONNÉES JSON
     def _analyze_ifc_file(self, record):
-        """Analyse le fichier IFC pour extraire les métadonnées"""
+        """Analyse le fichier IFC pour extraire les métadonnées et données JSON"""
         try:
             if not record.ifc_file or not record.ifc_filename:
                 return
+
+            # Marquer le début de l'analyse
+            record.write({
+                'ifc_parsing_status': 'parsing',
+                'ifc_parsing_error': False
+            })
 
             # Créer le dossier de modèle
             models_dir = os.path.normpath(os.path.join(MODELS_DIR, str(record.id)))
@@ -236,61 +263,109 @@ class Model3D(models.Model):
 
             # Calculer la taille du fichier
             file_size = os.path.getsize(ifc_path)
-            record.ifc_file_size = file_size
 
-            # Lire les premières lignes pour détecter la version IFC
-            ifc_version = "Not detected"
-            if hasattr(record, 'ifc_filename'):
-                ifc_path = os.path.normpath(os.path.join(MODELS_DIR, str(record.id), record.ifc_filename))
+            # Utiliser le parser IFC pour extraire les données
+            if SimpleIfcParser:
+                parser = SimpleIfcParser()
+                ifc_data = parser.parse_file(ifc_path)
+
+                # Extraire les informations de base
+                file_info = ifc_data.get('file_info', {})
+                ifc_version = file_info.get('version', 'Non détectée')
+                entities_count = ifc_data.get('summary', {}).get('total_entities', 0)
+                entity_types = list(ifc_data.get('summary', {}).get('entity_types', {}).keys())
+
+                # Stocker les données JSON
+                record.write({
+                    'ifc_version': ifc_version,
+                    'ifc_file_size': file_size,
+                    'ifc_data_json': json.dumps(ifc_data, indent=2, ensure_ascii=False),
+                    'ifc_entities_count': entities_count,
+                    'ifc_entity_types': ', '.join(entity_types),
+                    'ifc_parsing_status': 'parsed',
+                    'ifc_parsing_error': False
+                })
+
+                _logger.info(f"IFC analysé avec succès: {record.ifc_filename}, version: {ifc_version}, "
+                           f"entités: {entities_count}, taille: {file_size} octets")
+
             else:
-                return
+                # Parser simple sans bibliothèque externe
+                ifc_data = self._simple_ifc_analysis(ifc_path)
 
-            max_bytes = 10000  # 10 ko
-            total_bytes = 0
-            max_lines = 100
+                record.write({
+                    'ifc_version': ifc_data.get('version', 'Non détectée'),
+                    'ifc_file_size': file_size,
+                    'ifc_data_json': json.dumps(ifc_data, indent=2, ensure_ascii=False),
+                    'ifc_entities_count': ifc_data.get('entities_count', 0),
+                    'ifc_entity_types': ', '.join(ifc_data.get('entity_types', [])),
+                    'ifc_parsing_status': 'parsed',
+                    'ifc_parsing_error': False
+                })
 
-            try:
-                with open(ifc_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    for line in f:
-                        total_bytes += len(line.encode('utf-8', errors='ignore'))
-                        line_count += 1
-                        if 'FILE_SCHEMA' in line and 'IFC' in line:
-                            # Détection version
-                            if 'IFC2X3' in line:
-                                ifc_version = "IFC 2x3"
-                            elif 'IFC4X3' in line:
-                                ifc_version = "IFC 4.3"
-                            elif 'IFC4X1' in line:
-                                ifc_version = "IFC 4.1"
-                            elif 'IFC4' in line:
-                                ifc_version = "IFC 4"
-                            else:
-                                import re
-                                match = re.search(r'IFC(\w+)', line)
-                                if match:
-                                    ifc_version = f"IFC {match.group(1)}"
-                            break
-                        if total_bytes > max_bytes or line_count > max_lines:
-                            break
-            except Exception as e:
-                _logger.warning(f"Erreur lors de la lecture du fichier IFC pour détection de version: {str(e)}")
-
-            record.ifc_version = ifc_version
-
-            # Info pour suivi/debug
-            try:
-                file_size = os.path.getsize(ifc_path)
-            except Exception:
-                file_size = -1
-
-            _logger.info(f"Fichier IFC analysé: {record.ifc_filename}, version: {ifc_version}, taille: {file_size} octets")
+                _logger.info(f"IFC analysé (mode simple): {record.ifc_filename}, taille: {file_size} octets")
 
         except Exception as e:
-            _logger.error(f"Erreur lors de l'analyse du fichier IFC: {str(e)}")
+            error_message = f"Erreur lors de l'analyse du fichier IFC: {str(e)}"
+            _logger.error(error_message)
+            record.write({
+                'ifc_parsing_status': 'error',
+                'ifc_parsing_error': error_message
+            })
+
+    def _simple_ifc_analysis(self, ifc_path):
+        """Analyse IFC simple sans bibliothèque externe"""
+        try:
+            with open(ifc_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+
+            # Extraire la version IFC
+            ifc_version = "Non détectée"
+            version_match = re.search(r"FILE_SCHEMA\(\('([^']*)'", content)
+            if version_match:
+                ifc_version = version_match.group(1)
+
+            # Extraire le nom du fichier
+            file_name = "unknown.ifc"
+            name_match = re.search(r"FILE_NAME\('([^']*)'", content)
+            if name_match:
+                file_name = name_match.group(1)
+
+            # Compter les entités
+            entities = re.findall(r'#\d+=(\w+)\(', content)
+            entity_types = list(set(entities))
+            entities_count = len(entities)
+
+            # Créer la structure JSON de base
+            result = {
+                'file_info': {
+                    'name': file_name,
+                    'version': ifc_version,
+                    'schema': ifc_version
+                },
+                'summary': {
+                    'total_entities': entities_count,
+                    'entity_types': {etype: entities.count(etype) for etype in entity_types}
+                },
+                'entities': {},
+                'parsing_method': 'simple_regex'
+            }
+
+            return result
+
+        except Exception as e:
+            _logger.error(f"Erreur dans l'analyse IFC simple: {str(e)}")
+            return {
+                'error': True,
+                'message': str(e),
+                'file_info': {'name': 'unknown.ifc', 'version': 'Erreur', 'schema': 'Erreur'},
+                'summary': {'total_entities': 0, 'entity_types': {}},
+                'entities': {}
+            }
 
     # NOUVELLE MÉTHODE POUR SAUVEGARDER LE FICHIER IFC
     def _save_ifc_file(self, record):
-        """Sauvegarde le fichier IFC sur le disque"""
+        """Sauvegarde le fichier IFC sur le disque et lance l'analyse"""
         try:
             if not record.ifc_file or not record.ifc_filename:
                 return
@@ -311,7 +386,7 @@ class Model3D(models.Model):
 
             _logger.info(f"Fichier IFC sauvegardé: {file_path}")
 
-            # Analyser le fichier IFC pour extraire les métadonnées
+            # Analyser le fichier IFC pour extraire les données JSON
             self._analyze_ifc_file(record)
 
             # Ajouter le fichier IFC à la liste des fichiers associés
@@ -328,8 +403,13 @@ class Model3D(models.Model):
                 record.has_external_files = True
 
         except Exception as e:
-            _logger.error(f"Erreur lors de la sauvegarde du fichier IFC: {str(e)}")
-            raise ValidationError(f"Erreur lors de la sauvegarde du fichier IFC: {str(e)}")
+            error_message = f"Erreur lors de la sauvegarde du fichier IFC: {str(e)}"
+            _logger.error(error_message)
+            record.write({
+                'ifc_parsing_status': 'error',
+                'ifc_parsing_error': error_message
+            })
+            raise ValidationError(error_message)
 
     # ACTION POUR TÉLÉCHARGER LE FICHIER IFC
     def action_download_ifc(self):
@@ -351,6 +431,73 @@ class Model3D(models.Model):
             'type': 'ir.actions.act_url',
             'url': self.ifc_url,
             'target': 'new',
+        }
+
+    # NOUVELLE ACTION POUR RÉANALYSER LE FICHIER IFC
+    def action_reparse_ifc(self):
+        """Action pour relancer l'analyse du fichier IFC"""
+        self.ensure_one()
+        if not self.ifc_file or not self.ifc_filename:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Aucun fichier IFC'),
+                    'message': _('Ce modèle n\'a pas de fichier IFC associé.'),
+                    'sticky': False,
+                    'type': 'warning',
+                }
+            }
+
+        try:
+            self._analyze_ifc_file(self)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Analyse terminée'),
+                    'message': _('Le fichier IFC a été analysé avec succès.'),
+                    'sticky': False,
+                    'type': 'success',
+                }
+            }
+        except Exception as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Erreur d\'analyse'),
+                    'message': _('Erreur lors de l\'analyse du fichier IFC: %s') % str(e),
+                    'sticky': True,
+                    'type': 'danger',
+                }
+            }
+
+    # NOUVELLE ACTION POUR VOIR LES DONNÉES IFC JSON
+    def action_view_ifc_data(self):
+        """Action pour afficher les données IFC JSON dans une popup"""
+        self.ensure_one()
+        if not self.ifc_data_json:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Aucune donnée IFC'),
+                    'message': _('Ce modèle n\'a pas de données IFC analysées.'),
+                    'sticky': False,
+                    'type': 'warning',
+                }
+            }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Données IFC JSON - %s') % self.name,
+            'res_model': 'cmms.model3d',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('cmms_3d_models.view_cmms_model3d_ifc_data_form').id,
+            'target': 'new',
+            'context': {'show_ifc_data_only': True}
         }
 
     # MÉTHODE POUR CRÉER/METTRE À JOUR L'ÉQUIPEMENT AUTOMATIQUEMENT

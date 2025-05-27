@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- custom_addons/cmms_3d_models/views/model3d_views.xml - Version avec support IFC -->
+<!-- custom_addons/cmms_3d_models/views/model3d_views.xml - Version avec support IFC JSON -->
 <odoo>
     <!-- Form View -->
     <record id="view_cmms_model3d_form" model="ir.ui.view">
@@ -31,7 +31,7 @@
                                 class="oe_stat_button" icon="fa-sitemap">
                             <field name="submodel_count" string="Sous-modèles" widget="statinfo"/>
                         </button>
-                        <!-- NOUVEAU BOUTON POUR TÉLÉCHARGER LE FICHIER IFC -->
+                        <!-- BOUTON POUR TÉLÉCHARGER LE FICHIER IFC -->
                         <button name="action_download_ifc" type="object"
                                 class="oe_stat_button" icon="fa-building"
                                 attrs="{'invisible': [('has_ifc_file', '=', False)]}">
@@ -40,7 +40,25 @@
                                 <span class="o_stat_text">IFC BIM</span>
                             </div>
                         </button>
-                        <!-- NOUVEAU BOUTON POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ -->
+                        <!-- NOUVEAU BOUTON POUR VOIR LES DONNÉES IFC JSON -->
+                        <button name="action_view_ifc_data" type="object"
+                                class="oe_stat_button" icon="fa-code"
+                                attrs="{'invisible': [('ifc_data_json', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Données</span>
+                                <span class="o_stat_text">IFC JSON</span>
+                            </div>
+                        </button>
+                        <!-- NOUVEAU BOUTON POUR RÉANALYSER L'IFC -->
+                        <button name="action_reparse_ifc" type="object"
+                                class="oe_stat_button" icon="fa-refresh"
+                                attrs="{'invisible': [('has_ifc_file', '=', False)]}">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Réanalyser</span>
+                                <span class="o_stat_text">IFC</span>
+                            </div>
+                        </button>
+                        <!-- BOUTON POUR VOIR L'ÉQUIPEMENT AUTO-CRÉÉ -->
                         <button name="action_view_auto_equipment" type="object"
                                 class="oe_stat_button" icon="fa-wrench"
                                 attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
@@ -51,8 +69,34 @@
                         </button>
                     </div>
 
-                    <!-- NOUVELLE ALERTE POUR INFORMER SUR LE FICHIER IFC -->
+                    <!-- NOUVELLE ALERTE POUR LE STATUT D'ANALYSE IFC -->
                     <div class="alert alert-info" role="alert"
+                         attrs="{'invisible': [('ifc_parsing_status', 'not in', ['parsing', 'parsed'])]}">
+                        <div attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsing')]}">
+                            <p><i class="fa fa-spinner fa-spin"></i> <strong>Analyse IFC en cours...</strong></p>
+                            <p>Le fichier IFC est en cours d'analyse pour extraire les données BIM.</p>
+                        </div>
+                        <div attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsed')]}">
+                            <p><i class="fa fa-check-circle text-success"></i> <strong>Analyse IFC terminée</strong></p>
+                            <p>
+                                <field name="ifc_entities_count" readonly="1" class="oe_inline"/> entités analysées
+                                (<field name="ifc_entity_types" readonly="1" class="oe_inline"/>)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ALERTE D'ERREUR D'ANALYSE IFC -->
+                    <div class="alert alert-danger" role="alert"
+                         attrs="{'invisible': [('ifc_parsing_status', '!=', 'error')]}">
+                        <p><i class="fa fa-exclamation-triangle"></i> <strong>Erreur d'analyse IFC</strong></p>
+                        <p><field name="ifc_parsing_error" readonly="1"/></p>
+                        <button name="action_reparse_ifc" type="object" class="btn btn-warning btn-sm">
+                            <i class="fa fa-refresh"></i> Réessayer l'analyse
+                        </button>
+                    </div>
+
+                    <!-- ALERTE POUR INFORMER SUR LE FICHIER IFC -->
+                    <div class="alert alert-success" role="alert"
                          attrs="{'invisible': [('has_ifc_file', '=', False)]}">
                         <p>
                             <strong>Fichier IFC BIM disponible:</strong>
@@ -62,7 +106,7 @@
                         <p>Ce modèle 3D possède des données BIM techniques au format IFC.</p>
                     </div>
 
-                    <!-- NOUVELLE ALERTE POUR INFORMER SUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT -->
+                    <!-- ALERTE POUR INFORMER SUR LA CRÉATION AUTOMATIQUE D'ÉQUIPEMENT -->
                     <div class="alert alert-success" role="alert"
                          attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
                         <p>
@@ -85,7 +129,7 @@
                         </h1>
                     </div>
 
-                    <!-- NOUVEAU GROUPE POUR LA CATÉGORIE D'ÉQUIPEMENT -->
+                    <!-- GROUPE POUR LA CATÉGORIE D'ÉQUIPEMENT -->
                     <group>
                         <group string="Équipement de maintenance">
                             <field name="equipment_category_id"
@@ -111,7 +155,7 @@
                                             <li>Option 2 (recommandée): Créez une archive ZIP contenant tous les fichiers du modèle et téléchargez-la</li>
                                         </ul>
                                     </li>
-                                    <li><strong>Nouveau:</strong> Pour les données BIM techniques, ajoutez un fichier IFC qui sera stocké à côté du modèle 3D de visualisation.</li>
+                                    <li><strong>Nouveau:</strong> Pour les données BIM techniques, ajoutez un fichier IFC qui sera automatiquement analysé et structuré au format JSON.</li>
                                 </ul>
                                 <p><strong>Note:</strong> Ces fichiers sont utilisés pour la visualisation 3D des équipements de maintenance.</p>
                             </div>
@@ -134,11 +178,11 @@
                                 </group>
                             </group>
 
-                            <!-- NOUVEAU GROUPE POUR LES FICHIERS IFC -->
+                            <!-- GROUPE POUR LES FICHIERS IFC -->
                             <group string="Fichier IFC BIM (Données techniques)">
                                 <field name="ifc_file" filename="ifc_filename"
                                        help="Fichier IFC (Industry Foundation Classes) contenant les données BIM techniques et de maintenance"/>
-                                <field name="ifc_filename" readonly="1"/>`
+                                <field name="ifc_filename" readonly="1"/>
                                 <field name="ifc_url" widget="url" readonly="1"
                                        attrs="{'invisible': [('ifc_url', '=', False)]}"/>
                                 <field name="has_ifc_file" invisible="1"/>
@@ -147,6 +191,17 @@
                                 <field name="ifc_file_size" readonly="1"
                                        attrs="{'invisible': [('ifc_file_size', '=', 0)]}"
                                        help="Taille du fichier IFC en octets"/>
+                            </group>
+
+                            <!-- NOUVEAU GROUPE POUR LE STATUT D'ANALYSE IFC -->
+                            <group string="Analyse IFC" attrs="{'invisible': [('has_ifc_file', '=', False)]}">
+                                <field name="ifc_parsing_status" readonly="1"/>
+                                <field name="ifc_entities_count" readonly="1"
+                                       attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsed')]}"/>
+                                <field name="ifc_entity_types" readonly="1"
+                                       attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsed')]}"/>
+                                <field name="ifc_parsing_error" readonly="1"
+                                       attrs="{'invisible': [('ifc_parsing_status', '!=', 'error')]}"/>
                             </group>
 
                             <group>
@@ -179,11 +234,14 @@
                             <field name="description" placeholder="Description du modèle..."/>
                         </page>
 
+                        <!-- PAGE MISE À JOUR POUR LES DONNÉES IFC JSON -->
                         <page string="Données BIM / IFC" attrs="{'invisible': [('has_ifc_file', '=', False)]}">
                             <div class="alert alert-info" role="alert">
                                 <p><strong>Informations sur le fichier IFC</strong></p>
                                 <p>Le fichier IFC contient les données techniques et de maintenance au format BIM standardisé.</p>
+                                <p>Les données sont automatiquement extraites et structurées au format JSON pour faciliter l'intégration.</p>
                             </div>
+
                             <group>
                                 <group string="Informations IFC">
                                     <field name="ifc_filename" readonly="1"/>
@@ -191,10 +249,44 @@
                                     <field name="ifc_file_size" readonly="1"/>
                                     <field name="ifc_url" widget="url" readonly="1"/>
                                 </group>
+                                <group string="Analyse des données">
+                                    <field name="ifc_parsing_status" readonly="1"/>
+                                    <field name="ifc_entities_count" readonly="1"
+                                           attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsed')]}"/>
+                                    <field name="ifc_entity_types" readonly="1"
+                                           attrs="{'invisible': [('ifc_parsing_status', '!=', 'parsed')]}"/>
+                                </group>
                             </group>
+
                             <div class="mt16">
                                 <button name="action_download_ifc" type="object"
                                         string="Télécharger le fichier IFC" class="btn btn-primary"/>
+                                <button name="action_view_ifc_data" type="object"
+                                        string="Voir les données JSON" class="btn btn-info"
+                                        attrs="{'invisible': [('ifc_data_json', '=', False)]}"/>
+                                <button name="action_reparse_ifc" type="object"
+                                        string="Réanalyser le fichier" class="btn btn-warning"/>
+                            </div>
+
+                            <!-- APERÇU DES DONNÉES JSON -->
+                            <div class="mt16" attrs="{'invisible': [('ifc_data_json', '=', False)]}">
+                                <h3>Aperçu des données JSON extraites</h3>
+                                <div class="alert alert-light">
+                                    <p><strong>📜 Résumé</strong> <field name="ifc_filename" readonly="1" class="oe_inline"/></p>
+                                    <p>
+                                        <strong>Entités trouvées:</strong> <field name="ifc_entities_count" readonly="1" class="oe_inline"/> |
+                                        <strong>Version IFC:</strong> <field name="ifc_version" readonly="1" class="oe_inline"/>
+                                    </p>
+                                    <p><strong>Types d'entités:</strong> <field name="ifc_entity_types" readonly="1" class="oe_inline"/></p>
+                                </div>
+
+                                <!-- CHAMP TEXTE POUR AFFICHER UN EXTRAIT DU JSON -->
+                                <div class="o_field_text">
+                                    <label>Données JSON (extrait):</label>
+                                    <field name="ifc_data_json" widget="text" readonly="1"
+                                           options="{'resizable': true}"
+                                           style="height: 300px; font-family: monospace; font-size: 12px;"/>
+                                </div>
                             </div>
                         </page>
 
@@ -230,7 +322,7 @@
                                 </tree>
                             </field>
 
-                            <!-- NOUVELLE SECTION POUR L'ÉQUIPEMENT AUTO-CRÉÉ -->
+                            <!-- SECTION POUR L'ÉQUIPEMENT AUTO-CRÉÉ -->
                             <div class="alert alert-success" role="alert"
                                  attrs="{'invisible': [('has_auto_equipment', '=', False)]}">
                                 <p>
@@ -248,7 +340,53 @@
         </field>
     </record>
 
-    <!-- Tree View -->
+    <!-- NOUVELLE VUE SPÉCIFIQUE POUR AFFICHER LES DONNÉES IFC JSON -->
+    <record id="view_cmms_model3d_ifc_data_form" model="ir.ui.view">
+        <field name="name">cmms.model3d.ifc.data.form</field>
+        <field name="model">cmms.model3d</field>
+        <field name="arch" type="xml">
+            <form string="Données IFC JSON">
+                <header>
+                    <button name="action_reparse_ifc" type="object" string="Réanalyser" class="btn-warning"/>
+                    <button name="action_download_ifc" type="object" string="Télécharger IFC" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Données IFC JSON - <field name="name" readonly="1" class="oe_inline"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Informations fichier">
+                            <field name="ifc_filename" readonly="1"/>
+                            <field name="ifc_version" readonly="1"/>
+                            <field name="ifc_file_size" readonly="1"/>
+                            <field name="ifc_parsing_status" readonly="1"/>
+                        </group>
+                        <group string="Analyse">
+                            <field name="ifc_entities_count" readonly="1"/>
+                            <field name="ifc_entity_types" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>📜 Structure des données JSON extraites</strong></p>
+                        <p>Ces données sont extraites automatiquement du fichier IFC et structurées pour faciliter l'intégration avec les systèmes de maintenance.</p>
+                    </div>
+
+                    <!-- AFFICHAGE DU JSON COMPLET -->
+                    <group string="Données JSON complètes">
+                        <field name="ifc_data_json" widget="text" readonly="1"
+                               options="{'resizable': true}"
+                               style="height: 600px; font-family: 'Courier New', monospace; font-size: 11px; background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 10px;"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View mise à jour -->
     <record id="view_cmms_model3d_tree" model="ir.ui.view">
         <field name="name">cmms.model3d.tree</field>
         <field name="model">cmms.model3d</field>
@@ -258,14 +396,19 @@
                 <field name="model_format"/>
                 <field name="has_ifc_file" widget="boolean_icon" string="IFC"/>
                 <field name="ifc_version" attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
+                <field name="ifc_parsing_status" attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
+                <field name="ifc_entities_count" attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
                 <field name="equipment_category_id"/>
                 <field name="has_auto_equipment" widget="boolean_icon"/>
                 <field name="has_external_files"/>
                 <field name="active"/>
                 <button name="action_view_3d" type="object"
                         string="Voir en 3D" class="btn-sm btn-primary"/>
+                <button name="action_view_ifc_data" type="object"
+                        string="Données JSON" class="btn-sm btn-info"
+                        attrs="{'invisible': [('ifc_data_json', '=', False)]}"/>
                 <button name="action_download_ifc" type="object"
-                        string="Télécharger IFC" class="btn-sm btn-info"
+                        string="Télécharger IFC" class="btn-sm btn-secondary"
                         attrs="{'invisible': [('has_ifc_file', '=', False)]}"/>
                 <button name="action_view_auto_equipment" type="object"
                         string="Voir équipement" class="btn-sm btn-success"
@@ -274,7 +417,7 @@
         </field>
     </record>
 
-    <!-- Search View -->
+    <!-- Search View mise à jour -->
     <record id="view_cmms_model3d_search" model="ir.ui.view">
         <field name="name">cmms.model3d.search</field>
         <field name="model">cmms.model3d</field>
@@ -284,10 +427,17 @@
                 <field name="model_format"/>
                 <field name="equipment_category_id"/>
                 <field name="ifc_version"/>
+                <field name="ifc_entity_types"/>
                 <filter string="Avec fichier IFC" name="has_ifc"
                         domain="[('has_ifc_file', '=', True)]"/>
                 <filter string="Sans fichier IFC" name="no_ifc"
                         domain="[('has_ifc_file', '=', False)]"/>
+                <filter string="IFC analysé" name="ifc_parsed"
+                        domain="[('ifc_parsing_status', '=', 'parsed')]"/>
+                <filter string="IFC en cours d'analyse" name="ifc_parsing"
+                        domain="[('ifc_parsing_status', '=', 'parsing')]"/>
+                <filter string="Erreur analyse IFC" name="ifc_error"
+                        domain="[('ifc_parsing_status', '=', 'error')]"/>
                 <filter string="Avec équipement auto-créé" name="has_auto_equipment"
                         domain="[('auto_created_equipment_id', '!=', False)]"/>
                 <filter string="Sans équipement auto-créé" name="no_auto_equipment"
@@ -298,6 +448,7 @@
                 <group expand="0" string="Grouper par">
                     <filter string="Format" name="group_by_format" context="{'group_by': 'model_format'}"/>
                     <filter string="Version IFC" name="group_by_ifc_version" context="{'group_by': 'ifc_version'}"/>
+                    <filter string="Statut analyse IFC" name="group_by_ifc_status" context="{'group_by': 'ifc_parsing_status'}"/>
                     <filter string="Catégorie d'équipement" name="group_by_equipment_category"
                             context="{'group_by': 'equipment_category_id'}"/>
                     <filter string="Équipement auto-créé" name="group_by_auto_equipment"
@@ -321,7 +472,7 @@
                 Importez des modèles 3D au format Blender (.blend), glTF (.gltf) ou GLB (.glb) pour les utiliser avec vos équipements de maintenance.
             </p>
             <p>
-                <strong>Nouveau:</strong> Ajoutez des fichiers IFC pour enrichir vos modèles 3D avec des données BIM techniques et de maintenance.
+                <strong>Nouveau:</strong> Ajoutez des fichiers IFC pour enrichir vos modèles 3D avec des données BIM techniques automatiquement extraites au format JSON.
             </p>
             <p>
                 <strong>Création automatique:</strong> Sélectionnez une catégorie d'équipement pour créer automatiquement un équipement de maintenance lié à votre modèle 3D.
