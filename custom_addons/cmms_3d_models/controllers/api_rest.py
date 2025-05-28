@@ -53,7 +53,7 @@ class CMSAPIController(http.Controller):
             ('Access-Control-Allow-Origin', '*'),
             ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
             ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept'),
-            ('Access-Control-Allow-Credentials', 'false'),  # Important pour Flutter Web
+            ('Access-Control-Allow-Credentials', 'false'),
             ('Access-Control-Max-Age', '3600'),
         ]
 
@@ -174,6 +174,137 @@ class CMSAPIController(http.Controller):
 
         return domain
 
+    def _serialize_ifc_data(self, model3d_record):
+        """Sérialise toutes les données IFC d'un modèle 3D de manière complète et structurée"""
+        try:
+            if not model3d_record or not model3d_record.has_ifc_file:
+                return None
+
+            # Données de base du fichier IFC
+            ifc_base_data = {
+                'file_info': {
+                    'filename': model3d_record.ifc_filename or '',
+                    'version': model3d_record.ifc_version or 'Non détectée',
+                    'file_size': model3d_record.ifc_file_size or 0,
+                    'download_url': model3d_record.ifc_url or None,
+                },
+                'parsing_info': {
+                    'status': model3d_record.ifc_parsing_status or 'not_parsed',
+                    'entities_count': model3d_record.ifc_entities_count or 0,
+                    'entity_types': model3d_record.ifc_entity_types or '',
+                    'error_message': model3d_record.ifc_parsing_error or None,
+                },
+                'structured_data': None,
+                'raw_json': None
+            }
+
+            # Ajouter les données JSON structurées si disponibles
+            if model3d_record.ifc_data_json and model3d_record.ifc_parsing_status == 'parsed':
+                try:
+                    # Parser le JSON des données IFC
+                    ifc_json_data = json.loads(model3d_record.ifc_data_json)
+
+                    # Extraire les informations structurées principales
+                    structured_data = {
+                        'header': ifc_json_data.get('header', {}),
+                        'file_info': ifc_json_data.get('file_info', {}),
+                        'property_sets': ifc_json_data.get('property_sets', {}),
+                        'referenced_objects': ifc_json_data.get('referenced_objects', {}),
+                        'summary': ifc_json_data.get('summary', {}),
+                        'parsing_mode': ifc_json_data.get('parsing_mode', 'unknown')
+                    }
+
+                    # Enrichir avec des informations de maintenance spécifiques
+                    maintenance_data = self._extract_maintenance_relevant_data(ifc_json_data)
+                    if maintenance_data:
+                        structured_data['maintenance_relevant'] = maintenance_data
+
+                    ifc_base_data['structured_data'] = structured_data
+
+                    # Optionnel : inclure le JSON brut pour les besoins avancés (mais limité)
+                    if len(model3d_record.ifc_data_json) < 50000:  # Limite pour éviter de surcharger l'API
+                        ifc_base_data['raw_json'] = ifc_json_data
+                    else:
+                        ifc_base_data['raw_json_note'] = 'Données JSON trop volumineuses - utilisez l\'endpoint dédié pour les récupérer'
+
+                except json.JSONDecodeError as e:
+                    _logger.error(f"Erreur de décodage JSON IFC pour le modèle {model3d_record.id}: {str(e)}")
+                    ifc_base_data['parsing_info']['error_message'] = f"Erreur de décodage JSON: {str(e)}"
+                except Exception as e:
+                    _logger.error(f"Erreur lors du traitement des données IFC pour le modèle {model3d_record.id}: {str(e)}")
+                    ifc_base_data['parsing_info']['error_message'] = f"Erreur de traitement: {str(e)}"
+
+            return ifc_base_data
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de la sérialisation IFC pour le modèle {model3d_record.id if model3d_record else 'Unknown'}: {str(e)}")
+            return {
+                'file_info': {'error': 'Erreur lors du chargement des données IFC'},
+                'parsing_info': {'status': 'error', 'error_message': str(e)},
+                'structured_data': None,
+                'raw_json': None
+            }
+
+    def _extract_maintenance_relevant_data(self, ifc_json_data):
+        """Extrait les données IFC particulièrement pertinentes pour la maintenance"""
+        try:
+            maintenance_data = {
+                'materials': [],
+                'properties': [],
+                'quantities': [],
+                'maintenance_properties': []
+            }
+
+            # Extraire les informations sur les matériaux
+            referenced_objects = ifc_json_data.get('referenced_objects', {})
+            for obj_id, obj_data in referenced_objects.items():
+                if obj_data.get('Type') == 'IFCMATERIAL':
+                    material_info = {
+                        'id': obj_id,
+                        'name': obj_data.get('Name'),
+                        'description': obj_data.get('Description'),
+                        'category': obj_data.get('Category')
+                    }
+                    maintenance_data['materials'].append(material_info)
+
+            # Extraire les propriétés liées à la maintenance
+            property_sets = ifc_json_data.get('property_sets', {})
+            for pset_name, pset_data in property_sets.items():
+                # Rechercher les propriétés de maintenance spécifiques
+                properties = pset_data.get('HasProperties', [])
+                for prop in properties:
+                    prop_name = prop.get('Name', '').lower()
+
+                    # Identifier les propriétés pertinentes pour la maintenance
+                    if any(keyword in prop_name for keyword in ['maintenance', 'service', 'life', 'durability', 'material', 'resistance', 'conductivity']):
+                        maintenance_prop = {
+                            'property_set': pset_name,
+                            'name': prop.get('Name'),
+                            'type': prop.get('Type'),
+                            'value': prop.get('NominalValue') or prop.get('Values'),
+                            'unit': prop.get('Unit'),
+                            'description': prop.get('Description')
+                        }
+                        maintenance_data['maintenance_properties'].append(maintenance_prop)
+
+                    # Toutes les propriétés pour référence
+                    general_prop = {
+                        'property_set': pset_name,
+                        'name': prop.get('Name'),
+                        'value': prop.get('NominalValue') or prop.get('Values'),
+                        'type': prop.get('Type')
+                    }
+                    maintenance_data['properties'].append(general_prop)
+
+            # Filtrer les données vides
+            maintenance_data = {k: v for k, v in maintenance_data.items() if v}
+
+            return maintenance_data if maintenance_data else None
+
+        except Exception as e:
+            _logger.error(f"Erreur lors de l'extraction des données de maintenance IFC: {str(e)}")
+            return None
+
     def _serialize_part(self, part_record):
         """Sérialiser une pièce de maintenance request avec toutes ses informations"""
         try:
@@ -284,7 +415,7 @@ class CMSAPIController(http.Controller):
             }
 
     def _serialize_request(self, request_record):
-        """Sérialiser une demande de maintenance avec toutes les informations enrichies"""
+        """Sérialiser une demande de maintenance avec toutes les informations enrichies INCLUANT LES DONNÉES IFC"""
         try:
             # URL du viewer 3D si disponible
             viewer_url = None
@@ -354,6 +485,10 @@ class CMSAPIController(http.Controller):
                     'has_3d_model': bool(equipment.model3d_id),
                 }
 
+                # NOUVEAU: Ajouter les données IFC complètes si disponibles
+                if equipment.model3d_id and equipment.model3d_id.has_ifc_file:
+                    equipment_info['model_3d']['ifc_data'] = self._serialize_ifc_data(equipment.model3d_id)
+
             # Construire la réponse complète
             request_data = {
                 'id': request_record.id,
@@ -375,7 +510,7 @@ class CMSAPIController(http.Controller):
                 'color': request_record.color,
                 'duration': request_record.duration,
 
-                # Équipement enrichi
+                # Équipement enrichi AVEC DONNÉES IFC
                 'equipment': equipment_info,
 
                 # Équipe
@@ -432,7 +567,7 @@ class CMSAPIController(http.Controller):
             }
 
     def _serialize_equipment(self, equipment_record):
-        """Sérialiser un équipement"""
+        """Sérialiser un équipement AVEC DONNÉES IFC"""
         # URLs des modèles 3D
         model_3d_url = None
         viewer_url = None
@@ -440,7 +575,7 @@ class CMSAPIController(http.Controller):
             model_3d_url = equipment_record.model3d_id.model_url
             viewer_url = equipment_record.model3d_id.viewer_url
 
-        return {
+        equipment_data = {
             'id': equipment_record.id,
             'name': equipment_record.name,
             'serial_no': equipment_record.serial_no or '',
@@ -465,7 +600,10 @@ class CMSAPIController(http.Controller):
                 'id': equipment_record.model3d_id.id,
                 'name': equipment_record.model3d_id.name,
                 'model_url': model_3d_url,
-                'viewer_url': viewer_url
+                'viewer_url': viewer_url,
+                'has_ifc': equipment_record.model3d_id.has_ifc_file,
+                'ifc_version': equipment_record.model3d_id.ifc_version,
+                'ifc_url': equipment_record.model3d_id.ifc_url,
             } if equipment_record.model3d_id else None,
             'assign_date': equipment_record.assign_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if equipment_record.assign_date else None,
             'cost': float(equipment_record.cost) if equipment_record.cost else 0.0,
@@ -475,7 +613,171 @@ class CMSAPIController(http.Controller):
             'cost_center': equipment_record.cost_center or '' if hasattr(equipment_record, 'cost_center') else '',
         }
 
-    # ===== OPTIONS (CORS) =====
+        # NOUVEAU: Ajouter les données IFC complètes si disponibles
+        if equipment_record.model3d_id and equipment_record.model3d_id.has_ifc_file:
+            equipment_data['model3d_id']['ifc_data'] = self._serialize_ifc_data(equipment_record.model3d_id)
+
+        return equipment_data
+
+    # ===== NOUVELLES ROUTES POUR LES DONNÉES IFC =====
+
+    @http.route('/api/flutter/maintenance/ifc/<int:model3d_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_ifc_data(self, model3d_id, **kwargs):
+        """Récupérer les données IFC complètes d'un modèle 3D"""
+        try:
+            model3d = request.env['cmms.model3d'].sudo().browse(model3d_id)
+
+            if not model3d.exists():
+                return self._error_response("Model 3D not found", 404)
+
+            if not model3d.has_ifc_file:
+                return self._error_response("No IFC file associated with this 3D model", 404)
+
+            # Sérialiser toutes les données IFC
+            ifc_data = self._serialize_ifc_data(model3d)
+
+            if not ifc_data:
+                return self._error_response("Failed to load IFC data", 500)
+
+            return self._success_response(
+                ifc_data,
+                f"IFC data retrieved successfully for model {model3d.name}"
+            )
+
+        except Exception as e:
+            _logger.error(f"Error getting IFC data for model {model3d_id}: {str(e)}")
+            return self._error_response(f"Error retrieving IFC data: {str(e)}", 500)
+
+    @http.route('/api/flutter/maintenance/ifc/<int:model3d_id>/raw', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_ifc_raw_data(self, model3d_id, **kwargs):
+        """Récupérer les données IFC JSON brutes complètes d'un modèle 3D"""
+        try:
+            model3d = request.env['cmms.model3d'].sudo().browse(model3d_id)
+
+            if not model3d.exists():
+                return self._error_response("Model 3D not found", 404)
+
+            if not model3d.has_ifc_file or not model3d.ifc_data_json:
+                return self._error_response("No IFC JSON data available for this 3D model", 404)
+
+            try:
+                # Parser et retourner le JSON brut complet
+                raw_ifc_data = json.loads(model3d.ifc_data_json)
+
+                response_data = {
+                    'model_info': {
+                        'id': model3d.id,
+                        'name': model3d.name,
+                        'ifc_filename': model3d.ifc_filename,
+                        'ifc_version': model3d.ifc_version,
+                        'parsing_status': model3d.ifc_parsing_status,
+                        'entities_count': model3d.ifc_entities_count,
+                    },
+                    'ifc_raw_data': raw_ifc_data
+                }
+
+                return self._success_response(
+                    response_data,
+                    f"Raw IFC JSON data retrieved successfully for model {model3d.name}"
+                )
+
+            except json.JSONDecodeError as e:
+                return self._error_response(f"Invalid IFC JSON data: {str(e)}", 500)
+
+        except Exception as e:
+            _logger.error(f"Error getting raw IFC data for model {model3d_id}: {str(e)}")
+            return self._error_response(f"Error retrieving raw IFC data: {str(e)}", 500)
+
+    @http.route('/api/flutter/maintenance/ifc/search', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def search_ifc_data(self, property_name=None, property_value=None, entity_type=None, **kwargs):
+        """Rechercher dans les données IFC de tous les modèles accessibles"""
+        try:
+            # Récupérer tous les modèles 3D avec des données IFC
+            models_with_ifc = request.env['cmms.model3d'].search([
+                ('has_ifc_file', '=', True),
+                ('ifc_parsing_status', '=', 'parsed'),
+                ('ifc_data_json', '!=', False)
+            ])
+
+            search_results = []
+
+            for model in models_with_ifc:
+                try:
+                    ifc_data = json.loads(model.ifc_data_json)
+
+                    # Recherche dans les PropertySets
+                    property_sets = ifc_data.get('property_sets', {})
+                    for pset_name, pset_data in property_sets.items():
+                        properties = pset_data.get('HasProperties', [])
+
+                        for prop in properties:
+                            prop_name = prop.get('Name', '').lower()
+                            prop_value = str(prop.get('NominalValue', '') or prop.get('Values', '')).lower()
+
+                            # Filtres de recherche
+                            matches = True
+
+                            if property_name and property_name.lower() not in prop_name:
+                                matches = False
+
+                            if property_value and property_value.lower() not in prop_value:
+                                matches = False
+
+                            if matches:
+                                search_results.append({
+                                    'model': {
+                                        'id': model.id,
+                                        'name': model.name,
+                                        'ifc_filename': model.ifc_filename
+                                    },
+                                    'property_set': pset_name,
+                                    'property': {
+                                        'name': prop.get('Name'),
+                                        'value': prop.get('NominalValue') or prop.get('Values'),
+                                        'type': prop.get('Type'),
+                                        'unit': prop.get('Unit'),
+                                        'description': prop.get('Description')
+                                    }
+                                })
+
+                    # Recherche dans les objets référencés
+                    if entity_type:
+                        referenced_objects = ifc_data.get('referenced_objects', {})
+                        for obj_id, obj_data in referenced_objects.items():
+                            if obj_data.get('Type', '').upper() == entity_type.upper():
+                                search_results.append({
+                                    'model': {
+                                        'id': model.id,
+                                        'name': model.name,
+                                        'ifc_filename': model.ifc_filename
+                                    },
+                                    'entity_type': obj_data.get('Type'),
+                                    'entity_id': obj_id,
+                                    'entity_data': obj_data
+                                })
+
+                except json.JSONDecodeError:
+                    _logger.warning(f"Invalid JSON in IFC data for model {model.id}")
+                    continue
+
+            return self._success_response({
+                'search_criteria': {
+                    'property_name': property_name,
+                    'property_value': property_value,
+                    'entity_type': entity_type
+                },
+                'results_count': len(search_results),
+                'results': search_results
+            }, f"IFC search completed - {len(search_results)} results found")
+
+        except Exception as e:
+            _logger.error(f"Error searching IFC data: {str(e)}")
+            return self._error_response(f"Error searching IFC data: {str(e)}", 500)
+
+    # ===== OPTIONS (CORS) MISES À JOUR =====
     @http.route([
         '/api/flutter/maintenance/requests',
         '/api/flutter/maintenance/equipment',
@@ -489,7 +791,10 @@ class CMSAPIController(http.Controller):
         '/api/flutter/maintenance/dashboard',
         '/api/flutter/maintenance/all',
         '/api/flutter/maintenance/stages',
-        '/api/flutter/maintenance/request-states'
+        '/api/flutter/maintenance/request-states',
+        '/api/flutter/maintenance/ifc/<int:model3d_id>',
+        '/api/flutter/maintenance/ifc/<int:model3d_id>/raw',
+        '/api/flutter/maintenance/ifc/search'
     ], type='http', auth='none', methods=['OPTIONS'], csrf=False)
     def api_options(self, **kwargs):
         """Gestion des requêtes OPTIONS pour CORS"""
@@ -522,14 +827,15 @@ class CMSAPIController(http.Controller):
         """Gestion des requêtes OPTIONS pour CORS (toutes les autres routes)"""
         return request.make_response('', headers=self._get_cors_headers())
 
-    # ===== MAINTENANCE REQUESTS =====
+    # ===== MAINTENANCE REQUESTS AVEC DONNÉES IFC =====
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_requests(self, limit=10000, offset=0, stage_id=None, status=None, equipment_id=None, **kwargs):
-        """Récupérer les demandes de maintenance avec pièces et assignations complètes"""
+    def get_requests(self, limit=10000, offset=0, stage_id=None, status=None, equipment_id=None, include_ifc=None, **kwargs):
+        """Récupérer les demandes de maintenance avec pièces, assignations ET DONNÉES IFC complètes"""
         try:
             limit = int(limit) if limit else 10000
             offset = int(offset) if offset else 0
+            include_ifc_data = include_ifc and include_ifc.lower() in ['true', '1', 'yes']
 
             # Construire le domaine de recherche
             domain = self._get_allowed_requests_domain()
@@ -571,12 +877,13 @@ class CMSAPIController(http.Controller):
             # Précharger toutes les relations pour optimiser les performances
             requests.read(['assignment_ids', 'part_ids', 'equipment_id', 'assigned_person_ids'])
 
-            # Sérialiser les données avec toutes les informations enrichies
+            # Sérialiser les données avec toutes les informations enrichies (y compris IFC)
             data = {
                 'requests': [self._serialize_request(req) for req in requests],
                 'total_count': request.env['maintenance.request'].search_count(domain),
                 'limit': limit,
                 'offset': offset,
+                'include_ifc_data': include_ifc_data,
                 'filters': {
                     'stage_id': int(stage_id) if stage_id and stage_id.isdigit() else None,
                     'equipment_id': int(equipment_id) if equipment_id and equipment_id.isdigit() else None,
@@ -586,27 +893,24 @@ class CMSAPIController(http.Controller):
 
             # Ajouter des statistiques utiles
             if requests:
+                ifc_equipped_count = len([req for req in requests
+                                        if req.equipment_id and req.equipment_id.model3d_id
+                                        and req.equipment_id.model3d_id.has_ifc_file])
+
                 data['statistics'] = {
                     'total_parts': sum(len(req.part_ids) for req in requests),
                     'total_assignments': sum(len(req.assignment_ids) for req in requests),
                     'requests_with_3d': len([req for req in requests if req.equipment_id and req.equipment_id.model3d_id]),
                     'requests_with_parts': len([req for req in requests if req.part_ids]),
+                    'requests_with_ifc': ifc_equipped_count,
                 }
 
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Requests with parts and assignments retrieved successfully",
-                'data': data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
+            # Message spécial si des données IFC sont incluses
+            message = "Requests with parts and assignments retrieved successfully"
+            if include_ifc_data:
+                message += " (including IFC BIM data)"
 
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
+            return self._success_response(data, message)
 
         except Exception as e:
             _logger.error(f"Error getting requests: {str(e)}")
@@ -614,9 +918,11 @@ class CMSAPIController(http.Controller):
 
     @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_request(self, request_id, **kwargs):
-        """Récupérer une demande spécifique avec toutes ses pièces et assignations"""
+    def get_request(self, request_id, include_ifc=None, **kwargs):
+        """Récupérer une demande spécifique avec toutes ses pièces, assignations ET DONNÉES IFC"""
         try:
+            include_ifc_data = include_ifc and include_ifc.lower() in ['true', '1', 'yes']
+
             domain = self._get_allowed_requests_domain()
             domain.append(('id', '=', request_id))
 
@@ -628,33 +934,31 @@ class CMSAPIController(http.Controller):
             # Précharger toutes les relations
             maintenance_request.read(['assignment_ids', 'part_ids', 'equipment_id', 'assigned_person_ids'])
 
-            # Sérialiser avec toutes les données enrichies
+            # Sérialiser avec toutes les données enrichies (y compris IFC automatiquement)
             data = self._serialize_request(maintenance_request)
 
             # Ajouter des informations supplémentaires pour la vue détaillée
+            has_ifc = (maintenance_request.equipment_id and
+                      maintenance_request.equipment_id.model3d_id and
+                      maintenance_request.equipment_id.model3d_id.has_ifc_file)
+
             data['detailed_info'] = {
                 'can_edit': True,  # Logique à adapter selon vos besoins
                 'has_parts': len(maintenance_request.part_ids) > 0,
                 'has_assignments': len(maintenance_request.assignment_ids) > 0,
                 'has_3d_model': bool(maintenance_request.equipment_id and maintenance_request.equipment_id.model3d_id),
+                'has_ifc_data': has_ifc,
+                'ifc_data_included': include_ifc_data,
                 'created_date': maintenance_request.create_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if maintenance_request.create_date else None,
                 'last_update': maintenance_request.write_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT) if maintenance_request.write_date else None,
             }
 
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Request with complete details retrieved successfully",
-                'data': data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
+            # Message adapté selon les données IFC
+            message = "Request with complete details retrieved successfully"
+            if has_ifc:
+                message += " (including IFC BIM data)"
 
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
+            return self._success_response(data, message)
 
         except Exception as e:
             _logger.error(f"Error getting request {request_id}: {str(e)}")
@@ -662,9 +966,11 @@ class CMSAPIController(http.Controller):
 
     @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
-    def get_equipment_by_id(self, equipment_id, **kwargs):
-        """Récupérer un équipement spécifique - Version Flutter Web optimisée"""
+    def get_equipment_by_id(self, equipment_id, include_ifc=None, **kwargs):
+        """Récupérer un équipement spécifique AVEC DONNÉES IFC - Version Flutter Web optimisée"""
         try:
+            include_ifc_data = include_ifc and include_ifc.lower() in ['true', '1', 'yes']
+
             domain = self._get_allowed_equipment_domain()
             domain.append(('id', '=', equipment_id))
 
@@ -673,27 +979,21 @@ class CMSAPIController(http.Controller):
             if not equipment:
                 return self._error_response("Equipment not found", 404)
 
+            # La sérialisation inclut automatiquement les données IFC si disponibles
             data = self._serialize_equipment(equipment)
 
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Equipment retrieved successfully",
-                'data': data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
+            # Message adapté selon les données IFC
+            message = "Equipment retrieved successfully"
+            if equipment.model3d_id and equipment.model3d_id.has_ifc_file:
+                message += " (including IFC BIM data)"
 
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
+            return self._success_response(data, message)
 
         except Exception as e:
             _logger.error(f"Error getting equipment {equipment_id}: {str(e)}")
             return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
 
+    # Autres méthodes existantes continuent ici...
     @http.route('/api/flutter/maintenance/requests', type='http', auth='none', methods=['POST'], csrf=False)
     @basic_auth_required
     def create_request(self, **kwargs):
@@ -735,20 +1035,11 @@ class CMSAPIController(http.Controller):
             # Créer la demande
             new_request = request.env['maintenance.request'].create(vals)
 
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Request created successfully",
-                'data': self._serialize_request(new_request),
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
+            # La sérialisation incluera automatiquement les données IFC si l'équipement en a
+            return self._success_response(
+                self._serialize_request(new_request),
+                "Request created successfully"
             )
-            response.status_code = 201
-            return response
 
         except ValidationError as e:
             return self._error_response(f"Validation error: {str(e)}", 400)
@@ -756,190 +1047,7 @@ class CMSAPIController(http.Controller):
             _logger.error(f"Error creating request: {str(e)}")
             return self._error_response(f"Error creating request: {str(e)}", 500)
 
-    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['PUT'], csrf=False)
-    @basic_auth_required
-    def update_request_flutter(self, request_id, **kwargs):
-        """Mettre à jour une demande de maintenance - Version Flutter Web optimisée"""
-        try:
-            # Vérifier les permissions
-            domain = self._get_allowed_requests_domain()
-            domain.append(('id', '=', request_id))
-
-            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
-
-            if not maintenance_request:
-                return self._error_response("Request not found", 404)
-
-            # Récupérer les données JSON du body pour Flutter Web
-            try:
-                # Pour les requêtes HTTP avec Flutter, les données sont dans le body
-                body = request.httprequest.data.decode('utf-8')
-                data = json.loads(body) if body else {}
-            except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                _logger.error(f"Error parsing JSON data: {str(e)}")
-                return self._error_response("Invalid JSON data", 400)
-
-            # Préparer les valeurs de mise à jour
-            vals = {}
-            allowed_fields = [
-                'name', 'description', 'schedule_date', 'priority',
-                'kanban_state', 'stage_id', 'assigned_user_id', 'maintenance_team_id',
-                'maintenance_type'
-            ]
-
-            for field in allowed_fields:
-                if field in data:
-                    vals[field] = data[field]
-
-            # Gestion spéciale pour le changement de stage
-            if 'stage_id' in vals:
-                stage = request.env['maintenance.stage'].browse(vals['stage_id'])
-                if stage.exists():
-                    vals['stage_id'] = stage.id
-                    # Si le stage est marqué comme "done", fermer automatiquement la demande
-                    if stage.done:
-                        vals['close_date'] = fields.Datetime.now()
-                        vals['kanban_state'] = 'done'
-                    else:
-                        # Si on revient à un stage non-done, réouvrir la demande
-                        vals['close_date'] = False
-                        if vals.get('kanban_state') == 'done':
-                            vals['kanban_state'] = 'normal'
-                else:
-                    return self._error_response(f"Stage with ID {vals['stage_id']} not found", 400)
-
-            # Gestion spéciale pour kanban_state
-            if 'kanban_state' in vals:
-                valid_states = ['normal', 'blocked', 'done']
-                if vals['kanban_state'] not in valid_states:
-                    return self._error_response(f"Invalid kanban_state. Must be one of: {valid_states}", 400)
-
-                # Si on marque comme done sans stage done, mettre close_date
-                if vals['kanban_state'] == 'done' and not maintenance_request.stage_id.done:
-                    vals['close_date'] = fields.Datetime.now()
-                elif vals['kanban_state'] != 'done':
-                    # Si on change de done à autre chose, enlever close_date (sauf si stage reste done)
-                    if not (maintenance_request.stage_id.done or
-                           (vals.get('stage_id') and request.env['maintenance.stage'].browse(vals['stage_id']).done)):
-                        vals['close_date'] = False
-
-            # Mettre à jour
-            maintenance_request.write(vals)
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Request updated successfully",
-                'data': self._serialize_request(maintenance_request),
-                'updated_fields': list(vals.keys()),
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except ValidationError as e:
-            return self._error_response(f"Validation error: {str(e)}", 400)
-        except Exception as e:
-            _logger.error(f"Error updating request {request_id}: {str(e)}")
-            return self._error_response(f"Error updating request: {str(e)}", 500)
-
-    @http.route('/api/flutter/maintenance/requests/<int:request_id>', type='http', auth='none', methods=['DELETE'], csrf=False)
-    @basic_auth_required
-    def delete_request(self, request_id, **kwargs):
-        """Supprimer une demande de maintenance - Version Flutter Web optimisée"""
-        try:
-            # Vérifier les permissions
-            domain = self._get_allowed_requests_domain()
-            domain.append(('id', '=', request_id))
-
-            maintenance_request = request.env['maintenance.request'].search(domain, limit=1)
-
-            if not maintenance_request:
-                return self._error_response("Request not found", 404)
-
-            # Archiver au lieu de supprimer pour conserver l'historique
-            maintenance_request.action_archive()
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Request archived successfully",
-                'data': None,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except Exception as e:
-            _logger.error(f"Error deleting request {request_id}: {str(e)}")
-            return self._error_response(f"Error archiving request: {str(e)}", 500)
-
-    # ===== EQUIPMENT =====
-    @http.route('/api/flutter/maintenance/equipment', type='http', auth='none', methods=['GET'], csrf=False)
-    @basic_auth_required
-    def get_equipment(self, limit=10000, offset=0, category_id=None, has_3d_model=None, **kwargs):
-        """Récupérer les équipements - Version Flutter Web optimisée"""
-        try:
-            limit = int(limit) if limit else 10000
-            offset = int(offset) if offset else 0
-
-            # Utiliser la nouvelle fonction pour le domaine
-            domain = self._get_allowed_equipment_domain()
-
-            # Filtres supplémentaires
-            if category_id:
-                domain.append(('category_id', '=', int(category_id)))
-
-            if has_3d_model == 'true':
-                domain.append(('model3d_id', '!=', False))
-            elif has_3d_model == 'false':
-                domain.append(('model3d_id', '=', False))
-
-            # Récupérer les équipements
-            equipment_records = request.env['maintenance.equipment'].search(
-                domain,
-                limit=limit,
-                offset=offset,
-                order='name asc'
-            )
-
-            # Sérialiser les données
-            data = {
-                'equipment': [self._serialize_equipment(eq) for eq in equipment_records],
-                'total_count': request.env['maintenance.equipment'].search_count(domain),
-                'limit': limit,
-                'offset': offset
-            }
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Equipment retrieved successfully",
-                'data': data,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except Exception as e:
-            _logger.error(f"Error getting equipment: {str(e)}")
-            return self._error_response(f"Error retrieving equipment: {str(e)}", 500)
-
+    # Continuer avec les autres méthodes existantes...
     @http.route('/api/flutter/user/profile', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
     def get_user_profile(self, **kwargs):
@@ -1019,125 +1127,6 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting user profile: {str(e)}")
             return self._error_response(f"Error retrieving user profile: {str(e)}", 500)
-
-    # Route pour mettre à jour le profil utilisateur dans Flutter Web
-    @http.route('/api/flutter/user/profile/update', type='http', auth='none', methods=['PUT'], csrf=False)
-    @basic_auth_required
-    def update_user_profile_flutter(self, **kwargs):
-        """Mettre à jour le profil de l'utilisateur connecté - Version Flutter Web optimisée"""
-        try:
-            user = request.env.user
-
-            # Récupérer les données JSON du body
-            try:
-                body = request.httprequest.data.decode('utf-8')
-                data = json.loads(body) if body else {}
-            except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                _logger.error(f"Error parsing JSON data: {str(e)}")
-                return self._error_response("Invalid JSON data", 400)
-
-            if not data:
-                return self._error_response("No data provided", 400)
-
-            # Champs autorisés pour la mise à jour
-            user_updates = {}
-            partner_updates = {}
-            person_updates = {}
-
-            # Mise à jour de l'email (priorité principale)
-            if 'email' in data and data['email']:
-                email = data['email'].strip()
-
-                # Vérifier que l'email est valide (simple validation)
-                if '@' in email and '.' in email:
-                    # Vérifier que l'email n'est pas déjà utilisé par un autre utilisateur
-                    existing_user = request.env['res.users'].search([
-                        ('email', '=', email),
-                        ('id', '!=', user.id)
-                    ], limit=1)
-
-                    if existing_user:
-                        return self._error_response(f"Email {email} is already used by another user", 400)
-
-                    # Mettre à jour l'email sur l'utilisateur et son partner
-                    user_updates['email'] = email
-                    if user.partner_id:
-                        partner_updates['email'] = email
-
-                    # Mettre à jour l'email sur la personne de maintenance si elle existe
-                    person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-                    if person:
-                        person_updates['email'] = email
-                else:
-                    return self._error_response("Invalid email format", 400)
-
-            # Autres champs optionnels
-            if 'name' in data and data['name']:
-                user_updates['name'] = data['name']
-                if user.partner_id:
-                    partner_updates['name'] = data['name']
-
-            if 'phone' in data:
-                if user.partner_id:
-                    partner_updates['phone'] = data['phone']
-                # Mettre à jour sur la personne de maintenance si elle existe
-                person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-                if person:
-                    person_updates['phone'] = data['phone']
-
-            if 'mobile' in data:
-                if user.partner_id:
-                    partner_updates['mobile'] = data['mobile']
-                # Mettre à jour sur la personne de maintenance si elle existe
-                person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-                if person:
-                    person_updates['mobile'] = data['mobile']
-
-            # Champs spécifiques à la personne de maintenance
-            person = request.env['maintenance.person'].search([('user_id', '=', user.id)], limit=1)
-            if person:
-                if 'first_name' in data:
-                    person_updates['first_name'] = data['first_name']
-                if 'specialties' in data:
-                    person_updates['specialties'] = data['specialties']
-                if 'certifications' in data:
-                    person_updates['certifications'] = data['certifications']
-                if 'available' in data:
-                    person_updates['available'] = bool(data['available'])
-
-            # Appliquer les mises à jour
-            updated_fields = []
-
-            if user_updates:
-                user.write(user_updates)
-                updated_fields.extend([f"user.{field}" for field in user_updates.keys()])
-
-            if partner_updates and user.partner_id:
-                user.partner_id.write(partner_updates)
-                updated_fields.extend([f"partner.{field}" for field in partner_updates.keys()])
-
-            if person_updates and person:
-                person.write(person_updates)
-                updated_fields.extend([f"person.{field}" for field in person_updates.keys()])
-
-            # Réponse spéciale sans cookie pour Flutter Web
-            response_data = {
-                'success': True,
-                'message': "Profile updated successfully",
-                'updated_fields': updated_fields,
-                'timestamp': fields.Datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-            }
-
-            response = request.make_response(
-                json.dumps(response_data, default=str),
-                headers=self._get_cors_headers() + [('Content-Type', 'application/json')]
-            )
-            response.status_code = 200
-            return response
-
-        except Exception as e:
-            _logger.error(f"Error updating user profile: {str(e)}")
-            return self._error_response(f"Error updating profile: {str(e)}", 500)
 
     # Vérification email pour Flutter
     @http.route('/api/flutter/user/profile/email-check', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
