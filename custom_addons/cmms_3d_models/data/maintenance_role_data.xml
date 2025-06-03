@@ -3,9 +3,9 @@
     <data noupdate="1">
         <!-- Rôles par défaut pour la maintenance -->
         <record id="role_technician_level_1" model="maintenance.role">
-            <field name="name">Technicien Niveau 1</field>
+            <field name="name">Technician Level 1</field>
             <field name="sequence">10</field>
-            <field name="description">Technicien de maintenance de base - Interventions simples et préventives</field>
+            <field name="description">Basic maintenance technician – Simple and preventive interventions</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="False"/>
             <field name="can_manage_all_requests" eval="False"/>
@@ -14,9 +14,9 @@
         </record>
 
         <record id="role_technician_level_2" model="maintenance.role">
-            <field name="name">Technicien Niveau 2</field>
+            <field name="name">Technician Level 2</field>
             <field name="sequence">20</field>
-            <field name="description">Technicien de maintenance expérimenté - Réparations complexes</field>
+            <field name="description">Experienced maintenance technician – Complex repairs</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="False"/>
             <field name="can_manage_all_requests" eval="False"/>
@@ -25,9 +25,9 @@
         </record>
 
         <record id="role_technician_level_3" model="maintenance.role">
-            <field name="name">Technicien Niveau 3</field>
+            <field name="name">Technician Level 3</field>
             <field name="sequence">30</field>
-            <field name="description">Technicien de maintenance expert - Diagnostics avancés et formation</field>
+            <field name="description">Expert maintenance technician – Advanced diagnostics and training</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="True"/>
             <field name="can_manage_all_requests" eval="False"/>
@@ -36,9 +36,9 @@
         </record>
 
         <record id="role_team_leader" model="maintenance.role">
-            <field name="name">Chef d'équipe</field>
+            <field name="name">Team Leader</field>
             <field name="sequence">40</field>
-            <field name="description">Responsable d'équipe de maintenance - Coordination et supervision</field>
+            <field name="description">Maintenance team leader – Coordination and supervision</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="True"/>
             <field name="can_manage_all_requests" eval="False"/>
@@ -47,9 +47,9 @@
         </record>
 
         <record id="role_supervisor" model="maintenance.role">
-            <field name="name">Superviseur</field>
+            <field name="name">Supervisor</field>
             <field name="sequence">50</field>
-            <field name="description">Superviseur de maintenance - Gestion des ressources et planification</field>
+            <field name="description">Maintenance supervisor – Resource management and planning</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="True"/>
             <field name="can_manage_all_requests" eval="True"/>
@@ -60,7 +60,7 @@
         <record id="role_manager" model="maintenance.role">
             <field name="name">Manager</field>
             <field name="sequence">60</field>
-            <field name="description">Manager de maintenance - Direction et stratégie de maintenance</field>
+            <field name="description">Maintenance manager – Leadership and maintenance strategy</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="True"/>
             <field name="can_manage_all_requests" eval="True"/>
@@ -69,9 +69,9 @@
         </record>
 
         <record id="role_operator" model="maintenance.role">
-            <field name="name">Opérateur</field>
+            <field name="name">Operator</field>
             <field name="sequence">70</field>
-            <field name="description">Opérateur d'équipement - Utilisation et maintenance de premier niveau</field>
+            <field name="description">Equipment operator – Operation and first-level maintenance</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="False"/>
             <field name="can_manage_all_requests" eval="False"/>
@@ -80,9 +80,9 @@
         </record>
 
         <record id="role_quality_manager" model="maintenance.role">
-            <field name="name">Responsable Qualité</field>
+            <field name="name">Quality Manager</field>
             <field name="sequence">80</field>
-            <field name="description">Responsable qualité maintenance - Audit et amélioration continue</field>
+            <field name="description">Maintenance quality manager – Auditing and continuous improvement</field>
             <field name="can_create_request" eval="True"/>
             <field name="can_assign_request" eval="False"/>
             <field name="can_manage_all_requests" eval="True"/>
