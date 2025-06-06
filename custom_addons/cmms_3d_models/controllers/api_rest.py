@@ -792,6 +792,7 @@ class CMSAPIController(http.Controller):
         '/api/flutter/maintenance/dashboard',
         '/api/flutter/maintenance/all',
         '/api/flutter/maintenance/stages',
+        '/api/flutter/maintenance/requests/<int:request_id>/stage',
         '/api/flutter/maintenance/request-states',
         '/api/flutter/maintenance/ifc/<int:model3d_id>',
         '/api/flutter/maintenance/ifc/<int:model3d_id>/raw',
@@ -980,6 +981,84 @@ class CMSAPIController(http.Controller):
         response = request.make_response('', headers=flutter_headers)
         response.status_code = 200
         return response
+
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>/stage', type='http', auth='none', methods=['PUT'], csrf=False)
+    @basic_auth_required
+    def update_request_stage(self, request_id, **kwargs):
+        """Mettre à jour le stage d'une demande de maintenance"""
+        try:
+            # Récupérer la demande
+            request_record = request.env['maintenance.request'].sudo().browse(request_id)
+            if not request_record.exists():
+                return self._error_response("Request not found", 404)
+
+            # Vérifier permissions
+            allowed_domain = self._get_allowed_requests_domain()
+            allowed_requests = request.env['maintenance.request'].search(allowed_domain)
+            if request_record not in allowed_requests:
+                return self._error_response("Access denied", 403)
+
+            # Récupérer stage_id
+            stage_id = None
+            try:
+                if request.httprequest.data:
+                    import json
+                    data = json.loads(request.httprequest.data.decode('utf-8'))
+                    stage_id = data.get('stage_id')
+            except:
+                stage_id = kwargs.get('stage_id')
+
+            if not stage_id:
+                return self._error_response("stage_id required", 400)
+
+            stage_id = int(stage_id)
+            if not request.env['maintenance.stage'].sudo().browse(stage_id).exists():
+                return self._error_response(f"Stage {stage_id} not found", 404)
+
+            # Mise à jour
+            request_record.sudo().write({'stage_id': stage_id})
+            updated_request = self._serialize_request(request_record)
+            return self._success_response(updated_request, "Stage updated successfully")
+
+        except Exception as e:
+            _logger.error(f"Error updating stage for request {request_id}: {str(e)}")
+            return self._error_response(f"Error: {str(e)}", 500)
+
+    @http.route('/api/flutter/maintenance/stages', type='http', auth='none', methods=['GET'], csrf=False)
+    @basic_auth_required
+    def get_maintenance_stages(self, **kwargs):
+        """Récupérer tous les stages de maintenance disponibles"""
+        try:
+            # Récupérer tous les stages ordonnés par séquence
+            stages = request.env['maintenance.stage'].sudo().search([], order='sequence asc, name asc')
+
+            stages_data = []
+            for stage in stages:
+                stage_info = {
+                    'id': stage.id,
+                    'name': stage.name,
+                    'sequence': getattr(stage, 'sequence', 0),
+                    'done': getattr(stage, 'done', False),
+                    'fold': getattr(stage, 'fold', False),
+                    'description': getattr(stage, 'description', ''),
+                }
+
+                # Ajouter d'autres champs si ils existent
+                if hasattr(stage, 'color'):
+                    stage_info['color'] = stage.color
+                if hasattr(stage, 'stage_type'):
+                    stage_info['stage_type'] = stage.stage_type
+
+                stages_data.append(stage_info)
+
+            return self._success_response(
+                stages_data,
+                f"Retrieved {len(stages_data)} maintenance stages successfully"
+            )
+
+        except Exception as e:
+            _logger.error(f"Error retrieving maintenance stages: {str(e)}")
+            return self._error_response(f"Error retrieving stages: {str(e)}", 500)
 
     # Route pour mettre à jour une pièce d'une requête de maintenance spécifique
     @http.route('/api/flutter/maintenance/requests/<int:request_id>/part/<int:part_id>',
