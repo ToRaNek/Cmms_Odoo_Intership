@@ -69,23 +69,29 @@ class MaintenanceRequestPart(models.Model):
         'Description du problème',
         help="Décrire le problème spécifique sur cette pièce (optionnel)"
     )
-    
+
+    done = fields.Boolean(
+            'Terminé',
+            default=False,
+            help="Cocher si l'intervention sur cette pièce est terminée"
+        )
+
     # Ordre/priorité
     sequence = fields.Integer('Séquence', default=10)
-    
+
     # Champs informatifs (calculés)
     submodel_relative_id = fields.Integer(
         'ID relatif',
         related='submodel_id.relative_id',
         readonly=True
     )
-    
+
     submodel_scale = fields.Float(
         'Échelle',
         related='submodel_id.scale',
         readonly=True
     )
-    
+
     @api.constrains('intervention_type', 'intervention_other')
     def _check_intervention_other(self):
         """Valider que le champ 'Autre intervention' est rempli si 'Autre' est sélectionné"""
@@ -94,27 +100,27 @@ class MaintenanceRequestPart(models.Model):
                 raise ValidationError(
                     _("Vous devez préciser le type d'intervention si vous sélectionnez 'Autre'.")
                 )
-    
+
     @api.onchange('intervention_type')
     def _onchange_intervention_type(self):
         """Vider le champ 'autre intervention' si on ne sélectionne pas 'Autre'"""
         if self.intervention_type != 'other':
             self.intervention_other = False
-    
+
     @api.model
     def default_get(self, fields_list):
         """Définir des valeurs par défaut intelligentes"""
         defaults = super().default_get(fields_list)
-        
+
         # Si on accède via le contexte d'une demande, filtrer les sous-modèles
         if self.env.context.get('default_request_id'):
             request = self.env['maintenance.request'].browse(self.env.context['default_request_id'])
             if request.equipment_id and request.equipment_id.model3d_id:
                 # On peut définir un domaine par défaut si nécessaire
                 pass
-        
+
         return defaults
-    
+
     def name_get(self):
         """Affichage personnalisé du nom"""
         result = []
@@ -128,7 +134,7 @@ class MaintenanceRequestPart(models.Model):
 
 class MaintenanceRequestExtendedParts(models.Model):
     _inherit = 'maintenance.request'
-    
+
     # Relation avec les pièces
     part_ids = fields.One2many(
         'maintenance.request.part',
@@ -136,17 +142,17 @@ class MaintenanceRequestExtendedParts(models.Model):
         string='Pièces concernées',
         help="Sélectionner les pièces spécifiques à maintenir"
     )
-    
+
     part_count = fields.Integer(
         'Nombre de pièces',
         compute='_compute_part_count'
     )
-    
+
     @api.depends('part_ids')
     def _compute_part_count(self):
         for record in self:
             record.part_count = len(record.part_ids)
-    
+
     def action_view_parts(self):
         """Ouvrir la vue des pièces"""
         self.ensure_one()

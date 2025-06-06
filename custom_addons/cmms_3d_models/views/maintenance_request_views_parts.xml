@@ -141,6 +141,10 @@
                                    string="Description du problème"
                                    placeholder="Décrire le problème sur cette pièce..."/>
 
+                            <!-- Checkbox Terminé -->
+                            <field name="done" string="Terminé"/>
+
+
                             <!-- Séquence pour l'ordre -->
                             <field name="sequence" optional="hide"/>
 

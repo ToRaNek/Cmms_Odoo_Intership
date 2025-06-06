@@ -323,6 +323,7 @@ class CMSAPIController(http.Controller):
                 'intervention_type': part_record.intervention_type,
                 'intervention_type_display': intervention_display,
                 'intervention_other': part_record.intervention_other or '',
+                'done': part_record.done,
                 'sequence': part_record.sequence,
 
                 # Informations du sous-modèle 3D
@@ -963,6 +964,169 @@ class CMSAPIController(http.Controller):
         except Exception as e:
             _logger.error(f"Error getting request {request_id}: {str(e)}")
             return self._error_response(f"Error retrieving request: {str(e)}", 500)
+    # OPTIONS pour la route de mise à jour des pièces de requête de maintenance
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>/part/<int:part_id>',
+                type='http', auth='none', methods=['OPTIONS'], csrf=False)
+    def api_options_request_part_update(self, **kwargs):
+        """Gestion des requêtes OPTIONS pour la mise à jour des pièces de requête"""
+        flutter_headers = [
+            ('Access-Control-Allow-Origin', '*'),
+            ('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'),
+            ('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin'),
+            ('Access-Control-Allow-Credentials', 'false'),
+            ('Access-Control-Max-Age', '86400'),
+            ('Vary', 'Origin'),
+        ]
+        response = request.make_response('', headers=flutter_headers)
+        response.status_code = 200
+        return response
+
+    # Route pour mettre à jour une pièce d'une requête de maintenance spécifique
+    @http.route('/api/flutter/maintenance/requests/<int:request_id>/part/<int:part_id>',
+                type='http', auth='none', methods=['PUT', 'GET'],
+                csrf=False, cors='*')
+    def update_maintenance_request_part(self, request_id, part_id, **kwargs):
+        """API pour mettre à jour une pièce d'une requête de maintenance"""
+        try:
+            if request.httprequest.method == 'GET':
+                return self._get_maintenance_request_part(request_id, part_id)
+
+            elif request.httprequest.method == 'PUT':
+                return self._update_maintenance_request_part(request_id, part_id, **kwargs)
+
+        except Exception as e:
+            return request.make_response(
+                json.dumps({'error': str(e)}),
+                headers=[('Content-Type', 'application/json')],
+                status=500
+            )
+
+    def _get_maintenance_request_part(self, request_id, part_id):
+        """Récupérer les données d'une pièce spécifique d'une requête"""
+        try:
+            # Utiliser sudo() pour contourner les restrictions d'accès
+            part = request.env['maintenance.request.part'].sudo().browse(part_id)
+
+            if not part.exists():
+                return request.make_response(
+                    json.dumps({'error': 'Pièce non trouvée'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=404
+                )
+
+            # Vérifier que la pièce appartient bien à la requête de maintenance
+            if part.request_id.id != request_id:
+                return request.make_response(
+                    json.dumps({'error': 'Pièce non associée à cette requête de maintenance'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=400
+                )
+
+            # Sérialiser la pièce
+            part_data = self._serialize_part(part)
+
+            return request.make_response(
+                json.dumps({
+                    'success': True,
+                    'data': part_data
+                }),
+                headers=[('Content-Type', 'application/json')]
+            )
+
+        except Exception as e:
+            return request.make_response(
+                json.dumps({'error': f'Erreur lors de la récupération: {str(e)}'}),
+                headers=[('Content-Type', 'application/json')],
+                status=500
+            )
+
+    def _update_maintenance_request_part(self, request_id, part_id, **kwargs):
+        """Mettre à jour une pièce d'une requête de maintenance"""
+        try:
+            # Récupérer les données JSON du body
+            data = json.loads(request.httprequest.data.decode('utf-8'))
+
+            # Utiliser sudo() pour contourner les restrictions d'accès
+            part = request.env['maintenance.request.part'].sudo().browse(part_id)
+
+            if not part.exists():
+                return request.make_response(
+                    json.dumps({'error': 'Pièce non trouvée'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=404
+                )
+
+            # Vérifier que la pièce appartient bien à la requête de maintenance
+            if part.request_id.id != request_id:
+                return request.make_response(
+                    json.dumps({'error': 'Pièce non associée à cette requête de maintenance'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=400
+                )
+
+            # Préparer les valeurs à mettre à jour
+            update_vals = {}
+
+            # Champs autorisés à être mis à jour
+            allowed_fields = [
+                'intervention_type',
+                'intervention_other',
+                'description',
+                'done',
+                'sequence'
+            ]
+
+            for field in allowed_fields:
+                if field in data:
+                    update_vals[field] = data[field]
+
+            # Validation spécifique pour intervention_type
+            if 'intervention_type' in update_vals:
+                valid_types = ['repair', 'replace', 'check', 'clean', 'other']
+                if update_vals['intervention_type'] not in valid_types:
+                    return request.make_response(
+                        json.dumps({'error': f'Type d\'intervention invalide. Types autorisés: {valid_types}'}),
+                        headers=[('Content-Type', 'application/json')],
+                        status=400
+                    )
+
+            # Validation pour intervention_other (obligatoire si type = other)
+            if update_vals.get('intervention_type') == 'other' and not update_vals.get('intervention_other'):
+                return request.make_response(
+                    json.dumps({'error': 'Le champ "intervention_other" est obligatoire quand le type est "other"'}),
+                    headers=[('Content-Type', 'application/json')],
+                    status=400
+                )
+
+            # Mettre à jour la pièce avec sudo()
+            if update_vals:
+                part.write(update_vals)
+
+            # Sérialiser la pièce mise à jour
+            updated_part_data = self._serialize_part(part)
+
+            # Retourner la réponse de succès
+            return request.make_response(
+                json.dumps({
+                    'success': True,
+                    'message': 'Pièce mise à jour avec succès',
+                    'data': updated_part_data
+                }),
+                headers=[('Content-Type', 'application/json')]
+            )
+
+        except json.JSONDecodeError:
+            return request.make_response(
+                json.dumps({'error': 'Format JSON invalide'}),
+                headers=[('Content-Type', 'application/json')],
+                status=400
+            )
+        except Exception as e:
+            return request.make_response(
+                json.dumps({'error': f'Erreur lors de la mise à jour: {str(e)}'}),
+                headers=[('Content-Type', 'application/json')],
+                status=500
+            )
 
     @http.route('/api/flutter/maintenance/equipment/<int:equipment_id>', type='http', auth='none', methods=['GET'], csrf=False)
     @basic_auth_required
